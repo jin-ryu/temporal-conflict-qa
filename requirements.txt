@@ -1,0 +1,6 @@
+datasets
+mwparserfromhell
+requests
+google-genai
+openai
+python-dotenv
