@@ -31,8 +31,8 @@ STEP_CONFIG = {
     },
     3: {
         "dir":     DIR_QA_REASONING,
-        "pattern": "hoh_sft_*_[0-9]*.jsonl",
-        "output":  DIR_QA_REASONING / "hoh_sft.jsonl",
+        "pattern": "hoh_qa_*_reasoning_*.jsonl",
+        "output":  DIR_QA_REASONING / "hoh_qa_reasoning.jsonl",
     },
 }
 

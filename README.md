@@ -29,7 +29,7 @@ RAG 시스템에서 시간적 충돌(temporal conflict)을 다루는 능력을 �
   generate_reasoning.py  --provider gpt|gemini [--ratio 0.3]
   Teacher LLM → SFT cold-start용 reasoning 생성
         │
-        ▼  data/qa-reasoning/hoh_sft_{provider}_{suffix}.jsonl
+        ▼  data/qa-reasoning/hoh_qa_{provider}_N_M_reasoning_{provider}.jsonl
         │
         ▼
   merge_shards.py  --step 1|2|3
@@ -60,8 +60,8 @@ temporal-conflict-qa/
 │   │   ├── hoh_qa_gpt_0_500.jsonl
 │   │   └── hoh_qa.jsonl               ← merge_shards.py --step 2
 │   └── qa-reasoning/          # generate_reasoning.py 결과
-│       ├── hoh_sft_gpt_0_500.jsonl
-│       └── hoh_sft.jsonl              ← merge_shards.py --step 3
+│       ├── hoh_qa_gpt_0_500_reasoning_gpt.jsonl
+│       └── hoh_qa_reasoning.jsonl     ← merge_shards.py --step 3
 └── logs/                      # 실행 로그 (스크립트별 폴더, 타임스탬프별 파일)
     ├── hoh_to_chunks/
     │   └── hoh_to_chunks_20260314_123456.log
@@ -211,7 +211,7 @@ python generate_reasoning.py --provider gemini --input data/qa/hoh_qa_gpt_0_500.
 ```bash
 python merge_shards.py --step 1   # chunks → data/chunks/hoh_chunks.jsonl
 python merge_shards.py --step 2   # qa     → data/qa/hoh_qa.jsonl
-python merge_shards.py --step 3   # qa-reasoning → data/qa-reasoning/hoh_sft.jsonl
+python merge_shards.py --step 3   # qa-reasoning → data/qa-reasoning/hoh_qa_reasoning.jsonl
 
 # --auto-range: shard 파일명의 공통 prefix + 범위로 출력 파일명 자동 생성
 python merge_shards.py --step 2 --auto-range   # → data/qa/hoh_qa_gpt_0_60.jsonl

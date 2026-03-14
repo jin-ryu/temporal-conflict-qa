@@ -336,12 +336,10 @@ if __name__ == "__main__":
             exit(1)
 
     for input_path in input_paths:
-        stem   = input_path.stem
-        suffix = stem.replace("hoh_qa_", "")
-
+        # hoh_qa_gpt_0_25.jsonl → hoh_qa_gpt_0_25_reasoning_gpt.jsonl
         generate_reasoning(
             input_path=input_path,
-            output_path=DIR_QA_REASONING / f"hoh_sft_{p}_{suffix}.jsonl",
+            output_path=DIR_QA_REASONING / f"{input_path.stem}_reasoning_{p}.jsonl",
             provider=p,
             sample_ratio=args.ratio,
             sample_seed=args.seed,
