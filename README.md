@@ -209,9 +209,12 @@ python generate_reasoning.py --provider gemini --input data/qa/hoh_qa_gpt_0_500.
 #### 4. Shard 병합
 
 ```bash
-python merge_shards.py --step 1   # chunks
-python merge_shards.py --step 2   # qa
-python merge_shards.py --step 3   # qa-reasoning
+python merge_shards.py --step 1   # chunks → data/chunks/hoh_chunks.jsonl
+python merge_shards.py --step 2   # qa     → data/qa/hoh_qa.jsonl
+python merge_shards.py --step 3   # qa-reasoning → data/qa-reasoning/hoh_sft.jsonl
+
+# --auto-range: shard 파일명의 공통 prefix + 범위로 출력 파일명 자동 생성
+python merge_shards.py --step 2 --auto-range   # → data/qa/hoh_qa_gpt_0_60.jsonl
 ```
 
 중복 id는 자동으로 제거된다.

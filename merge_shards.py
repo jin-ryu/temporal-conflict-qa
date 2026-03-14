@@ -37,12 +37,43 @@ STEP_CONFIG = {
 }
 
 
-def merge(pattern: str, output_path: Path, search_dir: Path = Path(".")) -> None:
+def _build_range_name(shard_files: list[Path]) -> str | None:
+    """shard 파일명에서 공통 prefix + 전체 숫자 범위를 추출.
+
+    예: [hoh_qa_gpt_0_25.jsonl, hoh_qa_gpt_25_60.jsonl]
+      → 'hoh_qa_gpt_0_60'
+    """
+    import re
+    # 공통 prefix 추출: 첫 번째 숫자 직전까지
+    stems = [f.stem for f in shard_files]
+    prefix_match = re.match(r"^(.*?_)\d", stems[0])
+    if not prefix_match:
+        return None
+    prefix = prefix_match.group(1)  # e.g. "hoh_qa_gpt_"
+
+    # 모든 shard에서 숫자 수집
+    nums: list[int] = []
+    for stem in stems:
+        found = re.findall(r"(\d+)", stem)
+        nums.extend(int(n) for n in found)
+    if not nums:
+        return None
+
+    return f"{prefix}{min(nums)}_{max(nums)}"
+
+
+def merge(pattern: str, output_path: Path, search_dir: Path = Path("."),
+          auto_range: bool = False) -> None:
     shard_files = sorted(search_dir.glob(pattern))
 
     if not shard_files:
         logger.warning("파일 없음: %s/%s", search_dir, pattern)
         return
+
+    if auto_range:
+        range_name = _build_range_name(shard_files)
+        if range_name:
+            output_path = output_path.with_name(f"{range_name}{output_path.suffix}")
 
     logger.info("%d개 shard 파일:", len(shard_files))
     for f in shard_files:
@@ -83,12 +114,15 @@ if __name__ == "__main__":
     parser.add_argument("--step", type=int, choices=[1, 2, 3], help="Step 번호")
     parser.add_argument("--pattern", type=str, help="glob 패턴 (직접 지정)")
     parser.add_argument("--output", type=str, help="출력 파일 경로 (직접 지정)")
+    parser.add_argument("--auto-range", action="store_true",
+                        help="출력 파일명에 shard 범위를 자동 추가 (예: hoh_qa_0_60.jsonl)")
     args = parser.parse_args()
 
     if args.step:
         cfg = STEP_CONFIG[args.step]
-        merge(cfg["pattern"], cfg["output"], search_dir=cfg["dir"])
+        merge(cfg["pattern"], cfg["output"], search_dir=cfg["dir"],
+              auto_range=args.auto_range)
     elif args.pattern and args.output:
-        merge(args.pattern, Path(args.output))
+        merge(args.pattern, Path(args.output), auto_range=args.auto_range)
     else:
         parser.print_help()
