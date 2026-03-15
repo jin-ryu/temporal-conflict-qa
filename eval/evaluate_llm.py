@@ -19,8 +19,10 @@ import random
 import re
 import string
 import sys
+import threading
 import time
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -30,7 +32,7 @@ from dotenv import load_dotenv
 from config import (
     DIR_EVAL, DIR_QA,
     EVAL_GPT_MODEL, EVAL_GEMINI_MODEL,
-    GPT_RPM, GEMINI_RPM,
+    GPT_RPM, GEMINI_RPM, VLLM_RPM, VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     setup_logging,
 )
@@ -44,16 +46,18 @@ logger = setup_logging("evaluate_llm")
 # ---------------------------------------------------------------------------
 
 _last_call_time: float = 0.0
+_rate_lock = threading.Lock()
 _requests_per_minute: int = GPT_RPM
 
 
 def _rate_limit_wait() -> None:
     global _last_call_time
-    min_interval = 60.0 / _requests_per_minute
-    elapsed = time.time() - _last_call_time
-    if elapsed < min_interval:
-        time.sleep(min_interval - elapsed)
-    _last_call_time = time.time()
+    with _rate_lock:
+        min_interval = 60.0 / _requests_per_minute
+        elapsed = time.time() - _last_call_time
+        if elapsed < min_interval:
+            time.sleep(min_interval - elapsed)
+        _last_call_time = time.time()
 
 
 # ---------------------------------------------------------------------------
@@ -128,11 +132,34 @@ def call_gemini(client, system: str, prompt: str, model: str) -> str | None:
     return None
 
 
+def call_vllm(client, system: str, prompt: str, model: str) -> str | None:
+    for attempt in range(MAX_API_RETRIES):
+        try:
+            _rate_limit_wait()
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user",   "content": prompt},
+                ],
+                temperature=0.0,
+                max_tokens=1024,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            if not _handle_api_error(e, attempt):
+                return None
+    logger.error("API max retries exhausted")
+    return None
+
+
 def call_llm(client, system: str, prompt: str, provider: str, model: str) -> str | None:
     if provider == "gpt":
         return call_gpt(client, system, prompt, model)
     elif provider == "gemini":
         return call_gemini(client, system, prompt, model)
+    elif provider == "vllm":
+        return call_vllm(client, system, prompt, model)
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
@@ -150,6 +177,10 @@ def make_client(provider: str):
         if not api_key:
             raise EnvironmentError("GEMINI_API_KEY가 설정되지 않았습니다.")
         return genai.Client(api_key=api_key)
+    elif provider == "vllm":
+        import openai
+        base_url = os.environ.get("VLLM_BASE_URL", "http://localhost:8000/v1")
+        return openai.OpenAI(api_key="dummy", base_url=base_url)
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
@@ -396,11 +427,11 @@ def evaluate(
     num_chunks: int = 5,
 ) -> None:
     global _requests_per_minute
-    _requests_per_minute = GPT_RPM if provider == "gpt" else GEMINI_RPM
+    _requests_per_minute = VLLM_RPM if provider == "vllm" else (GPT_RPM if provider == "gpt" else GEMINI_RPM)
 
     DIR_EVAL.mkdir(parents=True, exist_ok=True)
 
-    model_short = model.replace(".", "").replace("-", "")
+    model_short = model.split("/")[-1].replace(".", "").lower()
     qa_stem     = input_path.stem
     output_path = DIR_EVAL / f"eval_{model_short}_{condition}_{qa_stem}.jsonl"
 
@@ -425,65 +456,92 @@ def evaluate(
                 condition, provider, model, num_chunks, input_path.name, len(done), len(records))
 
 
+    # ── 대기 태스크 수집 ─────────────────────────────────────────────
+    pending = [(r, _get_chunks_for_condition(r, condition, distractor_pool, num_chunks))
+               for r in records if r["id"] not in done]
+
+    logger.info("pending: %d eval tasks", len(pending))
+
+    def _process_one(record, chunks):
+        record_id = record["id"]
+        prompt = build_eval_prompt(record, condition, chunks)
+
+        parsed = None
+        response_text = None
+        current_prompt = prompt
+        for attempt in range(MAX_PARTIAL_RETRIES):
+            response_text = call_llm(client, EVAL_SYSTEM_PROMPT, current_prompt, provider, model)
+            if response_text is None:
+                logger.warning("[%s] API 호출 실패, skipping", record_id)
+                break
+            parsed = parse_response(response_text)
+            if parsed is not None:
+                break
+            logger.warning("[%s] 포맷 오류, 재시도 %d/%d: %s",
+                           record_id, attempt + 1, MAX_PARTIAL_RETRIES, repr(response_text[-80:]))
+            current_prompt = (
+                prompt
+                + f"\n\n[Previous response was invalid — missing required tags.]\n"
+                + f"Your previous response:\n{response_text}\n\n"
+                + "You MUST wrap your answer in <thought>, <relevance>, and <answer> tags. "
+                + "Do not include any text outside these tags."
+            )
+
+        if parsed is None:
+            return None
+
+        sc = score_record(parsed, record, chunks)
+        return {
+            "id": record_id,
+            "condition": condition,
+            "provider": provider,
+            "model": model,
+            "mode": record.get("mode"),
+            "question": record.get("new_question") if condition != "ambiguous" else record.get("original_question"),
+            "target_answer": record["target_answer"],
+            "predicted_answer": parsed["answer"],
+            "evidence_chunk_id": record["evidence_chunk_id"],
+            "predicted_relevance": parsed["relevance_doc_num"],
+            "thought": parsed["thought"],
+            "raw_response": response_text,
+            **sc,
+        }
+
+    # ── 병렬 (vLLM) 또는 순차 (gemini/gpt) ────────────────────────
+    write_lock = threading.Lock()
+    use_parallel = provider == "vllm" and VLLM_CONCURRENCY > 1
+    max_workers = VLLM_CONCURRENCY if use_parallel else 1
+
+    completed = 0
     with output_path.open("a", encoding="utf-8") as fout:
-        for i, record in enumerate(records, 1):
-            record_id = record["id"]
-            if record_id in done:
-                continue
-
-            chunks = _get_chunks_for_condition(record, condition, distractor_pool, num_chunks)
-            prompt = build_eval_prompt(record, condition, chunks)
-
-            parsed = None
-            response_text = None
-            current_prompt = prompt
-            for attempt in range(MAX_PARTIAL_RETRIES):
-                response_text = call_llm(client, EVAL_SYSTEM_PROMPT, current_prompt, provider, model)
-                if response_text is None:
-                    logger.warning("[%s] API 호출 실패, skipping", record_id)
-                    break
-                parsed = parse_response(response_text)
-                if parsed is not None:
-                    break
-                logger.warning("[%s] 포맷 오류, 재시도 %d/%d: %s",
-                               record_id, attempt + 1, MAX_PARTIAL_RETRIES, repr(response_text[-80:]))
-                current_prompt = (
-                    prompt
-                    + f"\n\n[Previous response was invalid — missing required tags.]\n"
-                    + f"Your previous response:\n{response_text}\n\n"
-                    + "You MUST wrap your answer in <thought>, <relevance>, and <answer> tags. "
-                    + "Do not include any text outside these tags."
-                )
-
-            if parsed is None:
-                logger.warning("[%s] 파싱 최종 실패, skip (로그 확인)", record_id)
-                continue
-
-            sc = score_record(parsed, record, chunks)
-
-            result = {
-                "id": record_id,
-                "condition": condition,
-                "provider": provider,
-                "model": model,
-                "mode": record.get("mode"),
-                "question": record.get("new_question") if condition != "ambiguous" else record.get("original_question"),
-                "target_answer": record["target_answer"],
-                "predicted_answer": parsed["answer"],
-                "evidence_chunk_id": record["evidence_chunk_id"],
-                "predicted_relevance": parsed["relevance_doc_num"],
-                "thought": parsed["thought"],
-                "raw_response": response_text,
-                **sc,
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                executor.submit(_process_one, record, chunks): record
+                for record, chunks in pending
             }
+            for future in as_completed(futures):
+                record = futures[future]
+                record_id = record["id"]
+                try:
+                    result = future.result()
+                except Exception:
+                    logger.exception("[%s] unexpected error", record_id)
+                    result = None
 
-            fout.write(json.dumps(result, ensure_ascii=False) + "\n")
-            fout.flush()
-            done.add(record_id)
+                if result is not None:
+                    with write_lock:
+                        fout.write(json.dumps(result, ensure_ascii=False) + "\n")
+                        fout.flush()
+                        done.add(record_id)
 
-            if i % 10 == 0:
-                logger.info("[%d/%d] %s — EM=%.2f F1=%.2f Ev=%.2f",
-                            i, len(records), record_id, sc["answer_em"], sc["answer_f1"], sc["evidence_accuracy"])
+                completed += 1
+                if completed % 10 == 0:
+                    if result is not None:
+                        logger.info("[%d/%d] %s — EM=%.2f F1=%.2f Ev=%.2f",
+                                    completed, len(pending), record_id,
+                                    result["answer_em"], result["answer_f1"], result["evidence_accuracy"])
+                    else:
+                        logger.info("[%d/%d] %s — failed", completed, len(pending), record_id)
 
     logger.info("Done → %s", output_path)
     logger.info("summary 생성: python eval/summarize_eval.py")
@@ -504,7 +562,7 @@ if __name__ == "__main__":
         help="실험 조건: no_conflict (outdated 제거), conflict (전체 청크), ambiguous (전체 청크 + 원본 질문)"
     )
     parser.add_argument(
-        "--provider", type=str, default="gpt", choices=["gpt", "gemini"],
+        "--provider", type=str, default="gpt", choices=["gpt", "gemini", "vllm"],
         help="LLM provider (기본값: gpt)"
     )
     parser.add_argument(
@@ -516,15 +574,26 @@ if __name__ == "__main__":
         help=f"Gemini 모델명 (기본값: {EVAL_GEMINI_MODEL})"
     )
     parser.add_argument(
+        "--vllm-model", type=str, default=None,
+        help="vLLM 모델명 (--provider vllm 시 필수)"
+    )
+    parser.add_argument(
         "--num-chunks", type=int, default=5,
         help="프롬프트에 넣을 청크 수 (기본값: 5)"
     )
     args = parser.parse_args()
 
+    if args.vllm_model and args.provider != "vllm":
+        args.provider = "vllm"
+
     if args.provider == "gpt":
         model = args.gpt_model or EVAL_GPT_MODEL
-    else:
+    elif args.provider == "gemini":
         model = args.gemini_model or EVAL_GEMINI_MODEL
+    elif args.provider == "vllm":
+        if not args.vllm_model:
+            parser.error("--vllm-model is required when --provider is vllm")
+        model = args.vllm_model
 
     if args.input:
         input_paths = [Path(args.input)]
