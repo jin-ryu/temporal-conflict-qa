@@ -24,6 +24,7 @@ Provider
 --------
 --provider gemini  : Gemini API (기본값, GEMINI_API_KEY)
 --provider gpt     : OpenAI API (OPENAI_API_KEY)
+--provider vllm    : vLLM 로컬 서버 (OPENAI_BASE_URL, --vllm-model 필수)
 """
 
 import argparse
@@ -41,7 +42,7 @@ from dotenv import load_dotenv
 
 from config import (
     DIR_CHUNKS, DIR_QA, CHUNKS_PATH,
-    GEMINI_MODEL, GPT_MODEL, GEMINI_RPM, GPT_RPM,
+    GEMINI_MODEL, GPT_MODEL, GEMINI_RPM, GPT_RPM, VLLM_RPM,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     setup_logging,
 )
@@ -196,12 +197,13 @@ def call_gemini(client, prompt: str) -> dict | None:
     return None
 
 
-def call_gpt(client, prompt: str) -> dict | None:
+def call_openai_compat(client, prompt: str, model: str) -> dict | None:
+    """OpenAI 호환 API 호출 (GPT, vLLM 공용)."""
     for attempt in range(MAX_API_RETRIES):
         try:
             _rate_limit_wait()
             response = client.chat.completions.create(
-                model=GPT_MODEL,
+                model=model,
                 messages=[{"role": "user", "content": prompt}],
                 response_format={"type": "json_object"},
                 temperature=0.7,
@@ -214,11 +216,17 @@ def call_gpt(client, prompt: str) -> dict | None:
     return None
 
 
+# 현재 사용 중인 모델명 (entry point에서 설정)
+VLLM_MODEL: str = ""
+
+
 def call_llm(client, prompt: str, provider: str) -> dict | None:
     if provider == "gemini":
         return call_gemini(client, prompt)
     elif provider == "gpt":
-        return call_gpt(client, prompt)
+        return call_openai_compat(client, prompt, GPT_MODEL)
+    elif provider == "vllm":
+        return call_openai_compat(client, prompt, VLLM_MODEL)
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
@@ -232,10 +240,14 @@ def make_client(provider: str):
         return genai.Client(api_key=api_key)
     elif provider == "gpt":
         import openai
-        api_key = os.environ.get("OPENAI_API_KEY")
+        api_key  = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             raise EnvironmentError("OPENAI_API_KEY가 설정되지 않았습니다.")
-        return openai.OpenAI(api_key=api_key)
+        return openai.OpenAI(api_key=api_key)  # 기본 api.openai.com
+    elif provider == "vllm":
+        import openai
+        base_url = os.environ.get("VLLM_BASE_URL", "http://localhost:8000/v1")
+        return openai.OpenAI(api_key="dummy", base_url=base_url)
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
@@ -368,13 +380,26 @@ def chunks_to_qa(
     provider: str,
 ) -> None:
     global _requests_per_minute
-    _requests_per_minute = GEMINI_RPM if provider == "gemini" else GPT_RPM
+    if provider == "vllm":
+        _requests_per_minute = VLLM_RPM
+    elif provider == "gemini":
+        _requests_per_minute = GEMINI_RPM
+    else:
+        _requests_per_minute = GPT_RPM
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
+    # 로그용 모델명
+    if provider == "vllm":
+        model_label = f"vllm/{VLLM_MODEL}"
+    elif provider == "gpt":
+        model_label = f"gpt/{GPT_MODEL}"
+    else:
+        model_label = f"gemini/{GEMINI_MODEL}"
+
     client = make_client(provider)
     done   = load_done_ids(output_path)
-    logger.info("=== chunks_to_qa (%s) input=%s: %d already done ===", provider, input_path.name, len(done))
+    logger.info("=== chunks_to_qa (%s) input=%s: %d already done ===", model_label, input_path.name, len(done))
 
     with input_path.open(encoding="utf-8") as fin, \
          output_path.open("a", encoding="utf-8") as fout:
@@ -431,6 +456,7 @@ def chunks_to_qa(
                     "id": pair_id,
                     "hoh_source_idx": int(record_id.split("_")[1]),
                     "provider": provider,
+                    "model": VLLM_MODEL if provider == "vllm" else (GPT_MODEL if provider == "gpt" else GEMINI_MODEL),
                     "mode": pair["mode"],
                     "original_question": record["question"],
                     "new_question": pair["new_question"],
@@ -476,7 +502,7 @@ def chunks_to_qa(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="hoh_chunks.jsonl → data/qa/ QA pairs")
     parser.add_argument(
-        "--provider", type=str, default="gemini", choices=["gemini", "gpt"],
+        "--provider", type=str, default="gemini", choices=["gemini", "gpt", "vllm"],
         help="LLM provider (기본값: gemini)"
     )
     parser.add_argument(
@@ -491,12 +517,21 @@ if __name__ == "__main__":
         "--gemini-model", type=str, default=None,
         help=f"Gemini 모델명 (기본값: {GEMINI_MODEL})"
     )
+    parser.add_argument(
+        "--vllm-model", type=str, default=None,
+        help="vLLM 모델명 (--provider vllm 시 필수, 예: Qwen/Qwen3-32B)"
+    )
     args = parser.parse_args()
 
     if args.gpt_model:
         GPT_MODEL = args.gpt_model
     if args.gemini_model:
         GEMINI_MODEL = args.gemini_model
+
+    if args.provider == "vllm":
+        if not args.vllm_model:
+            parser.error("--provider vllm 사용 시 --vllm-model 이 필수입니다.")
+        VLLM_MODEL = args.vllm_model
 
     input_path = Path(args.input) if args.input else CHUNKS_PATH
     if not input_path.exists():
@@ -505,10 +540,15 @@ if __name__ == "__main__":
 
     stem   = input_path.stem
     suffix = stem.replace("hoh_chunks", "")
-    p      = args.provider
+
+    # 파일명용 모델 태그: "gpt", "gemini", 또는 vllm 모델명 (Qwen/Qwen3-32B → qwen3-32b)
+    if args.provider == "vllm":
+        model_tag = args.vllm_model.split("/")[-1].lower()
+    else:
+        model_tag = args.provider
 
     chunks_to_qa(
         input_path=input_path,
-        output_path=DIR_QA / f"hoh_qa_{p}{suffix}.jsonl",
-        provider=p,
+        output_path=DIR_QA / f"hoh_qa_{model_tag}{suffix}.jsonl",
+        provider=args.provider,
     )
