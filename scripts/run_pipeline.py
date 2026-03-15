@@ -14,8 +14,13 @@ generate_reasoning.py 는 별도 실행:
 import argparse
 import subprocess
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config import DIR_CHUNKS, DIR_QA, setup_logging
+
+_HERE = Path(__file__).resolve().parent
 
 logger = setup_logging("run_pipeline")
 
@@ -46,7 +51,7 @@ def main() -> None:
 
     # ── hoh_to_chunks ─────────────────────────────────────────────────
     run([
-        sys.executable, "hoh_to_chunks.py",
+        sys.executable, str(_HERE / "hoh_to_chunks.py"),
         "--start", str(args.start),
         "--end",   str(args.end),
     ])
@@ -57,7 +62,7 @@ def main() -> None:
 
     # ── chunks_to_qa ──────────────────────────────────────────────────
     cmd2 = [
-        sys.executable, "chunks_to_qa.py",
+        sys.executable, str(_HERE / "chunks_to_qa.py"),
         "--provider", args.provider,
         "--input", str(chunks_path),
     ]

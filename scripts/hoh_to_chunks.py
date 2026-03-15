@@ -43,7 +43,10 @@ import os
 import re
 import time
 import unicodedata
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import mwparserfromhell
 import requests
