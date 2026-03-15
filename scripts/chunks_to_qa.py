@@ -67,6 +67,20 @@ def _answer_for_mode(answers: list[dict], mode: str) -> str:
     return ""
 
 
+def _evidence_chunk_id_for_mode(chunks: list[dict], mode: str) -> int | None:
+    """mode에 해당하는 label의 청크 id를 자동 결정한다."""
+    if mode == "current":
+        for ch in chunks:
+            if ch["label"] == "current":
+                return ch["chunk_id"]
+    else:
+        idx = int(mode.split("_")[-1])
+        for ch in chunks:
+            if ch["label"] == "outdated" and ch.get("outdated_index") == idx:
+                return ch["chunk_id"]
+    return None
+
+
 def expected_modes(record: dict) -> list[str]:
     modes = []
     for ans in record["answers"]:
@@ -126,9 +140,7 @@ def build_prompt(record: dict, mode: str) -> str:
         "or date formats (e.g. 07/2024). Use only descriptive, narrative phrases for temporal hints. "
         "If you include any year or date number, the output will be rejected. ***\n"
         "2. target_answer: Use the exact value specified in TARGET MODE above. Do not modify it.\n"
-        "3. evidence_chunk_id: The chunk_id (integer) of the chunk that supports the target_answer. "
-        "Must be a chunk_id that exists in the CHUNKS list above.\n"
-        "4. reasoning: Explain why the evidence chunk supports the answer for this mode, "
+        "3. reasoning: Explain why the evidence chunk supports the answer for this mode, "
         "and why chunks from other time periods would give incorrect answers — "
         "using date-based temporal reasoning."
     )
@@ -136,7 +148,7 @@ def build_prompt(record: dict, mode: str) -> str:
     lines.append("Respond strictly in the following JSON schema:")
     lines.append(
         '{"mode": str, "new_question": str, '
-        '"target_answer": str, "evidence_chunk_id": int, "reasoning": str}'
+        '"target_answer": str, "reasoning": str}'
     )
 
     return "\n".join(lines)
@@ -292,18 +304,12 @@ _DATE_PATTERN = re.compile(
 def validate_pair(
     raw: dict,
     mode: str,
-    valid_chunk_ids: set[int],
+    chunks: list[dict],
     record_answers: list[dict],
 ) -> tuple[dict | None, str]:
     """검증 통과 시 (pair, ""), 실패 시 (None, rejection_reason)."""
     if not isinstance(raw, dict):
         return None, "invalid response format"
-
-    chunk_id = raw.get("evidence_chunk_id")
-    if not isinstance(chunk_id, int) or chunk_id not in valid_chunk_ids:
-        reason = f"invalid evidence_chunk_id={chunk_id}"
-        logger.warning("mode=%s: %s", mode, reason)
-        return None, reason
 
     new_q     = raw.get("new_question", "").strip()
     reasoning = raw.get("reasoning", "").strip()
@@ -318,11 +324,17 @@ def validate_pair(
         logger.warning("mode=%s: %s", mode, reason)
         return None, reason
 
+    evidence_chunk_id = _evidence_chunk_id_for_mode(chunks, mode)
+    if evidence_chunk_id is None:
+        reason = f"no evidence chunk found for mode={mode}"
+        logger.warning("mode=%s: %s", mode, reason)
+        return None, reason
+
     return {
         "mode": mode,
         "new_question": new_q,
         "target_answer": _answer_for_mode(record_answers, mode),
-        "evidence_chunk_id": chunk_id,
+        "evidence_chunk_id": evidence_chunk_id,
         "reasoning": reasoning,
     }, ""
 
@@ -384,7 +396,7 @@ def chunks_to_qa(
                 done.add(record_id)
                 continue
 
-            valid_chunk_ids = {ch["chunk_id"] for ch in record["chunks"]}
+            # evidence_chunk_id는 validate_pair 내에서 mode 기반 자동 할당
 
             # ── LLM 호출: current / outdated_* ──────────────────────────
             for mode in modes:
@@ -405,7 +417,7 @@ def chunks_to_qa(
                     raw = call_llm(client, prompt, provider)
                     if raw is None:
                         break
-                    pair, rejection = validate_pair(raw, mode, valid_chunk_ids, record["answers"])
+                    pair, rejection = validate_pair(raw, mode, record["chunks"], record["answers"])
                     if pair is not None:
                         break
                     logger.info("[%s] validation failed (%s), retry %d/%d", pair_id, rejection, attempt + 1, MAX_PARTIAL_RETRIES)
@@ -424,6 +436,7 @@ def chunks_to_qa(
                     "new_question": pair["new_question"],
                     "target_answer": pair["target_answer"],
                     "evidence_chunk_id": pair["evidence_chunk_id"],
+                    "reasoning_qa": pair["reasoning"],
                     "chunks": record["chunks"],
                 }, ensure_ascii=False) + "\n")
                 fout.flush()
