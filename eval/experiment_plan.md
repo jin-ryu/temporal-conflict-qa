@@ -44,7 +44,7 @@
 | Answer EM | exact match (정규화 후 완전 일치) |
 | Answer Token F1 | 토큰 단위 precision/recall F1 |
 | Evidence Accuracy | `<relevance>` 블록의 chunk id가 ground truth와 일치 |
-| Combined Score | answer EM × evidence accuracy |
+| Combined Score | answer Token F1 × evidence accuracy |
 
 ---
 
