@@ -16,6 +16,8 @@ from pathlib import Path
 DIR_CHUNKS       = Path("data/chunks")
 DIR_QA           = Path("data/qa")
 DIR_QA_REASONING = Path("data/qa-reasoning")
+DIR_EVAL         = Path("data/eval")
+DIR_EVAL_SUMMARY = Path("data/eval_summary")
 DIR_LOGS         = Path("logs")
 
 CHUNKS_PATH = DIR_CHUNKS / "hoh_chunks.jsonl"
@@ -43,8 +45,13 @@ WIKI_USER_AGENT = (
 # LLM 모델
 # ---------------------------------------------------------------------------
 
+# 데이터셋 생성용 (chunks_to_qa, generate_reasoning)
 GEMINI_MODEL = "gemini-2.5-flash"
 GPT_MODEL    = "gpt-4.1-mini"
+
+# 평가용 (evaluate_llm)
+EVAL_GEMINI_MODEL = "gemini-2.5-flash"
+EVAL_GPT_MODEL    = "gpt-4.1"
 
 # ---------------------------------------------------------------------------
 # Rate limit (requests per minute)

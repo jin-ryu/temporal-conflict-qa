@@ -1,0 +1,538 @@
+"""
+LLM 평가 스크립트 — temporal conflict QA 실험.
+
+조건 A/B/C에 따라 context 청크를 필터링하고,
+LLM에 <thought>/<relevance>/<answer> 형식의 응답을 요청하여
+Answer EM, Token F1, Evidence Accuracy, Combined Score를 산출한다.
+
+사용법:
+  python evaluate_llm.py --input data/qa/hoh_qa_gpt_0_35.jsonl --condition A
+  python evaluate_llm.py --input data/qa/hoh_qa_gpt_0_35.jsonl --condition B --provider gemini
+  python evaluate_llm.py --input data/qa/hoh_qa_gpt_0_35.jsonl --condition C
+"""
+
+import argparse
+import hashlib
+import json
+import os
+import random
+import re
+import string
+import sys
+import time
+from collections import Counter
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from dotenv import load_dotenv
+
+from config import (
+    DIR_EVAL, DIR_QA,
+    EVAL_GPT_MODEL, EVAL_GEMINI_MODEL,
+    GPT_RPM, GEMINI_RPM,
+    MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
+    setup_logging,
+)
+
+load_dotenv()
+logger = setup_logging("evaluate_llm")
+
+
+# ---------------------------------------------------------------------------
+# Rate limiter
+# ---------------------------------------------------------------------------
+
+_last_call_time: float = 0.0
+_requests_per_minute: int = GPT_RPM
+
+
+def _rate_limit_wait() -> None:
+    global _last_call_time
+    min_interval = 60.0 / _requests_per_minute
+    elapsed = time.time() - _last_call_time
+    if elapsed < min_interval:
+        time.sleep(min_interval - elapsed)
+    _last_call_time = time.time()
+
+
+# ---------------------------------------------------------------------------
+# API calls
+# ---------------------------------------------------------------------------
+
+def _handle_api_error(e: Exception, attempt: int) -> bool:
+    err_str = str(e)
+    err_type = type(e).__name__
+
+    is_rate_limit = any(x in err_str for x in ("429", "ResourceExhausted", "RESOURCE_EXHAUSTED", "RateLimitError"))
+    is_server_err = "500" in err_str or "503" in err_str
+    is_network_err = any(t in err_type for t in (
+        "ConnectError", "TimeoutException", "ReadTimeout",
+        "ConnectTimeout", "RemoteProtocolError", "NetworkError",
+    )) or "httpcore" in err_str or "httpx" in err_str
+
+    if is_rate_limit:
+        wait = min(30.0 * (2 ** attempt) + random.uniform(0, 2), 300.0)
+        logger.warning("rate limit, retrying in %.1fs (attempt %d/%d)", wait, attempt + 1, MAX_API_RETRIES)
+        time.sleep(wait)
+        return True
+    elif is_server_err or is_network_err:
+        wait = min(5.0 * (2 ** attempt) + random.uniform(0, 2), 120.0)
+        label = "network" if is_network_err else "server"
+        logger.warning("%s error (%s), retrying in %.1fs (attempt %d/%d)", label, err_type, wait, attempt + 1, MAX_API_RETRIES)
+        time.sleep(wait)
+        return True
+    else:
+        logger.error("API fatal error (%s): %s", err_type, err_str[:200])
+        return False
+
+
+def call_gpt(client, system: str, prompt: str, model: str) -> str | None:
+    for attempt in range(MAX_API_RETRIES):
+        try:
+            _rate_limit_wait()
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user",   "content": prompt},
+                ],
+                temperature=0.0,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            if not _handle_api_error(e, attempt):
+                return None
+    logger.error("API max retries exhausted")
+    return None
+
+
+def call_gemini(client, system: str, prompt: str, model: str) -> str | None:
+    from google.genai import types
+    for attempt in range(MAX_API_RETRIES):
+        try:
+            _rate_limit_wait()
+            response = client.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system,
+                    temperature=0.0,
+                ),
+            )
+            return response.text.strip()
+        except Exception as e:
+            if not _handle_api_error(e, attempt):
+                return None
+    logger.error("API max retries exhausted")
+    return None
+
+
+def call_llm(client, system: str, prompt: str, provider: str, model: str) -> str | None:
+    if provider == "gpt":
+        return call_gpt(client, system, prompt, model)
+    elif provider == "gemini":
+        return call_gemini(client, system, prompt, model)
+    else:
+        raise ValueError(f"Unknown provider: {provider}")
+
+
+def make_client(provider: str):
+    if provider == "gpt":
+        import openai
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise EnvironmentError("OPENAI_API_KEY가 설정되지 않았습니다.")
+        return openai.OpenAI(api_key=api_key)
+    elif provider == "gemini":
+        from google import genai
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise EnvironmentError("GEMINI_API_KEY가 설정되지 않았습니다.")
+        return genai.Client(api_key=api_key)
+    else:
+        raise ValueError(f"Unknown provider: {provider}")
+
+
+# ---------------------------------------------------------------------------
+# Chunk sampling (k 고정)
+# ---------------------------------------------------------------------------
+
+def _build_distractor_pool(records: list[dict]) -> dict[int, list[dict]]:
+    """hoh_source_idx별 distractor 청크를 수집해 풀을 만든다."""
+    pool: dict[int, list[dict]] = {}
+    for r in records:
+        src = r["hoh_source_idx"]
+        if src not in pool:
+            pool[src] = []
+        for ch in r["chunks"]:
+            if ch["label"] == "distractor":
+                if not any(c["chunk_id"] == ch["chunk_id"] for c in pool[src]):
+                    pool[src].append(ch)
+    return pool
+
+
+def _record_rng(record_id: str) -> random.Random:
+    """record id 기반 deterministic RNG — resume 시에도 동일한 결과 보장."""
+    seed = int(hashlib.md5(record_id.encode()).hexdigest(), 16) % (2 ** 32)
+    return random.Random(seed)
+
+
+def _get_chunks_for_condition(
+    record: dict,
+    condition: str,
+    distractor_pool: dict[int, list[dict]],
+    num_chunks: int = 5,
+) -> list[dict]:
+    """조건별 청크를 num_chunks개로 구성한다.
+
+    필수 청크(current, 조건 B/C는 outdated 포함)를 유지한 뒤
+    나머지 슬롯을 distractor로 채운다.
+    record id 기반 deterministic RNG를 사용해 resume 시에도 동일한 구성을 보장한다.
+    """
+    rng = _record_rng(record["id"])
+    chunks = record["chunks"]
+    src = record["hoh_source_idx"]
+
+    current_time = next(
+        (ch["last_modified_time"] for ch in chunks if ch["label"] == "current"),
+        "N/A",
+    )
+
+    # 필수 청크 결정
+    mandatory = [ch for ch in chunks if ch["label"] == "current"]
+    if condition != "no_conflict":
+        mandatory += [ch for ch in chunks if ch["label"] == "outdated"]
+
+    n_distractor = num_chunks - len(mandatory)
+
+    # distractor 후보: 레코드 내 distractor 우선, 부족하면 다른 source에서 보충
+    used_ids = {ch["chunk_id"] for ch in mandatory}
+    own_distractors = [ch for ch in chunks if ch["label"] == "distractor"]
+    candidates = [ch for ch in own_distractors if ch["chunk_id"] not in used_ids]
+
+    if len(candidates) < n_distractor:
+        for other_src, pool_chunks in distractor_pool.items():
+            if other_src == src:
+                continue
+            for ch in pool_chunks:
+                if ch["chunk_id"] not in used_ids:
+                    candidates.append(ch)
+
+    sampled = rng.sample(candidates, min(n_distractor, len(candidates)))
+
+    # 외부 distractor는 timestamp를 current와 맞춤 (shortcut 방지)
+    own_ids = {ch["chunk_id"] for ch in own_distractors}
+    padded = [
+        ch if ch["chunk_id"] in own_ids
+        else dict(ch, label="distractor", last_modified_time=current_time)
+        for ch in sampled
+    ]
+
+    result = mandatory + padded
+    rng.shuffle(result)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Prompt builder
+# ---------------------------------------------------------------------------
+
+EVAL_SYSTEM_PROMPT = (
+    "You are an assistant that answers questions using the provided documents. "
+    "Each document has a modification timestamp. "
+    "Use the timestamps to identify the most temporally relevant document for the question.\n\n"
+    "You MUST respond using ONLY the following XML tags, in this exact order:\n\n"
+    "<thought>\n"
+    "Step-by-step reasoning about which document is most relevant based on the timestamps.\n"
+    "</thought>\n"
+    "<relevance>\n"
+    "The number of the most relevant document (e.g. 3)\n"
+    "</relevance>\n"
+    "<answer>\n"
+    "Your final answer, as concisely as possible.\n"
+    "</answer>\n\n"
+    "Do not include any text outside these tags."
+)
+
+
+def build_eval_prompt(record: dict, condition: str, chunks: list[dict]) -> str:
+    """조건별 프롬프트 구성. chunks는 _get_chunks_for_condition 결과."""
+    if condition == "ambiguous":
+        question = record["original_question"]
+    else:
+        question = record["new_question"]
+
+    lines: list[str] = []
+    lines.append(f"[Query] {question}")
+    lines.append("")
+
+    for i, ch in enumerate(chunks, 1):
+        lmt = ch.get("last_modified_time") or "N/A"
+        lines.append(f"[Document {i}] [modified: {lmt}]")
+        lines.append(ch["text"])
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Response parser
+# ---------------------------------------------------------------------------
+
+def parse_response(text: str) -> dict | None:
+    """<thought>/<relevance>/<answer> 파싱. 태그가 하나라도 빠지면 None 반환."""
+    if not text:
+        return None
+
+    thought_m   = re.search(r"<thought>(.*?)</thought>", text, re.DOTALL)
+    relevance_m = re.search(r"<relevance>\s*\[?\s*(\d+)\s*\]?\s*</relevance>", text, re.DOTALL)
+    answer_m    = re.search(r"<answer>(.*?)</answer>", text, re.DOTALL)
+
+    if not answer_m or not relevance_m:
+        return None
+
+    return {
+        "thought": thought_m.group(1).strip() if thought_m else "",
+        "relevance_doc_num": int(relevance_m.group(1)),
+        "answer": answer_m.group(1).strip(),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Scoring
+# ---------------------------------------------------------------------------
+
+def _normalize(s: str) -> str:
+    """소문자화, 관사 제거, 구두점 제거, 공백 정규화."""
+    s = s.lower()
+    s = re.sub(r"\b(a|an|the)\b", " ", s)
+    s = s.translate(str.maketrans("", "", string.punctuation))
+    return " ".join(s.split())
+
+
+def token_f1(prediction: str, ground_truth: str) -> float:
+    pred_tokens = _normalize(prediction).split()
+    gt_tokens = _normalize(ground_truth).split()
+    if not pred_tokens or not gt_tokens:
+        return float(pred_tokens == gt_tokens)
+    common = Counter(pred_tokens) & Counter(gt_tokens)
+    num_common = sum(common.values())
+    if num_common == 0:
+        return 0.0
+    precision = num_common / len(pred_tokens)
+    recall = num_common / len(gt_tokens)
+    return 2 * precision * recall / (precision + recall)
+
+
+def score_record(parsed: dict, record: dict, chunks: list[dict]) -> dict:
+    """EM, F1, evidence, combined 계산. chunks는 실제 프롬프트에 사용된 청크 목록."""
+    target = record["target_answer"]
+    pred_answer = parsed["answer"]
+
+    em = float(_normalize(pred_answer) == _normalize(target))
+    f1 = token_f1(pred_answer, target)
+
+    evidence_correct = 0.0
+    if parsed["relevance_doc_num"] is not None:
+        doc_idx = parsed["relevance_doc_num"] - 1
+        if 0 <= doc_idx < len(chunks):
+            if chunks[doc_idx]["chunk_id"] == record["evidence_chunk_id"]:
+                evidence_correct = 1.0
+
+    combined = em * evidence_correct
+
+    return {
+        "answer_em": em,
+        "answer_f1": f1,
+        "evidence_accuracy": evidence_correct,
+        "combined_score": combined,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Resume
+# ---------------------------------------------------------------------------
+
+def load_done_ids(output_path: Path) -> set[str]:
+    done: set[str] = set()
+    if not output_path.exists():
+        return done
+    with output_path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    done.add(json.loads(line)["id"])
+                except Exception:
+                    pass
+    return done
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def filter_records_by_condition(records: list[dict], condition: str) -> list[dict]:
+    """조건에 맞는 mode의 레코드만 필터링.
+
+    no_conflict: current 모드만 (outdated 청크 제거 후 현재 시점 질문만 평가)
+    conflict:    current + outdated 모드 (충돌 청크 포함, 양쪽 시점 질문 모두)
+    ambiguous:   current_raw 모드만 (시간 힌트 없는 원본 질문)
+    """
+    if condition == "no_conflict":
+        return [r for r in records if r.get("mode") == "current"]
+    elif condition == "conflict":
+        return [r for r in records if r.get("mode") not in ("current_raw",)]
+    else:  # ambiguous
+        return [r for r in records if r.get("mode") == "current_raw"]
+
+
+def evaluate(
+    input_path: Path,
+    condition: str,
+    provider: str,
+    model: str,
+    num_chunks: int = 5,
+) -> None:
+    global _requests_per_minute
+    _requests_per_minute = GPT_RPM if provider == "gpt" else GEMINI_RPM
+
+    DIR_EVAL.mkdir(parents=True, exist_ok=True)
+
+    model_short = model.replace(".", "").replace("-", "")
+    qa_stem     = input_path.stem
+    output_path = DIR_EVAL / f"eval_{model_short}_{condition}_{qa_stem}.jsonl"
+
+    # 전체 레코드 로드 (distractor pool 구성용)
+    all_records = []
+    with input_path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                all_records.append(json.loads(line))
+
+    records = filter_records_by_condition(all_records, condition)
+    if not records:
+        logger.error("조건 %s에 해당하는 레코드가 없습니다.", condition)
+        return
+
+    distractor_pool = _build_distractor_pool(all_records)
+
+    client = make_client(provider)
+    done = load_done_ids(output_path)
+    logger.info("=== evaluate_llm (condition=%s, provider=%s, model=%s, num_chunks=%d) input=%s: %d done, %d target ===",
+                condition, provider, model, num_chunks, input_path.name, len(done), len(records))
+
+
+    with output_path.open("a", encoding="utf-8") as fout:
+        for i, record in enumerate(records, 1):
+            record_id = record["id"]
+            if record_id in done:
+                continue
+
+            chunks = _get_chunks_for_condition(record, condition, distractor_pool, num_chunks)
+            prompt = build_eval_prompt(record, condition, chunks)
+
+            parsed = None
+            response_text = None
+            current_prompt = prompt
+            for attempt in range(MAX_PARTIAL_RETRIES):
+                response_text = call_llm(client, EVAL_SYSTEM_PROMPT, current_prompt, provider, model)
+                if response_text is None:
+                    logger.warning("[%s] API 호출 실패, skipping", record_id)
+                    break
+                parsed = parse_response(response_text)
+                if parsed is not None:
+                    break
+                logger.warning("[%s] 포맷 오류, 재시도 %d/%d: %s",
+                               record_id, attempt + 1, MAX_PARTIAL_RETRIES, repr(response_text[-80:]))
+                current_prompt = (
+                    prompt
+                    + f"\n\n[Previous response was invalid — missing required tags.]\n"
+                    + f"Your previous response:\n{response_text}\n\n"
+                    + "You MUST wrap your answer in <thought>, <relevance>, and <answer> tags. "
+                    + "Do not include any text outside these tags."
+                )
+
+            if parsed is None:
+                logger.warning("[%s] 파싱 최종 실패, skip (로그 확인)", record_id)
+                continue
+
+            sc = score_record(parsed, record, chunks)
+
+            result = {
+                "id": record_id,
+                "condition": condition,
+                "provider": provider,
+                "model": model,
+                "mode": record.get("mode"),
+                "question": record.get("new_question") if condition != "ambiguous" else record.get("original_question"),
+                "target_answer": record["target_answer"],
+                "predicted_answer": parsed["answer"],
+                "evidence_chunk_id": record["evidence_chunk_id"],
+                "predicted_relevance": parsed["relevance_doc_num"],
+                "thought": parsed["thought"],
+                "raw_response": response_text,
+                **sc,
+            }
+
+            fout.write(json.dumps(result, ensure_ascii=False) + "\n")
+            fout.flush()
+            done.add(record_id)
+
+            if i % 10 == 0:
+                logger.info("[%d/%d] %s — EM=%.2f F1=%.2f Ev=%.2f",
+                            i, len(records), record_id, sc["answer_em"], sc["answer_f1"], sc["evidence_accuracy"])
+
+    logger.info("Done → %s", output_path)
+    logger.info("summary 생성: python eval/summarize_eval.py")
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="LLM 평가: temporal conflict QA 실험")
+    parser.add_argument(
+        "--input", type=str, default=None,
+        help="입력 파일 경로. 생략 시 data/qa/ 전체"
+    )
+    parser.add_argument(
+        "--condition", type=str, required=True, choices=["no_conflict", "conflict", "ambiguous"],
+        help="실험 조건: no_conflict (outdated 제거), conflict (전체 청크), ambiguous (전체 청크 + 원본 질문)"
+    )
+    parser.add_argument(
+        "--provider", type=str, default="gpt", choices=["gpt", "gemini"],
+        help="LLM provider (기본값: gpt)"
+    )
+    parser.add_argument(
+        "--gpt-model", type=str, default=None,
+        help=f"GPT 모델명 (기본값: {EVAL_GPT_MODEL})"
+    )
+    parser.add_argument(
+        "--gemini-model", type=str, default=None,
+        help=f"Gemini 모델명 (기본값: {EVAL_GEMINI_MODEL})"
+    )
+    parser.add_argument(
+        "--num-chunks", type=int, default=5,
+        help="프롬프트에 넣을 청크 수 (기본값: 5)"
+    )
+    args = parser.parse_args()
+
+    if args.provider == "gpt":
+        model = args.gpt_model or EVAL_GPT_MODEL
+    else:
+        model = args.gemini_model or EVAL_GEMINI_MODEL
+
+    if args.input:
+        input_paths = [Path(args.input)]
+    else:
+        input_paths = sorted(DIR_QA.glob("hoh_qa_*.jsonl"))
+        if not input_paths:
+            logger.error("%s/ 에 hoh_qa_*.jsonl 파일이 없습니다.", DIR_QA)
+            exit(1)
+
+    for input_path in input_paths:
+        evaluate(input_path=input_path, condition=args.condition, provider=args.provider, model=model, num_chunks=args.num_chunks)
