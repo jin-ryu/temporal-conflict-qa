@@ -40,12 +40,19 @@ def main() -> None:
     parser.add_argument("--start", type=int, default=0, help="시작 인덱스 (inclusive)")
     parser.add_argument("--end",   type=int, required=True, help="종료 인덱스 (exclusive)")
     parser.add_argument(
-        "--provider", type=str, default="gemini", choices=["gemini", "gpt"],
+        "--provider", type=str, default="gemini", choices=["gemini", "gpt", "vllm"],
         help="LLM provider (기본값: gemini)"
     )
     parser.add_argument("--gpt-model",    type=str, default=None, help="GPT 모델명 오버라이드")
     parser.add_argument("--gemini-model", type=str, default=None, help="Gemini 모델명 오버라이드")
+    parser.add_argument("--vllm-model",   type=str, default=None, help="vLLM 모델명 (예: Qwen/Qwen3-32B-AWQ)")
     args = parser.parse_args()
+
+    if args.vllm_model and args.provider != "vllm":
+        args.provider = "vllm"
+
+    if args.provider == "vllm" and not args.vllm_model:
+        parser.error("--vllm-model is required when --provider is vllm")
 
     chunks_path = DIR_CHUNKS / f"hoh_chunks_{args.start}_{args.end}.jsonl"
 
@@ -70,11 +77,17 @@ def main() -> None:
         cmd2 += ["--gpt-model", args.gpt_model]
     if args.gemini_model:
         cmd2 += ["--gemini-model", args.gemini_model]
+    if args.vllm_model:
+        cmd2 += ["--vllm-model", args.vllm_model]
     run(cmd2)
 
     # ── 완료 ──────────────────────────────────────────────────────────
     suffix  = f"_{args.start}_{args.end}"
-    qa_path = DIR_QA / f"hoh_qa_{args.provider}{suffix}.jsonl"
+    if args.provider == "vllm" and args.vllm_model:
+        model_tag = args.vllm_model.split("/")[-1].lower()
+    else:
+        model_tag = args.provider
+    qa_path = DIR_QA / f"hoh_qa_{model_tag}{suffix}.jsonl"
 
     logger.info("=" * 60)
     logger.info("  파이프라인 완료!")

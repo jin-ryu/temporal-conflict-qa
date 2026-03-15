@@ -207,6 +207,7 @@ def call_openai_compat(client, prompt: str, model: str) -> dict | None:
                 messages=[{"role": "user", "content": prompt}],
                 response_format={"type": "json_object"},
                 temperature=0.7,
+                max_tokens=1024,
             )
             return json.loads(response.choices[0].message.content.strip())
         except Exception as e:
@@ -522,6 +523,9 @@ if __name__ == "__main__":
         help="vLLM 모델명 (--provider vllm 시 필수, 예: Qwen/Qwen3-32B)"
     )
     args = parser.parse_args()
+
+    if args.vllm_model and args.provider != "vllm":
+        args.provider = "vllm"
 
     if args.gpt_model:
         GPT_MODEL = args.gpt_model
