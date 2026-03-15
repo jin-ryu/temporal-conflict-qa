@@ -32,8 +32,10 @@ import json
 import os
 import random
 import re
+import threading
 import time
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -42,7 +44,7 @@ from dotenv import load_dotenv
 
 from config import (
     DIR_CHUNKS, DIR_QA, CHUNKS_PATH,
-    GEMINI_MODEL, GPT_MODEL, GEMINI_RPM, GPT_RPM, VLLM_RPM,
+    GEMINI_MODEL, GPT_MODEL, GEMINI_RPM, GPT_RPM, VLLM_RPM, VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     setup_logging,
 )
@@ -160,16 +162,18 @@ def build_prompt(record: dict, mode: str) -> str:
 # ---------------------------------------------------------------------------
 
 _last_call_time: float = 0.0
+_rate_lock = threading.Lock()
 _requests_per_minute: int = GEMINI_RPM
 
 
 def _rate_limit_wait() -> None:
     global _last_call_time
-    min_interval = 60.0 / _requests_per_minute
-    elapsed = time.time() - _last_call_time
-    if elapsed < min_interval:
-        time.sleep(min_interval - elapsed)
-    _last_call_time = time.time()
+    with _rate_lock:
+        min_interval = 60.0 / _requests_per_minute
+        elapsed = time.time() - _last_call_time
+        if elapsed < min_interval:
+            time.sleep(min_interval - elapsed)
+        _last_call_time = time.time()
 
 
 # ---------------------------------------------------------------------------
@@ -375,6 +379,53 @@ def load_done_ids(output_path: Path) -> set[str]:
 # Main pipeline
 # ---------------------------------------------------------------------------
 
+def _process_one_task(
+    client,
+    provider: str,
+    record: dict,
+    mode: str,
+) -> dict | None:
+    """단일 (record, mode) 태스크를 처리하고 결과 dict 또는 None을 반환한다."""
+    record_id = record["id"]
+    pair_id = f"{record_id}_{mode}"
+
+    pair = None
+    rejection = ""
+    for attempt in range(MAX_PARTIAL_RETRIES):
+        prompt = build_prompt(record, mode)
+        if rejection:
+            prompt += (
+                f"\n\n[PREVIOUS ATTEMPT REJECTED]\n"
+                f"Reason: {rejection}\n"
+                f"Fix this issue and regenerate."
+            )
+        raw = call_llm(client, prompt, provider)
+        if raw is None:
+            break
+        pair, rejection = validate_pair(raw, mode, record["chunks"], record["answers"])
+        if pair is not None:
+            break
+        logger.info("[%s] validation failed (%s), retry %d/%d", pair_id, rejection, attempt + 1, MAX_PARTIAL_RETRIES)
+
+    if pair is None:
+        logger.warning("[%s] failed mode=%s, skipping", pair_id, mode)
+        return None
+
+    return {
+        "id": pair_id,
+        "hoh_source_idx": int(record_id.split("_")[1]),
+        "provider": provider,
+        "model": VLLM_MODEL if provider == "vllm" else (GPT_MODEL if provider == "gpt" else GEMINI_MODEL),
+        "mode": pair["mode"],
+        "original_question": record["question"],
+        "new_question": pair["new_question"],
+        "target_answer": pair["target_answer"],
+        "evidence_chunk_id": pair["evidence_chunk_id"],
+        "reasoning_qa": pair["reasoning"],
+        "chunks": record["chunks"],
+    }
+
+
 def chunks_to_qa(
     input_path: Path,
     output_path: Path,
@@ -402,9 +453,11 @@ def chunks_to_qa(
     done   = load_done_ids(output_path)
     logger.info("=== chunks_to_qa (%s) input=%s: %d already done ===", model_label, input_path.name, len(done))
 
-    with input_path.open(encoding="utf-8") as fin, \
-         output_path.open("a", encoding="utf-8") as fout:
+    # ── 전체 태스크 수집 ──────────────────────────────────────────────
+    tasks = []       # (record, mode) — LLM 호출 필요
+    raw_tasks = []   # record         — current_raw (LLM 불필요)
 
+    with input_path.open(encoding="utf-8") as fin:
         for line in fin:
             line = line.strip()
             if not line:
@@ -422,76 +475,75 @@ def chunks_to_qa(
                 done.add(record_id)
                 continue
 
-            # evidence_chunk_id는 validate_pair 내에서 mode 기반 자동 할당
-
-            # ── LLM 호출: current / outdated_* ──────────────────────────
             for mode in modes:
                 pair_id = f"{record_id}_{mode}"
-                if pair_id in done:
-                    continue
+                if pair_id not in done:
+                    tasks.append((record, mode))
 
-                pair = None
-                rejection = ""
-                for attempt in range(MAX_PARTIAL_RETRIES):
-                    prompt = build_prompt(record, mode)
-                    if rejection:
-                        prompt += (
-                            f"\n\n[PREVIOUS ATTEMPT REJECTED]\n"
-                            f"Reason: {rejection}\n"
-                            f"Fix this issue and regenerate."
-                        )
-                    raw = call_llm(client, prompt, provider)
-                    if raw is None:
-                        break
-                    pair, rejection = validate_pair(raw, mode, record["chunks"], record["answers"])
-                    if pair is not None:
-                        break
-                    logger.info("[%s] validation failed (%s), retry %d/%d", pair_id, rejection, attempt + 1, MAX_PARTIAL_RETRIES)
-
-                if pair is None:
-                    logger.warning("[%s] failed mode=%s, skipping", pair_id, mode)
-                    done.add(pair_id)
-                    continue
-
-                fout.write(json.dumps({
-                    "id": pair_id,
-                    "hoh_source_idx": int(record_id.split("_")[1]),
-                    "provider": provider,
-                    "model": VLLM_MODEL if provider == "vllm" else (GPT_MODEL if provider == "gpt" else GEMINI_MODEL),
-                    "mode": pair["mode"],
-                    "original_question": record["question"],
-                    "new_question": pair["new_question"],
-                    "target_answer": pair["target_answer"],
-                    "evidence_chunk_id": pair["evidence_chunk_id"],
-                    "reasoning_qa": pair["reasoning"],
-                    "chunks": record["chunks"],
-                }, ensure_ascii=False) + "\n")
-                fout.flush()
-                done.add(pair_id)
-
-            # ── LLM 없이: current_raw ────────────────────────────────────
             raw_pair_id = f"{record_id}_current_raw"
             if raw_pair_id not in done:
-                raw_pair = make_current_raw_pair(record)
-                if raw_pair is None:
-                    logger.warning("[%s] current 청크 없음, skipping", raw_pair_id)
-                else:
-                    fout.write(json.dumps({
-                        "id": raw_pair_id,
-                        "hoh_source_idx": int(record_id.split("_")[1]),
-                        "provider": "none",
-                        "mode": "current_raw",
-                        "original_question": record["question"],
-                        "new_question": raw_pair["new_question"],
-                        "target_answer": raw_pair["target_answer"],
-                        "evidence_chunk_id": raw_pair["evidence_chunk_id"],
-                        "chunks": record["chunks"],
-                    }, ensure_ascii=False) + "\n")
-                    fout.flush()
-                done.add(raw_pair_id)
+                raw_tasks.append(record)
 
-            if len(done) % 50 == 0:
-                logger.info("%d pairs done", len(done))
+    logger.info("pending: %d LLM tasks, %d current_raw tasks", len(tasks), len(raw_tasks))
+
+    # ── 결과 기록 (thread-safe) ───────────────────────────────────────
+    write_lock = threading.Lock()
+
+    def _write_result(fout, result: dict) -> None:
+        with write_lock:
+            fout.write(json.dumps(result, ensure_ascii=False) + "\n")
+            fout.flush()
+            done.add(result["id"])
+
+    with output_path.open("a", encoding="utf-8") as fout:
+        # ── current_raw (LLM 불필요, 즉시 처리) ──────────────────────
+        for record in raw_tasks:
+            raw_pair = make_current_raw_pair(record)
+            raw_pair_id = f"{record['id']}_current_raw"
+            if raw_pair is None:
+                logger.warning("[%s] current 청크 없음, skipping", raw_pair_id)
+            else:
+                _write_result(fout, {
+                    "id": raw_pair_id,
+                    "hoh_source_idx": int(record["id"].split("_")[1]),
+                    "provider": "none",
+                    "mode": "current_raw",
+                    "original_question": record["question"],
+                    "new_question": raw_pair["new_question"],
+                    "target_answer": raw_pair["target_answer"],
+                    "evidence_chunk_id": raw_pair["evidence_chunk_id"],
+                    "chunks": record["chunks"],
+                })
+            done.add(raw_pair_id)
+
+        # ── LLM 호출: 병렬 (vLLM) 또는 순차 (gemini/gpt) ────────────
+        use_parallel = provider == "vllm" and VLLM_CONCURRENCY > 1
+        max_workers = VLLM_CONCURRENCY if use_parallel else 1
+
+        completed = 0
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                executor.submit(_process_one_task, client, provider, record, mode): (record, mode)
+                for record, mode in tasks
+            }
+            for future in as_completed(futures):
+                record, mode = futures[future]
+                pair_id = f"{record['id']}_{mode}"
+                try:
+                    result = future.result()
+                except Exception:
+                    logger.exception("[%s] unexpected error", pair_id)
+                    result = None
+
+                if result is not None:
+                    _write_result(fout, result)
+                else:
+                    with write_lock:
+                        done.add(pair_id)
+
+                completed += 1
+                if completed % 50 == 0:
+                    logger.info("%d / %d LLM tasks done", completed, len(tasks))
 
     logger.info("Done → %s", output_path)
 

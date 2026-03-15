@@ -59,7 +59,8 @@ EVAL_GPT_MODEL    = "gpt-4.1"
 
 GEMINI_RPM = 10    # free tier 기준
 GPT_RPM    = 60
-VLLM_RPM   = 500   # 로컬 서버, GPU 처리량에 맞게 조정
+VLLM_RPM         = 500   # 로컬 서버, GPU 처리량에 맞게 조정
+VLLM_CONCURRENCY = 8     # vLLM 병렬 요청 수 (ThreadPoolExecutor workers)
 
 # ---------------------------------------------------------------------------
 # 재시도 / 체크포인트
