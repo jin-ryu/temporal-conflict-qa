@@ -340,7 +340,7 @@ def score_record(parsed: dict, record: dict, chunks: list[dict]) -> dict:
             if chunks[doc_idx]["chunk_id"] == record["evidence_chunk_id"]:
                 evidence_correct = 1.0
 
-    combined = em * evidence_correct
+    combined = f1 * evidence_correct
 
     return {
         "answer_em": em,
