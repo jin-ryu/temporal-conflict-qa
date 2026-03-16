@@ -23,7 +23,6 @@ Provider
 
 import argparse
 import json
-import os
 import random
 import time
 import sys
@@ -35,9 +34,13 @@ from dotenv import load_dotenv
 
 from config import (
     DIR_QA, DIR_QA_REASONING,
-    GPT_MODEL, GEMINI_MODEL, GPT_RPM, GEMINI_RPM,
+    GPT_MODEL, GEMINI_MODEL,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     setup_logging,
+)
+from llm_client import (
+    make_client, set_rpm,
+    rate_limit_wait, handle_api_error,
 )
 
 load_dotenv()
@@ -92,30 +95,13 @@ def build_reasoning_prompt(record: dict) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Rate limiter
-# ---------------------------------------------------------------------------
-
-_last_call_time: float = 0.0
-_requests_per_minute: int = GPT_RPM
-
-
-def _rate_limit_wait() -> None:
-    global _last_call_time
-    min_interval = 60.0 / _requests_per_minute
-    elapsed = time.time() - _last_call_time
-    if elapsed < min_interval:
-        time.sleep(min_interval - elapsed)
-    _last_call_time = time.time()
-
-
-# ---------------------------------------------------------------------------
 # API calls
 # ---------------------------------------------------------------------------
 
 def call_gpt(client, prompt: str) -> str | None:
     for attempt in range(MAX_API_RETRIES):
         try:
-            _rate_limit_wait()
+            rate_limit_wait()
             response = client.chat.completions.create(
                 model=GPT_MODEL,
                 messages=[{"role": "user", "content": prompt}],
@@ -123,7 +109,7 @@ def call_gpt(client, prompt: str) -> str | None:
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            if not _handle_api_error(e, attempt):
+            if not handle_api_error(e, attempt):
                 return None
     logger.error("API max retries exhausted")
     return None
@@ -133,7 +119,7 @@ def call_gemini(client, prompt: str) -> str | None:
     from google.genai import types
     for attempt in range(MAX_API_RETRIES):
         try:
-            _rate_limit_wait()
+            rate_limit_wait()
             response = client.models.generate_content(
                 model=GEMINI_MODEL,
                 contents=prompt,
@@ -141,7 +127,7 @@ def call_gemini(client, prompt: str) -> str | None:
             )
             return response.text.strip()
         except Exception as e:
-            if not _handle_api_error(e, attempt):
+            if not handle_api_error(e, attempt):
                 return None
     logger.error("API max retries exhausted")
     return None
@@ -154,50 +140,6 @@ def call_llm(client, prompt: str, provider: str) -> str | None:
         return call_gemini(client, prompt)
     else:
         raise ValueError(f"Unknown provider: {provider}")
-
-
-def make_client(provider: str):
-    if provider == "gpt":
-        import openai
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            raise EnvironmentError("OPENAI_API_KEY가 설정되지 않았습니다.")
-        return openai.OpenAI(api_key=api_key)
-    elif provider == "gemini":
-        from google import genai
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise EnvironmentError("GEMINI_API_KEY가 설정되지 않았습니다.")
-        return genai.Client(api_key=api_key)
-    else:
-        raise ValueError(f"Unknown provider: {provider}")
-
-
-def _handle_api_error(e: Exception, attempt: int) -> bool:
-    err_str  = str(e)
-    err_type = type(e).__name__
-
-    is_rate_limit  = any(x in err_str for x in ("429", "ResourceExhausted", "RESOURCE_EXHAUSTED", "RateLimitError"))
-    is_server_err  = "500" in err_str or "503" in err_str
-    is_network_err = any(t in err_type for t in (
-        "ConnectError", "TimeoutException", "ReadTimeout",
-        "ConnectTimeout", "RemoteProtocolError", "NetworkError",
-    )) or "httpcore" in err_str or "httpx" in err_str
-
-    if is_rate_limit:
-        wait = min(30.0 * (2 ** attempt) + random.uniform(0, 2), 300.0)
-        logger.warning("rate limit, retrying in %.1fs (attempt %d/%d)", wait, attempt + 1, MAX_API_RETRIES)
-        time.sleep(wait)
-        return True
-    elif is_server_err or is_network_err:
-        wait = min(5.0 * (2 ** attempt) + random.uniform(0, 2), 120.0)
-        label = "network" if is_network_err else "server"
-        logger.warning("%s error (%s), retrying in %.1fs (attempt %d/%d)", label, err_type, wait, attempt + 1, MAX_API_RETRIES)
-        time.sleep(wait)
-        return True
-    else:
-        logger.error("API fatal error (%s): %s", err_type, err_str[:200])
-        return False
 
 
 # ---------------------------------------------------------------------------
@@ -230,8 +172,7 @@ def generate_reasoning(
     sample_ratio: float,
     sample_seed: int,
 ) -> None:
-    global _requests_per_minute
-    _requests_per_minute = GPT_RPM if provider == "gpt" else GEMINI_RPM
+    set_rpm(provider)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 

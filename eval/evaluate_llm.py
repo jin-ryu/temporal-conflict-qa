@@ -14,7 +14,6 @@ Answer EM, Token F1, Evidence Accuracy, Combined Score를 산출한다.
 import argparse
 import hashlib
 import json
-import os
 import random
 import re
 import string
@@ -32,9 +31,13 @@ from dotenv import load_dotenv
 from config import (
     DIR_EVAL, DIR_QA,
     EVAL_GPT_MODEL, EVAL_GEMINI_MODEL,
-    GPT_RPM, GEMINI_RPM, VLLM_RPM, VLLM_CONCURRENCY,
+    VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     setup_logging,
+)
+from llm_client import (
+    make_client, set_rpm,
+    rate_limit_wait, handle_api_error,
 )
 
 load_dotenv()
@@ -42,59 +45,13 @@ logger = setup_logging("evaluate_llm")
 
 
 # ---------------------------------------------------------------------------
-# Rate limiter
-# ---------------------------------------------------------------------------
-
-_last_call_time: float = 0.0
-_rate_lock = threading.Lock()
-_requests_per_minute: int = GPT_RPM
-
-
-def _rate_limit_wait() -> None:
-    global _last_call_time
-    with _rate_lock:
-        min_interval = 60.0 / _requests_per_minute
-        elapsed = time.time() - _last_call_time
-        if elapsed < min_interval:
-            time.sleep(min_interval - elapsed)
-        _last_call_time = time.time()
-
-
-# ---------------------------------------------------------------------------
 # API calls
 # ---------------------------------------------------------------------------
-
-def _handle_api_error(e: Exception, attempt: int) -> bool:
-    err_str = str(e)
-    err_type = type(e).__name__
-
-    is_rate_limit = any(x in err_str for x in ("429", "ResourceExhausted", "RESOURCE_EXHAUSTED", "RateLimitError"))
-    is_server_err = "500" in err_str or "503" in err_str
-    is_network_err = any(t in err_type for t in (
-        "ConnectError", "TimeoutException", "ReadTimeout",
-        "ConnectTimeout", "RemoteProtocolError", "NetworkError",
-    )) or "httpcore" in err_str or "httpx" in err_str
-
-    if is_rate_limit:
-        wait = min(30.0 * (2 ** attempt) + random.uniform(0, 2), 300.0)
-        logger.warning("rate limit, retrying in %.1fs (attempt %d/%d)", wait, attempt + 1, MAX_API_RETRIES)
-        time.sleep(wait)
-        return True
-    elif is_server_err or is_network_err:
-        wait = min(5.0 * (2 ** attempt) + random.uniform(0, 2), 120.0)
-        label = "network" if is_network_err else "server"
-        logger.warning("%s error (%s), retrying in %.1fs (attempt %d/%d)", label, err_type, wait, attempt + 1, MAX_API_RETRIES)
-        time.sleep(wait)
-        return True
-    else:
-        logger.error("API fatal error (%s): %s", err_type, err_str[:200])
-        return False
-
 
 def call_gpt(client, system: str, prompt: str, model: str) -> str | None:
     for attempt in range(MAX_API_RETRIES):
         try:
-            _rate_limit_wait()
+            rate_limit_wait()
             response = client.chat.completions.create(
                 model=model,
                 messages=[
@@ -105,7 +62,7 @@ def call_gpt(client, system: str, prompt: str, model: str) -> str | None:
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            if not _handle_api_error(e, attempt):
+            if not handle_api_error(e, attempt):
                 return None
     logger.error("API max retries exhausted")
     return None
@@ -115,7 +72,7 @@ def call_gemini(client, system: str, prompt: str, model: str) -> str | None:
     from google.genai import types
     for attempt in range(MAX_API_RETRIES):
         try:
-            _rate_limit_wait()
+            rate_limit_wait()
             response = client.models.generate_content(
                 model=model,
                 contents=prompt,
@@ -126,7 +83,7 @@ def call_gemini(client, system: str, prompt: str, model: str) -> str | None:
             )
             return response.text.strip()
         except Exception as e:
-            if not _handle_api_error(e, attempt):
+            if not handle_api_error(e, attempt):
                 return None
     logger.error("API max retries exhausted")
     return None
@@ -135,7 +92,6 @@ def call_gemini(client, system: str, prompt: str, model: str) -> str | None:
 def call_vllm(client, system: str, prompt: str, model: str) -> str | None:
     for attempt in range(MAX_API_RETRIES):
         try:
-            _rate_limit_wait()
             response = client.chat.completions.create(
                 model=model,
                 messages=[
@@ -147,7 +103,7 @@ def call_vllm(client, system: str, prompt: str, model: str) -> str | None:
             )
             return response.choices[0].message.content.strip()
         except Exception as e:
-            if not _handle_api_error(e, attempt):
+            if not handle_api_error(e, attempt):
                 return None
     logger.error("API max retries exhausted")
     return None
@@ -164,25 +120,6 @@ def call_llm(client, system: str, prompt: str, provider: str, model: str) -> str
         raise ValueError(f"Unknown provider: {provider}")
 
 
-def make_client(provider: str):
-    if provider == "gpt":
-        import openai
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key:
-            raise EnvironmentError("OPENAI_API_KEY가 설정되지 않았습니다.")
-        return openai.OpenAI(api_key=api_key)
-    elif provider == "gemini":
-        from google import genai
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise EnvironmentError("GEMINI_API_KEY가 설정되지 않았습니다.")
-        return genai.Client(api_key=api_key)
-    elif provider == "vllm":
-        import openai
-        base_url = os.environ.get("VLLM_BASE_URL", "http://localhost:8000/v1")
-        return openai.OpenAI(api_key="dummy", base_url=base_url)
-    else:
-        raise ValueError(f"Unknown provider: {provider}")
 
 
 # ---------------------------------------------------------------------------
@@ -213,7 +150,7 @@ def _get_chunks_for_condition(
     record: dict,
     condition: str,
     distractor_pool: dict[int, list[dict]],
-    num_chunks: int = 5,
+    num_chunks: int = 10,
 ) -> list[dict]:
     """조건별 청크를 num_chunks개로 구성한다.
 
@@ -233,16 +170,21 @@ def _get_chunks_for_condition(
     # 필수 청크 결정
     mandatory = [ch for ch in chunks if ch["label"] == "current"]
     if condition != "no_conflict":
-        mandatory += [ch for ch in chunks if ch["label"] == "outdated"]
+        outdated = [ch for ch in chunks if ch["label"] == "outdated"]
+        # mandatory가 num_chunks를 초과하면 outdated를 샘플링
+        max_outdated = num_chunks - len(mandatory)
+        if len(outdated) > max_outdated > 0:
+            outdated = rng.sample(outdated, max_outdated)
+        mandatory += outdated
 
-    n_distractor = num_chunks - len(mandatory)
+    n_distractor = max(num_chunks - len(mandatory), 0)
 
     # distractor 후보: 레코드 내 distractor 우선, 부족하면 다른 source에서 보충
     used_ids = {ch["chunk_id"] for ch in mandatory}
     own_distractors = [ch for ch in chunks if ch["label"] == "distractor"]
     candidates = [ch for ch in own_distractors if ch["chunk_id"] not in used_ids]
 
-    if len(candidates) < n_distractor:
+    if n_distractor > 0 and len(candidates) < n_distractor:
         for other_src, pool_chunks in distractor_pool.items():
             if other_src == src:
                 continue
@@ -424,10 +366,9 @@ def evaluate(
     condition: str,
     provider: str,
     model: str,
-    num_chunks: int = 5,
+    num_chunks: int = 10,
 ) -> None:
-    global _requests_per_minute
-    _requests_per_minute = VLLM_RPM if provider == "vllm" else (GPT_RPM if provider == "gpt" else GEMINI_RPM)
+    set_rpm(provider)
 
     DIR_EVAL.mkdir(parents=True, exist_ok=True)
 
@@ -578,7 +519,7 @@ if __name__ == "__main__":
         help="vLLM 모델명 (--provider vllm 시 필수)"
     )
     parser.add_argument(
-        "--num-chunks", type=int, default=5,
+        "--num-chunks", type=int, default=10,
         help="프롬프트에 넣을 청크 수 (기본값: 5)"
     )
     args = parser.parse_args()
