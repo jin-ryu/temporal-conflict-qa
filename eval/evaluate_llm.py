@@ -223,9 +223,16 @@ EVAL_SYSTEM_PROMPT = (
     "The number of the most relevant document (e.g. 3)\n"
     "</relevance>\n"
     "<answer>\n"
-    "Your final answer, as concisely as possible.\n"
+    "ONLY the exact short answer (a name, number, date, or short phrase). "
+    "Do NOT include explanations, full sentences, or extra context.\n"
     "</answer>\n\n"
-    "Do not include any text outside these tags."
+    "Do not include any text outside these tags.\n\n"
+    "Example:\n"
+    "<thought>\nThe question asks about the name before the mid-2024 update. "
+    "Document 3 (modified: 2024-07-01) states 'Maudiozyma bulderi' and Document 5 (modified: 2024-06-01) states 'Saccharomyces bulderi'. "
+    "Since the question asks about the name before the update, Document 5 predates the change and is more relevant.\n</thought>\n"
+    "<relevance>\n5\n</relevance>\n"
+    "<answer>\nSaccharomyces bulderi\n</answer>"
 )
 
 
