@@ -266,7 +266,6 @@ def hoh_to_chunks(
                     "chunk_id": ch["chunk_id"],
                     "label": label,
                     "text": ch["text"],
-                    "sentence_indices": ch["sentence_indices"],
                     "last_modified_time": lmt,
                 })
 
@@ -310,7 +309,6 @@ def hoh_to_chunks(
                             "chunk_id": next_chunk_id,
                             "label": "outdated",
                             "text": ch["text"],
-                            "sentence_indices": ch["sentence_indices"],
                             "last_modified_time": oi_time,
                             "outdated_index": i,
                         })
