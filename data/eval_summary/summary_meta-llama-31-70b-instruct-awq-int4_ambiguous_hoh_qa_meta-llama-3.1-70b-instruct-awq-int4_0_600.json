@@ -1,0 +1,25 @@
+{
+  "source_file": "eval_meta-llama-31-70b-instruct-awq-int4_ambiguous_hoh_qa_meta-llama-3.1-70b-instruct-awq-int4_0_600.jsonl",
+  "model": "hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
+  "condition": "ambiguous",
+  "qa_stem": "hoh_qa_meta-llama-3.1-70b-instruct-awq-int4_0_600",
+  "provider": "vllm",
+  "n": 594,
+  "n_parse_error": 0,
+  "answer_em": 0.5219,
+  "answer_f1": 0.6317,
+  "evidence_accuracy": 0.4933,
+  "combined_score": 0.414,
+  "n_expected": 599,
+  "by_mode": {
+    "current_raw": {
+      "n": 594,
+      "n_parse_error": 0,
+      "answer_em": 0.5219,
+      "answer_f1": 0.6317,
+      "evidence_accuracy": 0.4933,
+      "combined_score": 0.414,
+      "n_expected": 599
+    }
+  }
+}
