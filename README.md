@@ -259,7 +259,7 @@ python eval/evaluate_llm.py --input data/qa/hoh_qa_gpt_0_50.jsonl --condition no
 ```
 
 결과는 `data/eval/eval_{model}_{condition}_{qa_stem}.jsonl`에 저장된다.
-실험 설계에 대한 자세한 내용은 [`eval/experiment_plan.md`](eval/experiment_plan.md) 참조.
+실험 설계에 대한 자세한 내용은 [`eval/experiment_plan.md`](docs/experiment_plan.md) 참조.
 
 #### 7. 평가 결과 집계
 
