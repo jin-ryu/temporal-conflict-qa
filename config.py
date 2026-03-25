@@ -20,7 +20,25 @@ DIR_EVAL         = Path("data/eval")
 DIR_EVAL_SUMMARY = Path("data/eval_summary")
 DIR_LOGS         = Path("logs")
 
-CHUNKS_PATH = DIR_CHUNKS / "hoh_chunks.jsonl"
+CHUNKS_PATH = DIR_CHUNKS / "chunks.jsonl"
+
+# ---------------------------------------------------------------------------
+# 모델 alias (파일명용)
+# ---------------------------------------------------------------------------
+
+MODEL_ALIAS = {
+    "meta-llama-3.1-70b-instruct-awq-int4": "llama70b",
+    "meta-llama-31-70b-instruct-awq-int4": "llama70b",
+    "gpt-4.1": "gpt41",
+    "gpt-41": "gpt41",
+    "gpt": "gpt41",
+}
+
+
+def get_model_alias(model_name: str) -> str:
+    """모델명을 파일명용 짧은 alias로 변환한다."""
+    tag = model_name.split("/")[-1].lower()
+    return MODEL_ALIAS.get(tag, tag)
 
 # ---------------------------------------------------------------------------
 # 청킹

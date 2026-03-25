@@ -33,7 +33,7 @@ from config import (
     EVAL_GPT_MODEL, EVAL_GEMINI_MODEL,
     VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
-    setup_logging,
+    get_model_alias, setup_logging,
 )
 from llm_client import (
     make_client, set_rpm,
@@ -379,7 +379,7 @@ def evaluate(
 
     DIR_EVAL.mkdir(parents=True, exist_ok=True)
 
-    model_short = model.split("/")[-1].replace(".", "").lower()
+    model_short = get_model_alias(model)
     qa_stem     = input_path.stem
     output_path = DIR_EVAL / f"eval_{model_short}_{condition}_{qa_stem}.jsonl"
 

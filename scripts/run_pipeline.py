@@ -18,7 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from config import DIR_CHUNKS, DIR_QA, setup_logging
+from config import DIR_CHUNKS, DIR_QA, get_model_alias, setup_logging
 
 _HERE = Path(__file__).resolve().parent
 
@@ -54,7 +54,7 @@ def main() -> None:
     if args.provider == "vllm" and not args.vllm_model:
         parser.error("--vllm-model is required when --provider is vllm")
 
-    chunks_path = DIR_CHUNKS / f"hoh_chunks_{args.start}_{args.end}.jsonl"
+    chunks_path = DIR_CHUNKS / f"chunks_{args.start}_{args.end}.jsonl"
 
     # ── hoh_to_chunks ─────────────────────────────────────────────────
     run([
@@ -84,10 +84,10 @@ def main() -> None:
     # ── 완료 ──────────────────────────────────────────────────────────
     suffix  = f"_{args.start}_{args.end}"
     if args.provider == "vllm" and args.vllm_model:
-        model_tag = args.vllm_model.split("/")[-1].lower()
+        model_tag = get_model_alias(args.vllm_model)
     else:
-        model_tag = args.provider
-    qa_path = DIR_QA / f"hoh_qa_{model_tag}{suffix}.jsonl"
+        model_tag = get_model_alias(args.provider)
+    qa_path = DIR_QA / f"qa_{model_tag}{suffix}.jsonl"
 
     logger.info("=" * 60)
     logger.info("  파이프라인 완료!")

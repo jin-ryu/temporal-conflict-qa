@@ -45,7 +45,7 @@ from config import (
     DIR_CHUNKS, DIR_QA, CHUNKS_PATH,
     GEMINI_MODEL, GPT_MODEL, VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
-    setup_logging,
+    get_model_alias, setup_logging,
 )
 from llm_client import (
     make_client, set_rpm,
@@ -525,16 +525,15 @@ if __name__ == "__main__":
         exit(1)
 
     stem   = input_path.stem
-    suffix = stem.replace("hoh_chunks", "")
+    suffix = stem.replace("chunks", "")
 
-    # 파일명용 모델 태그: "gpt", "gemini", 또는 vllm 모델명 (Qwen/Qwen3-32B → qwen3-32b)
     if args.provider == "vllm":
-        model_tag = args.vllm_model.split("/")[-1].lower()
+        model_tag = get_model_alias(args.vllm_model)
     else:
-        model_tag = args.provider
+        model_tag = get_model_alias(args.provider)
 
     chunks_to_qa(
         input_path=input_path,
-        output_path=DIR_QA / f"hoh_qa_{model_tag}{suffix}.jsonl",
+        output_path=DIR_QA / f"qa_{model_tag}{suffix}.jsonl",
         provider=args.provider,
     )

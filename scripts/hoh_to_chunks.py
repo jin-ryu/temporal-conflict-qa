@@ -335,13 +335,13 @@ def hoh_to_chunks(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="HoH-QAs → hoh_chunks.jsonl")
+    parser = argparse.ArgumentParser(description="HoH-QAs → chunks.jsonl")
     parser.add_argument("--start", type=int, default=0,    help="시작 인덱스 (inclusive)")
     parser.add_argument("--end",   type=int, default=None, help="종료 인덱스 (exclusive), 생략 시 전체")
     args = parser.parse_args()
 
     if args.end is not None:
-        out = DIR_CHUNKS / f"hoh_chunks_{args.start}_{args.end}.jsonl"
+        out = DIR_CHUNKS / f"chunks_{args.start}_{args.end}.jsonl"
     else:
         out = CHUNKS_PATH
 

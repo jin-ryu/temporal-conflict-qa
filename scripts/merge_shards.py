@@ -24,18 +24,18 @@ logger = setup_logging("merge_shards")
 STEP_CONFIG = {
     1: {
         "dir":     DIR_CHUNKS,
-        "pattern": "hoh_chunks_[0-9]*.jsonl",
-        "output":  DIR_CHUNKS / "hoh_chunks.jsonl",
+        "pattern": "chunks_[0-9]*.jsonl",
+        "output":  DIR_CHUNKS / "chunks.jsonl",
     },
     2: {
         "dir":     DIR_QA,
-        "pattern": "hoh_qa_*_[0-9]*.jsonl",
-        "output":  DIR_QA / "hoh_qa.jsonl",
+        "pattern": "qa_*_[0-9]*.jsonl",
+        "output":  DIR_QA / "qa.jsonl",
     },
     3: {
         "dir":     DIR_QA_REASONING,
-        "pattern": "hoh_qa_*_reasoning_*.jsonl",
-        "output":  DIR_QA_REASONING / "hoh_qa_reasoning.jsonl",
+        "pattern": "qa_*_reasoning_*.jsonl",
+        "output":  DIR_QA_REASONING / "qa_reasoning.jsonl",
     },
 }
 
