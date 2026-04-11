@@ -1,6 +1,6 @@
 # 데이터셋 심층 분석 보고서
 
-> **대상 파일**: `data/qa/hoh_qa_meta-llama-3.1-70b-instruct-awq-int4_0_600.jsonl`
+> **대상 파일**: `data/qa/qa_llama3_1-70b-awq_0_600.jsonl`
 >
 > **분석 목적**: 시간적 충돌(Temporal Conflict) QA 연구에 적합한 데이터셋인지 다각도 평가
 >

@@ -27,18 +27,21 @@ CHUNKS_PATH = DIR_CHUNKS / "chunks.jsonl"
 # ---------------------------------------------------------------------------
 
 MODEL_ALIAS = {
-    "meta-llama-3.1-70b-instruct-awq-int4": "llama70b",
-    "meta-llama-31-70b-instruct-awq-int4": "llama70b",
-    "gpt-4.1": "gpt41",
-    "gpt-41": "gpt41",
-    "gpt": "gpt41",
+    "meta-llama-3.1-70b-instruct-awq-int4": "llama3_1-70b-awq",
+    "meta-llama-31-70b-instruct-awq-int4": "llama3_1-70b-awq",
+    "gpt-4.1": "gpt4_1",
+    "gpt-41": "gpt4_1",
+    "gpt": "gpt4_1",
+    "gpt-4.1-mini": "gpt4_1-mini",
 }
 
 
 def get_model_alias(model_name: str) -> str:
-    """모델명을 파일명용 짧은 alias로 변환한다."""
+    """모델명을 파일명용 짧은 alias로 변환한다. 사전에 없으면 점(.)을 언더바(_)로 바꾼다."""
     tag = model_name.split("/")[-1].lower()
-    return MODEL_ALIAS.get(tag, tag)
+    if tag in MODEL_ALIAS:
+        return MODEL_ALIAS[tag]
+    return tag.replace(".", "_")
 
 # ---------------------------------------------------------------------------
 # 청킹
