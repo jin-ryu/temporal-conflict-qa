@@ -1,6 +1,6 @@
 # Temporal Conflict QA Dataset
 
-RAG 시스템에서 시간적 충돌(temporal conflict)을 다루는 능력을 평가/학습하기 위한 데이터셋 생성 파이프라인.
+RAG 시스템에서 시간적 충돌(temporal conflict)을 다루는 능력을 평가/학습하기 위한 데이터셋 생성 파이프라인 및 실험 프레임워크.
 
 [russwest404/HoH-QAs](https://huggingface.co/datasets/russwest404/HoH-QAs)를 기반으로, Wikipedia 히스토리컬 revision을 가져와 청크를 만들고, LLM(GPT/Gemini/vLLM)을 통해 시간적 추론이 필요한 새로운 QA pair를 생성한다.
 
@@ -57,17 +57,15 @@ temporal-conflict-qa/
 ├── experiments/               # 실험 및 평가 프레임워크 (독립적 관리)
 │   ├── 01_pilot_initial_eval/ # [실험 1] 대규모 자동 평가 히스토리
 │   │   ├── scripts/           # evaluate_llm.py, summarize_eval.py
-│   │   └── results/           # eval/, summary/ 결과 데이터
-│   └── 02_pilot_closed_source/# [실험 2] Gemini 1.5 Flash 파일럿 (수동/정밀)
+│   │   ├── results/           # 개별 실험 결과 (jsonl)
+│   │   └── metrics/           # 집계된 리포트 (json)
+│   └── 02_pilot_closed_source/# [실험 2] Gemini 3 Flash 파일럿 (수동/정밀)
 │       ├── scripts/           # 샘플링, 템플릿 생성, 평가 스크립트
 │       ├── data/              # 샘플링된 100개 데이터
-│       ├── results/           # 실제 기록될 결과 (results.json)
-│       └── metrics/           # 분석 리포트 (summary.json)
-├── setup.sh                   # 가상환경 설치 스크립트
-├── requirements.txt
-├── .env                       # API 키 (git 제외)
-├── architecture.md            # TV-RAG 아키텍처 문서
-├── data/                      # 생성된 원본 데이터셋 (chunks, qa, reasoning)
+│       ├── results/           # 실제 기록될 결과 (exp_a.json, exp_b.json)
+│       └── metrics/           # 분석 리포트 (summary_exp_a.json, summary_exp_b.json)
+├── data/                      # 생성된 원본 데이터셋
+├── docs/                      # 실험 계획 및 아키텍처 문서
 └── logs/                      # 실행 로그
 ```
 
@@ -231,17 +229,19 @@ python3 experiments/01_pilot_initial_eval/scripts/evaluate_llm.py --input data/q
 # 결과 집계
 python3 experiments/01_pilot_initial_eval/scripts/summarize_eval.py
 ```
+- 결과 데이터는 `results/`에, 최종 집계 리포트는 `metrics/`에 저장됩니다.
 
-### [실험 2] Gemini 파일럿 스터디 (Closed-source Pilot)
+### [실험 2] Gemini 3 Flash 파일럿 (Closed-source Pilot)
 닫힌 RAG 환경에서의 성능 급락을 실증하기 위한 수동/정밀 실험입니다.
 
-1.  **샘플링 및 준비**: `experiments/02_pilot_closed_source/results/results.json`에 실험용 프롬프트가 미리 생성되어 있습니다.
-2.  **실험 수행**: Gemini 웹 및 AI Studio에 프롬프트를 입력하고 결과를 `results.json`의 `response` 및 `is_correct` 필드에 기록합니다.
+1.  **실험 A (Open Web)**: `results/results_exp_a.json`의 질문을 Gemini 웹에 입력하고 결과를 기록합니다.
+2.  **실험 B (Closed RAG)**: `results/results_exp_b.json`의 `no_conflict` 및 `conflict` 프롬프트를 AI Studio에 입력하고 결과를 기록합니다.
 3.  **지표 계산**:
     ```bash
     python3 experiments/02_pilot_closed_source/scripts/evaluate_pilot.py
     ```
-    이 명령을 통해 Answer Accuracy 및 Evidence Accuracy 통계를 즉시 확인할 수 있습니다.
+    - `metrics/summary_exp_a.json` 및 `summary_exp_b.json`으로 결과가 분리되어 저장됩니다.
+    - `response` 필드만 입력해도 정규화된 EM(Exact Match) 로직으로 **자동 채점**이 지원됩니다.
 
 ---
 

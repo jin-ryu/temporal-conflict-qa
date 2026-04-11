@@ -29,12 +29,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dotenv import load_dotenv
 
 from config import (
-    DIR_EVAL, DIR_QA,
+    DIR_QA,
     EVAL_GPT_MODEL, EVAL_GEMINI_MODEL,
     VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     get_model_alias, setup_logging,
 )
+
+DIR_EVAL = Path(__file__).resolve().parent.parent / "results"
 from llm_client import (
     make_client, set_rpm,
     rate_limit_wait, handle_api_error,
@@ -492,7 +494,7 @@ def evaluate(
                         logger.info("[%d/%d] %s — failed", completed, len(pending), record_id)
 
     logger.info("Done → %s", output_path)
-    logger.info("summary 생성: python eval/summarize_eval.py")
+    logger.info("summary 생성: python experiments/01_pilot_initial_eval/scripts/summarize_eval.py")
 
 
 # ---------------------------------------------------------------------------

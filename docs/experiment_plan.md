@@ -55,22 +55,21 @@
   - `current_raw`: 50건 → ambiguous 조건 대상
 
 ---
-
 ## 파일 컨벤션
 
 ```
-data/eval/eval_{model}_{condition}_{qa_stem}.jsonl       # 건별 결과 (resume 지원)
-data/eval_summary/summary_{model}_{condition}_{qa_stem}.json  # 조건별 집계
+experiments/01_pilot_initial_eval/results/eval_{model}_{condition}_{qa_stem}.jsonl  # 건별 결과
+experiments/01_pilot_initial_eval/metrics/summary_{model}_{condition}_{qa_stem}.json  # 집계 지표
 ```
 
 ### 실행 예시
 
 ```bash
-python eval/evaluate_llm.py --input data/qa/hoh_qa_gpt_0_50.jsonl --condition no_conflict
-python eval/evaluate_llm.py --input data/qa/hoh_qa_gpt_0_50.jsonl --condition conflict
-python eval/evaluate_llm.py --input data/qa/hoh_qa_gpt_0_50.jsonl --condition ambiguous
+# 1. LLM 평가 실행
+python experiments/01_pilot_initial_eval/scripts/evaluate_llm.py --input data/qa/hoh_qa_gpt_0_50.jsonl --condition conflict
 
-python eval/summarize_eval.py  # 전체 집계 (파일별 summary 생성)
+# 2. 결과 집계 (metrics/ 생성)
+python experiments/01_pilot_initial_eval/scripts/summarize_eval.py
 ```
 
 ---

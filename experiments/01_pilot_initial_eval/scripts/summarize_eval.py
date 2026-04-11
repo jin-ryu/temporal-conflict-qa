@@ -1,13 +1,13 @@
 """
 평가 결과 집계 스크립트.
 
-data/eval/ 의 eval_*.jsonl 파일을 읽어 조건별 지표를 집계하고
-data/eval_summary/ 에 저장한다.
+experiments/01_pilot_initial_eval/results/ 의 eval_*.jsonl 파일을 읽어 조건별 지표를 집계하고
+experiments/01_pilot_initial_eval/metrics/ 에 저장한다.
 
 사용법:
-  python eval/summarize_eval.py
-  python eval/summarize_eval.py --input data/eval/eval_gpt41_conflict_hoh_qa_gpt_0_50.jsonl
-  python eval/summarize_eval.py --input file1.jsonl file2.jsonl --subset 100
+  python experiments/01_pilot_initial_eval/scripts/summarize_eval.py
+  python experiments/01_pilot_initial_eval/scripts/summarize_eval.py --input experiments/01_pilot_initial_eval/results/eval_gpt41_conflict_hoh_qa_gpt_0_50.jsonl
+  python experiments/01_pilot_initial_eval/scripts/summarize_eval.py --input file1.jsonl file2.jsonl --subset 100
 """
 
 import argparse
@@ -19,7 +19,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from config import DIR_EVAL, DIR_EVAL_SUMMARY, DIR_QA, setup_logging
+from config import DIR_QA, setup_logging
+
+DIR_EVAL = Path(__file__).resolve().parent.parent / "results"
+DIR_EVAL_SUMMARY = Path(__file__).resolve().parent.parent / "metrics"
 
 logger = setup_logging("summarize_eval")
 
