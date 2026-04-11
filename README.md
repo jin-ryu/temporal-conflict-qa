@@ -47,42 +47,28 @@ RAG 시스템에서 시간적 충돌(temporal conflict)을 다루는 능력을 �
 temporal-conflict-qa/
 ├── config.py                  # 공통 설정 (디렉토리, 모델, RPM, 청킹 등)
 ├── llm_client.py              # LLM API 공통 모듈 (rate limiter, 에러 핸들링)
-├── scripts/
+├── scripts/                   # 데이터 생성 파이프라인 스크립트
 │   ├── hoh_to_chunks.py       # Wikipedia 청크 생성
 │   ├── chunks_to_qa.py        # LLM QA pair 생성 (GPT/Gemini/vLLM)
 │   ├── generate_reasoning.py  # SFT reasoning 생성 (ablation용)
 │   ├── merge_shards.py        # 범위별 결과 병합
 │   ├── sort_by_id.py          # JSONL 파일 id 기준 정렬
 │   └── run_pipeline.py        # 파이프라인 자동 실행 (chunks → qa)
-├── eval/
-│   ├── evaluate_llm.py        # LLM 평가 (조건별: no_conflict/conflict/ambiguous)
-│   ├── summarize_eval.py      # 평가 결과 집계
-│   └── experiment_plan.md     # 실험 설계 문서
+├── experiments/               # 실험 및 평가 프레임워크 (독립적 관리)
+│   ├── 01_pilot_initial_eval/ # [실험 1] 대규모 자동 평가 히스토리
+│   │   ├── scripts/           # evaluate_llm.py, summarize_eval.py
+│   │   └── results/           # eval/, summary/ 결과 데이터
+│   └── 02_pilot_closed_source/# [실험 2] Gemini 1.5 Flash 파일럿 (수동/정밀)
+│       ├── scripts/           # 샘플링, 템플릿 생성, 평가 스크립트
+│       ├── data/              # 샘플링된 100개 데이터
+│       ├── results/           # 실제 기록될 결과 (results.json)
+│       └── metrics/           # 분석 리포트 (summary.json)
 ├── setup.sh                   # 가상환경 설치 스크립트
 ├── requirements.txt
 ├── .env                       # API 키 (git 제외)
-├── .env.example               # 키 템플릿
 ├── architecture.md            # TV-RAG 아키텍처 문서
-├── data/
-│   ├── original/              # HoH-QAs 원본 데이터
-│   │   └── original_0_600.jsonl
-│   ├── chunks/                # hoh_to_chunks.py 결과
-│   │   ├── chunks_0_600.jsonl
-│   │   └── chunks.jsonl               ← merge_shards.py --step 1
-│   ├── qa/                    # chunks_to_qa.py 결과
-│   │   ├── qa_llama70b_0_600.jsonl
-│   │   └── qa.jsonl                   ← merge_shards.py --step 2
-│   ├── qa-reasoning/          # generate_reasoning.py 결과
-│   │   └── qa_reasoning.jsonl         ← merge_shards.py --step 3
-│   ├── eval/                  # evaluate_llm.py 결과
-│   │   └── eval_{eval_model}_{condition}_{qa_model}_{range}.jsonl
-│   └── eval_summary/          # summarize_eval.py 결과
-│       └── summary_{eval_model}_{condition}_{qa_model}_{range}.json
-└── logs/                      # 실행 로그 (스크립트별 폴더, 타임스탬프별 파일)
-    ├── hoh_to_chunks/
-    │   └── hoh_to_chunks_20260314_123456.log
-    ├── chunks_to_qa/
-    └── generate_reasoning/
+├── data/                      # 생성된 원본 데이터셋 (chunks, qa, reasoning)
+└── logs/                      # 실행 로그
 ```
 
 > `data/` 및 `logs/` 디렉토리는 스크립트 실행 시 자동 생성된다.
@@ -109,11 +95,6 @@ temporal-conflict-qa/
   ]
 }
 ```
-
-- `hoh_source_idx`: HoH 원본 데이터셋 인덱스 (정수)
-- `answers`: current 1개 + outdated n개 (n ≥ 1)
-- `chunks`: current snapshot 전체 (current 1개 + distractor 다수) + outdated snapshot에서 evidence chunk 1개씩
-- distractor 청크에도 `last_modified_time`이 부여됨 (current_time과 동일, timestamp 유무 shortcut 방지)
 
 ### chunks_to_qa.py 출력: `data/qa/qa_{model_alias}_N_M.jsonl`
 
@@ -236,77 +217,44 @@ python scripts/sort_by_id.py data/qa/qa_llama70b_0_600.jsonl                # �
 python scripts/sort_by_id.py data/qa/qa_llama70b_0_600.jsonl -o sorted.jsonl # 별도 파일
 ```
 
-#### 6. LLM 평가 (temporal conflict 실험)
+---
 
-평가 모델은 `config.py`의 `EVAL_GPT_MODEL` / `EVAL_GEMINI_MODEL`에서 설정한다.
+## 실험 및 평가
 
-```bash
-# GPT (기본값: EVAL_GPT_MODEL)
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition no_conflict
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition conflict
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition ambiguous
-
-# Gemini (기본값: EVAL_GEMINI_MODEL)
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition no_conflict --provider gemini
-
-# vLLM (로컬 서버)
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition no_conflict --vllm-model hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4
-
-# 모델 직접 지정
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition no_conflict --gpt-model gpt-4.1-mini
-
-# 청크 수 변경 (기본값: 5)
-python eval/evaluate_llm.py --input data/qa/qa_llama70b_0_600.jsonl --condition no_conflict --num-chunks 10
-```
-
-결과는 `data/eval/eval_{eval_model}_{condition}_{qa_stem}.jsonl`에 저장된다.
-실험 설계에 대한 자세한 내용은 [`eval/experiment_plan.md`](docs/experiment_plan.md) 참조.
-
-#### 7. 평가 결과 집계
-
-세 조건이 모두 완료된 후 실행:
+### [실험 1] 대규모 자동 평가 (Initial Eval)
+다양한 모델의 시간적 충돌 해결 능력을 자동으로 측정합니다.
 
 ```bash
-# data/eval/ 전체 집계
-python eval/summarize_eval.py
+# 평가 실행 (루트 디렉토리에서 실행)
+python3 experiments/01_pilot_initial_eval/scripts/evaluate_llm.py --input data/qa/qa.jsonl --condition conflict
 
-# 특정 파일만 집계
-python eval/summarize_eval.py --input data/eval/eval_gpt41_no_conflict_llama70b_0_600.jsonl data/eval/eval_gpt41_conflict_llama70b_0_600.jsonl
-
-# 모델 간 공정 비교: 공통 성공 id 교집합에서 N건만 추출
-python eval/summarize_eval.py --input data/eval/eval_gpt41_conflict_*.jsonl data/eval/eval_llama70b_conflict_*.jsonl --subset 100
+# 결과 집계
+python3 experiments/01_pilot_initial_eval/scripts/summarize_eval.py
 ```
 
-결과는 `data/eval_summary/summary_{stem}.json`에 저장된다. `--subset` 사용 시 `summary_{stem}_subsetN.json`.
+### [실험 2] Gemini 파일럿 스터디 (Closed-source Pilot)
+닫힌 RAG 환경에서의 성능 급락을 실증하기 위한 수동/정밀 실험입니다.
+
+1.  **샘플링 및 준비**: `experiments/02_pilot_closed_source/results/results.json`에 실험용 프롬프트가 미리 생성되어 있습니다.
+2.  **실험 수행**: Gemini 웹 및 AI Studio에 프롬프트를 입력하고 결과를 `results.json`의 `response` 및 `is_correct` 필드에 기록합니다.
+3.  **지표 계산**:
+    ```bash
+    python3 experiments/02_pilot_closed_source/scripts/evaluate_pilot.py
+    ```
+    이 명령을 통해 Answer Accuracy 및 Evidence Accuracy 통계를 즉시 확인할 수 있습니다.
 
 ---
 
 ## Wikipedia 청크 생성 전략
 
-- MediaWiki API (`rvstart` + `rvdir=older`)로 `last_modified_time` 기준 직전 revision fetch
-- `mwparserfromhell`로 wikitext → 평문 변환
-- 슬라이딩 윈도우: `chunk_size=5`, `stride=3`
-- **current snapshot**: evidence chunk → `current`, 나머지 → `distractor` (모든 청크에 `last_modified_time` 부여)
-- **outdated snapshot**: evidence chunk 1개만 → `outdated` (distractor 없음, 중복 방지)
-- 총 청크 수가 `MAX_CHUNKS=10` 초과 시 distractor를 균등 샘플링으로 축소
+- MediaWiki API (`rvstart` + `rvdir=older`)로 `last_modified_time` 기준 직전 revision fetch.
+- 슬라이딩 윈도우: `chunk_size=5`, `stride=3`.
+- **current snapshot**: evidence chunk → `current`, 나머지 → `distractor`.
+- **outdated snapshot**: evidence chunk 1개만 → `outdated`.
+- 총 청크 수가 `MAX_CHUNKS=10` 초과 시 distractor를 균등 샘플링으로 축소.
 
 ## LLM 호출 전략
 
-- GPT 모델: `gpt-4.1-mini` / Gemini 모델: `gemini-2.5-flash` / vLLM: `Meta-Llama-3.1-70B-Instruct-AWQ-INT4`
-- record 1개당 mode별 1번 호출 (`current`, `current_raw`, `outdated_0`, ...)
-- 생성된 질문에 연월 숫자 포함 시 rejection reason과 함께 재시도 (최대 3회)
-- 429 / 5xx / 네트워크 에러: 지수 백오프 재시도 (최대 6회)
-
----
-
-## 주요 의존성
-
-| 패키지 | 용도 |
-|--------|------|
-| `datasets` | HoH-QAs 로드 |
-| `requests` | Wikipedia MediaWiki API 호출 |
-| `mwparserfromhell` | wikitext 파싱 |
-| `openai` | GPT API |
-| `google-genai` | Gemini API |
-| `python-dotenv` | `.env` 파일 로드 |
-| `huggingface-hub` | HF 인증 (optional) |
+- record 1개당 mode별 1번 호출 (`current`, `current_raw`, `outdated_0`, ...).
+- 생성된 질문에 연월 숫자 포함 시 rejection reason과 함께 재시도 (최대 3회).
+- 429 / 5xx / 네트워크 에러: 지수 백오프 재시도 (최대 6회).

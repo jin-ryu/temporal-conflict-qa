@@ -1,0 +1,1209 @@
+{
+  "metadata": {
+    "experiment_name": "TV-RAG Pilot Study",
+    "total_samples": 100,
+    "model": "Gemini 3 Flash (Web ON)"
+  },
+  "records": [
+    {
+      "id": "hoh_000301_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "1958",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "In what year was Wayne Bertram Williams born, around the time he developed an interest in radio and journalism?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000163_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "222",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "How many reviews were used to calculate the average rating of Absolute Power at the time of its conclusion?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000319_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "25",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "How many players were called up for the national team's upcoming matches in the latest Nations League A campaign?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000340_current",
+      "mode": "current",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Paraguay",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Which team was the last match against that led to the update of caps and goals for the Bolivia national football team players shortly before the World Cup qualification matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000065_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "15 February 1950",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "When Tsui Hark was a prominent figure in the Golden Age of Hong Kong cinema, what was his birthdate?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000335_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "32 million",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "How many copies of the main entries in the Devil May Cry series have been sold worldwide?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000088_current_raw",
+      "mode": "current_raw",
+      "layers": 2,
+      "ground_truth": {
+        "answer": "9:47",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "At what time did Captain Gibson feel a high frequency vibration in the balls of his feet while cruising near Saginaw, Michigan?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000125_outdated_1",
+      "mode": "outdated_1",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Air France operates 32 aircraft, which is more than Delta Air Lines' 30.",
+        "target_time": "2024-08-01"
+      },
+      "question": "How many A350 aircraft did Air France and Delta Air Lines operate shortly after the A350F's entry-into-service was rescheduled?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000258_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "11-12",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "What is the age range of children in Year 7?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_outdated_2",
+      "mode": "outdated_2",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "606",
+        "target_time": "2024-08-01"
+      },
+      "question": "How many A350 family aircraft had been delivered when the number of A350 family aircraft orders approached 1,310?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000115_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "The match against Sweden",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "When the Estonian national football team players' caps and goals were last updated for the UEFA Nations League matches, what match was used as the reference point?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_outdated_0",
+      "mode": "outdated_0",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "598",
+        "target_time": "2024-06-01"
+      },
+      "question": "How many A350 family aircraft were delivered when the monthly total first surpassed 600?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000385_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "25",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many players were called up for a major international football tournament?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000310_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "13\u201317",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What is the age range for children referred to as 1.25 generation immigrants when the concept was most recently clarified?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_current_raw",
+      "mode": "current_raw",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "217 caps",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many official men's international appearances does Cristiano Ronaldo of Portugal hold?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000334_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "The United States",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who are the opponents of the Jamaica national football team in their upcoming CONCACAF Nations League matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000362_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "1,162",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many men have represented Ireland in rugby union as of the most recent update?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_outdated_3",
+      "mode": "outdated_3",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "214 caps",
+        "target_time": "2024-10-01"
+      },
+      "question": "How many official men's international appearances did Cristiano Ronaldo of Portugal hold before the regulation update in October?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000116_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Slovakia and Sweden",
+        "target_time": "2024-09-01"
+      },
+      "question": "Who were the opponents for the Estonian national football team in the UEFA Nations League matches shortly before the next coaching staff announcement?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000115_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "The match against Sweden",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "What match is used as the reference point for the updated caps and goals of the Estonian national football team players?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000177_outdated_0",
+      "mode": "outdated_0",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "44",
+        "target_time": "2024-07-01"
+      },
+      "question": "How many matches did Jan Oblak start as the team captain at the time the player records were last updated in the summer?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000331_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Venezuela",
+        "target_time": "2024-08-01 00:00:00"
+      },
+      "question": "What is the opponent in the match after which the caps and goals for the Jamaica national football team are correct?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000332_outdated_0",
+      "mode": "outdated_0",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "528",
+        "target_time": "2024-06-01"
+      },
+      "question": "How many matches has the Jamaica national football team played shortly after Theodore Whitmore was dismissed as senior national team head coach?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000335_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "32 million",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "How many copies of the main entries in the Devil May Cry series have been sold worldwide as of the latest available update?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000334_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "The United States",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who are the opponents of the Jamaica national football team in their CONCACAF Nations League matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000206_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Ukraine and Czechia",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who are the opponents for the UEFA Nations League matches that the 23 named players will be facing during the upcoming campaign?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000432_outdated_0",
+      "mode": "outdated_0",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "The match against Thailand",
+        "target_time": "2024-06-01"
+      },
+      "question": "When the match against Singapore was approaching, which match was referenced as the point of update for the caps and goals of the South Korea national football team players?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000433_current",
+      "mode": "current",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "Kuwait and Palestine",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "Who are the opponents for the most recent FIFA World Cup qualification matches that the players were called up for?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000298_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "59",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many businesses does the mall contain?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000301_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "1958",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What is the birth year of Wayne Bertram Williams?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000223_current",
+      "mode": "current",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Bulgaria",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "After which game are caps and goals correct for the Belarus national football team at the time of the UEFA Nations League matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000125_current_raw",
+      "mode": "current_raw",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Air France operates 35 aircraft, and Delta Air Lines operates 33 aircraft. Air France operates more.",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What is the number of A350 aircraft operated by Air France and Delta Air Lines, and which one operates more?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000065_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "15 February 1950",
+        "target_time": "2024-09-01"
+      },
+      "question": "When Tsui Hark's career in filmmaking first started gaining momentum, what was his birthdate?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000474_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "619 men from 113 nationalities",
+        "target_time": "2024-08-01 00:00:00"
+      },
+      "question": "How many men's footballers from different nationalities have officially played in 100 or more international matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000542_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "771,748",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "What is the total population of Santiago de los Caballeros?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000476_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "626",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many men's footballers have officially played in 100 or more international matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_outdated_0",
+      "mode": "outdated_0",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "206 caps",
+        "target_time": "2024-06-01"
+      },
+      "question": "How many official men's international appearances did Cristiano Ronaldo of Portugal hold shortly after surpassing Bader Al-Mutawa's record in March?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000258_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "11 to 12",
+        "target_time": "2024-06-01"
+      },
+      "question": "What was the age range of children in Year 7 at the time of the original curriculum announcement?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000223_current_raw",
+      "mode": "current_raw",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Bulgaria",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "After which game are caps and goals correct for the Belarus national football team?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000332_current",
+      "mode": "current",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "538",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many matches has the Jamaica national football team played since their first international match, including their latest appearances in the CONCACAF Nations League and Copa Am\u00e9rica?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000177_current_raw",
+      "mode": "current_raw",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "50",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many matches did Jan Oblak start as the team captain?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000206_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Ukraine and Czechia",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who are the opponents for the UEFA Nations League matches that the 23 named players will be facing?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_outdated_4",
+      "mode": "outdated_4",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "618",
+        "target_time": "2024-10-01"
+      },
+      "question": "How many A350 family aircraft had been delivered by the time Turkish Airlines had 110 aircraft on order?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000046_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Yadava king",
+        "target_time": "2024-07-01"
+      },
+      "question": "What was the occupation or social status of Vasudeva's father, Shurasena, when the Vasudeva's family history was first documented?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000103_outdated_0",
+      "mode": "outdated_0",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "The match against Nigeria.",
+        "target_time": "2024-06-01"
+      },
+      "question": "When the policy regarding kit suppliers was being updated, what match was used as the reference point for the correctness of caps and goals?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000340_outdated_0",
+      "mode": "outdated_0",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Uruguay",
+        "target_time": "2024-07-01"
+      },
+      "question": "Which team was the last match against that led to the update of caps and goals for the Bolivia national football team players when the squad for the Copa Am\u00e9rica was announced?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000177_current",
+      "mode": "current",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "50",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many matches did Jan Oblak start as the team captain as of the latest update?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000331_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Venezuela",
+        "target_time": "2024-08-01 00:00:00"
+      },
+      "question": "Who did Jamaica play against in the match after which the caps and goals for the Jamaica national football team are most up to date?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000362_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "1,162",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many men have represented Ireland in rugby union?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_current_raw",
+      "mode": "current_raw",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "623",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many A350 family aircraft have been delivered?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000220_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Slovenia and Belarus",
+        "target_time": "2024-06-01"
+      },
+      "question": "Who were the opponents for the friendly matches that the following players were called-up for, shortly before the UEFA Nations League matches against Moldova and Andorra?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000046_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Yadava king",
+        "target_time": "2024-09-01 00:00:00"
+      },
+      "question": "What was Vasudeva's father's occupation or social status at the time of Vasudeva's birth in the Surasena kingdom of Khandalwansha?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000246_current_raw",
+      "mode": "current_raw",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "1983",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "In what year did The Gambia finally create a military, in the form of the Gambia National Army and Gambian National Gendarmerie?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_outdated_3",
+      "mode": "outdated_3",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "613",
+        "target_time": "2024-09-01"
+      },
+      "question": "How many A350 family aircraft had been delivered around the time the commercial fleet surpassed 1.3 million flights?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000220_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Moldova and Andorra",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "Who are the opponents for the friendly matches that the following players were called-up for when the upcoming Nations League matches were announced?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000065_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "15 February 1950",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "What is Tsui Hark's birthdate?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_outdated_5",
+      "mode": "outdated_5",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "621",
+        "target_time": "2024-11-01"
+      },
+      "question": "How many A350 family aircraft had been delivered by the time the A350 fleet completed more than 1.58 million flights?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000246_current",
+      "mode": "current",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "1983",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "When the Gambia first established its own military forces, in what year did the Gambia National Army and Gambian National Gendarmerie come into being?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000340_current_raw",
+      "mode": "current_raw",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Paraguay",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Which team was the last match against that led to the update of caps and goals for the Bolivia national football team players?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000163_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "47",
+        "target_time": "2024-08-01"
+      },
+      "question": "How many reviews were used to calculate the average rating of Absolute Power shortly after the event began?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_current",
+      "mode": "current",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "623",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many A350 family aircraft had been delivered by the end of the given year?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000115_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "The match against Switzerland",
+        "target_time": "2024-06-01"
+      },
+      "question": "What match is used as the reference point for the updated caps and goals of the Estonian national football team players when preparing for the Baltic Cup in June?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000316_outdated_0",
+      "mode": "outdated_0",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "British-Australian",
+        "target_time": "2024-07-01"
+      },
+      "question": "What was Naomi Watts' nationality when she was in a relationship with Liev Schreiber, shortly before they separated?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000125_outdated_0",
+      "mode": "outdated_0",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Air France and Delta Air Lines operate the same number of aircraft, 30.",
+        "target_time": "2024-07-01"
+      },
+      "question": "How many A350 aircraft were operated by Air France and Delta Air Lines when the production programme first started to show a significant rise in deliveries?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_outdated_2",
+      "mode": "outdated_2",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "212 caps",
+        "target_time": "2024-08-01"
+      },
+      "question": "How many official men's international appearances did Cristiano Ronaldo of Portugal hold shortly after surpassing Bader Al-Mutawa's record?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000091_current_raw",
+      "mode": "current_raw",
+      "layers": 2,
+      "ground_truth": {
+        "answer": "Chigwizi",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What is the name of the abandoned coal mine over which the school was built?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000220_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Moldova and Andorra",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "Who were the opponents for the friendly matches that the following players were called-up for?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000116_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Azerbaijan and Slovakia",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who are the opponents for the Estonian national football team in the upcoming UEFA Nations League matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000332_current_raw",
+      "mode": "current_raw",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "538",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many matches has the Jamaica national football team played since their first international match in 1925?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000433_current_raw",
+      "mode": "current_raw",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "Kuwait and Palestine",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "Who are the opponents for the 2026 FIFA World Cup qualification matches that the players were called up for?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000046_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Yadava king",
+        "target_time": "2024-09-01 00:00:00"
+      },
+      "question": "What was the occupation or social status of Vasudeva's father, Shurasena?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000178_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "25",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many players were called up for Slovenia's national football team shortly after the match against Kazakhstan?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000298_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "64",
+        "target_time": "2024-08-01"
+      },
+      "question": "How many businesses did the mall contain when the summer updates were released?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000319_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "25",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "How many players were called up for the national team's upcoming matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000316_current",
+      "mode": "current",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "British",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "What is the nationality of the actress Naomi Watts, with whom Liev Schreiber was in a relationship, according to the most recent information available?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000298_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "59",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many businesses did the mall contain at the time of its latest ownership update?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000316_current_raw",
+      "mode": "current_raw",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "British",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "What nationality is the actress Naomi Watts, with whom Liev Schreiber was in a relationship?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000588_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "13th",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What is Morocco's ranking as the best national team in the world?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_outdated_4",
+      "mode": "outdated_4",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "216 caps",
+        "target_time": "2024-11-01"
+      },
+      "question": "How many official men's international appearances did Cristiano Ronaldo of Portugal hold at the end of the month before last?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_outdated_1",
+      "mode": "outdated_1",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "211 caps",
+        "target_time": "2024-07-01"
+      },
+      "question": "How many official men's international appearances did Cristiano Ronaldo of Portugal hold in early July?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000163_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "222",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "How many reviews were used to calculate the average rating of \"Absolute Power\"?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000206_outdated_0",
+      "mode": "outdated_0",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Czech Republic and Albania",
+        "target_time": "2024-09-01"
+      },
+      "question": "Who were the opponents for the UEFA Nations League matches that the 23 named players faced when Saba Goglichidze was added to the squad in early September?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000103_current_raw",
+      "mode": "current_raw",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "The second match against Kenya.",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "What match is used as the reference point for the correctness of caps and goals?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000246_outdated_0",
+      "mode": "outdated_0",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "1985",
+        "target_time": "2024-08-01"
+      },
+      "question": "When The Gambia was initially integrating its security forces with Senegal's, in what year did The Gambia finally create a military, in the form of the Gambia National Army and Gambian National Gendarmerie?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000123_outdated_1",
+      "mode": "outdated_1",
+      "layers": 7,
+      "ground_truth": {
+        "answer": "602",
+        "target_time": "2024-07-01"
+      },
+      "question": "How many A350 family aircraft had been delivered when the monthly delivery count first surpassed 600 units?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000103_current",
+      "mode": "current",
+      "layers": 4,
+      "ground_truth": {
+        "answer": "The second match against Kenya.",
+        "target_time": "2024-11-01 00:00:00"
+      },
+      "question": "What match is used as the reference point for the correctness of caps and goals at the time of the current squad selection?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000432_current_raw",
+      "mode": "current_raw",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "The match against Palestine",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What match is referenced as the point of update for the caps and goals of the South Korea national football team players?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000341_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "28",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many players were called up to the Bolivia national football team for a major tournament shortly before their match against Colombia?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000178_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "25",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many players were called up for Slovenia's national football team for an upcoming tournament/matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000223_outdated_0",
+      "mode": "outdated_0",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Malta",
+        "target_time": "2024-06-01"
+      },
+      "question": "After which game were caps and goals correct for the Belarus national football team, shortly before the start of the Russian invasion of Ukraine?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000125_current",
+      "mode": "current",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "Air France operates 35 aircraft, and Delta Air Lines operates 33 aircraft. Air France operates more.",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many A350 aircraft do Air France and Delta Air Lines operate at the present time?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000116_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Azerbaijan and Slovakia",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who are the opponents for the Estonian national football team in the UEFA Nations League matches?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000410_current_raw",
+      "mode": "current_raw",
+      "layers": 2,
+      "ground_truth": {
+        "answer": "Danmartin",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Who did the marriage to Ida make a power?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000432_current",
+      "mode": "current",
+      "layers": 5,
+      "ground_truth": {
+        "answer": "The match against Palestine",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "When the team was preparing for the upcoming World Cup qualification matches, what match was referenced as the point of update for the caps and goals of the South Korea national football team players?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000258_current",
+      "mode": "current",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "11-12",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "What is the age range of children in Year 7 at the time of the current school year?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000429_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "The match against Botswana",
+        "target_time": "2024-08-01 00:00:00"
+      },
+      "question": "What match is used as the reference point for the caps and goals of the South Africa national soccer team players?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000310_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "13\u201317",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "What is the age range for children referred to as 1.25 generation immigrants?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000341_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "28",
+        "target_time": "2024-10-01 00:00:00"
+      },
+      "question": "How many players were called up to the Bolivia national football team for a major tournament?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000475_current",
+      "mode": "current",
+      "layers": 6,
+      "ground_truth": {
+        "answer": "217 caps",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "How many official men's international appearances does Cristiano Ronaldo of Portugal hold as of the latest update?",
+      "response": "",
+      "is_correct": null
+    },
+    {
+      "id": "hoh_000569_current_raw",
+      "mode": "current_raw",
+      "layers": 3,
+      "ground_truth": {
+        "answer": "Philadelphia Wings",
+        "target_time": "2024-12-01 00:00:00"
+      },
+      "question": "Which team does Callum Crawford play for in the National Lacrosse League?",
+      "response": "",
+      "is_correct": null
+    }
+  ]
+}
