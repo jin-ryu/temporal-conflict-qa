@@ -27,6 +27,8 @@ def evaluate_pilot_study():
     parser = argparse.ArgumentParser(description="TV-RAG Pilot Study Evaluation Tool")
     parser.add_argument("--mode", choices=["a", "b", "all"], default="all", 
                         help="실험 모드 선택: a (Web ON), b (Closed RAG), all (전체)")
+    parser.add_argument("--save", action="store_true", default=True,
+                        help="자동 채점 결과를 원본 JSON 파일에 저장 (기본값: True)")
     args = parser.parse_args()
 
     path_a = Path("experiments/02_pilot_closed_source/results/results_exp_a.json")
@@ -50,7 +52,6 @@ def evaluate_pilot_study():
     stats_a = lambda: {"total": 0, "exp_a_correct": 0}
     stats_b = lambda: {"total": 0, "no_conflict_correct": 0, "conflict_ans_correct": 0, "conflict_evid_correct": 0}
     
-    # Mode-based & Layer-based aggregation
     mode_stats_a = defaultdict(stats_a)
     layer_stats_a = defaultdict(stats_a)
     overall_a = stats_a()
@@ -68,18 +69,29 @@ def evaluate_pilot_study():
             def update_a(stats):
                 stats["total"] += 1
                 if r.get("response"):
-                    if r.get("is_correct") is not None:
-                        if r["is_correct"]: stats["exp_a_correct"] += 1
-                    else:
-                        pred = _normalize(r["response"])
-                        gt = _normalize(r["ground_truth"]["answer"])
-                        if pred == gt or gt in pred: stats["exp_a_correct"] += 1
+                    # 1. 자동 채점 수행
+                    pred = _normalize(r["response"])
+                    gt = _normalize(r["ground_truth"]["answer"])
+                    auto_correct = (pred == gt or gt in pred)
+                    
+                    # 2. 파일에 저장할 값 결정 (null인 경우만 자동 결과로 채움)
+                    if r.get("is_correct") is None and args.save:
+                        r["is_correct"] = auto_correct
+                    
+                    # 3. 통계용 값 결정 (수동 값이 있으면 그것을 우선시)
+                    final_correct = r["is_correct"] if r.get("is_correct") is not None else auto_correct
+                    if final_correct:
+                        stats["exp_a_correct"] += 1
 
             update_a(mode_stats_a[m_grp])
             update_a(layer_stats_a[l_grp])
             update_a(overall_a)
 
-        # Save Exp A Summary
+        if args.save:
+            with open(path_a, "w") as f:
+                json.dump(data_a, f, indent=2)
+
+        # Save Summary
         summary_a = {
             "overall": calc_metrics(overall_a),
             "by_mode": {m: calc_metrics(mode_stats_a[m]) for m in mode_stats_a},
@@ -96,38 +108,50 @@ def evaluate_pilot_study():
             
             def update_b(stats):
                 stats["total"] += 1
+                gt_ans = _normalize(r["ground_truth"]["answer"])
+                
                 # No-Conflict
                 nc = r.get("no_conflict", {})
                 if nc.get("raw_response"):
-                    if nc.get("is_correct") is not None:
-                        if nc["is_correct"]: stats["no_conflict_correct"] += 1
-                    else:
-                        ans = _normalize(parse_xml_tag(nc["raw_response"], "answer") or nc["raw_response"])
-                        gt = _normalize(r["ground_truth"]["answer"])
-                        if ans == gt or gt in ans: stats["no_conflict_correct"] += 1
+                    ans = _normalize(parse_xml_tag(nc["raw_response"], "answer") or nc["raw_response"])
+                    auto_nc_correct = (ans == gt_ans or gt_ans in ans)
+                    if nc.get("is_correct") is None and args.save:
+                        nc["is_correct"] = auto_nc_correct
+                    
+                    final_nc_correct = nc["is_correct"] if nc.get("is_correct") is not None else auto_nc_correct
+                    if final_nc_correct: stats["no_conflict_correct"] += 1
                 
                 # Conflict
                 cf = r.get("conflict", {})
                 if cf.get("raw_response"):
-                    if cf.get("is_answer_correct") is not None:
-                        if cf["is_answer_correct"]: stats["conflict_ans_correct"] += 1
-                    else:
-                        ans = _normalize(parse_xml_tag(cf["raw_response"], "answer") or cf["raw_response"])
-                        gt = _normalize(r["ground_truth"]["answer"])
-                        if ans == gt or gt in ans: stats["conflict_ans_correct"] += 1
+                    # Answer
+                    ans = _normalize(parse_xml_tag(cf["raw_response"], "answer") or cf["raw_response"])
+                    auto_cf_ans_correct = (ans == gt_ans or gt_ans in ans)
+                    if cf.get("is_answer_correct") is None and args.save:
+                        cf["is_answer_correct"] = auto_cf_ans_correct
                     
-                    if cf.get("is_evidence_correct") is not None:
-                        if cf["is_evidence_correct"]: stats["conflict_evid_correct"] += 1
-                    else:
-                        rel = parse_xml_tag(cf["raw_response"], "relevance")
-                        gt_rel = r["ground_truth"].get("correct_relevance")
-                        if rel == gt_rel: stats["conflict_evid_correct"] += 1
+                    final_cf_ans_correct = cf["is_answer_correct"] if cf.get("is_answer_correct") is not None else auto_cf_ans_correct
+                    if final_cf_ans_correct: stats["conflict_ans_correct"] += 1
+                    
+                    # Evidence
+                    rel = parse_xml_tag(cf["raw_response"], "relevance")
+                    gt_rel = r["ground_truth"].get("correct_relevance")
+                    auto_cf_evid_correct = (rel == gt_rel)
+                    if cf.get("is_evidence_correct") is None and args.save:
+                        cf["is_evidence_correct"] = auto_cf_evid_correct
+                    
+                    final_cf_evid_correct = cf["is_evidence_correct"] if cf.get("is_evidence_correct") is not None else auto_cf_evid_correct
+                    if final_cf_evid_correct: stats["conflict_evid_correct"] += 1
 
             update_b(mode_stats_b[m_grp])
             update_b(layer_stats_b[l_grp])
             update_b(overall_b)
 
-        # Save Exp B Summary
+        if args.save:
+            with open(path_b, "w") as f:
+                json.dump(data_b, f, indent=2)
+
+        # Save Summary
         summary_b = {
             "overall": calc_metrics(overall_b),
             "by_mode": {m: calc_metrics(mode_stats_b[m]) for m in mode_stats_b},
@@ -137,7 +161,7 @@ def evaluate_pilot_study():
             json.dump(summary_b, f, indent=2)
 
     # --- Output Report ---
-    print(f"\n=== Pilot Study Evaluation Summary (Mode: {args.mode.upper()}) ===")
+    print(f"\n=== Pilot Study Evaluation Summary (Auto-graded & Saved) ===")
     if data_a:
         print(f"[Exp A - Web ON]  Total: {overall_a['total']} | Accuracy: {summary_a['overall']['exp_a_correct']:.2%}")
     if data_b:
@@ -146,6 +170,8 @@ def evaluate_pilot_study():
         print(f"  - Conflict Answer Accuracy:   {summary_b['overall']['conflict_ans_correct']:.2%}")
         print(f"  - Conflict Evidence Accuracy: {summary_b['overall']['conflict_evid_correct']:.2%}")
     print("-" * 50)
+    if args.save:
+        print("결과가 원본 JSON 파일의 'is_correct' 필드에 저장되었습니다.")
     print("분석 리포트가 experiments/02_pilot_closed_source/metrics/ 에 저장되었습니다.")
 
 if __name__ == "__main__":
