@@ -238,7 +238,12 @@ python3 experiments/01_pilot_initial_eval/scripts/summarize_eval.py
 2.  **실험 B (Closed RAG)**: `results/results_exp_b.json`의 `no_conflict` 및 `conflict` 프롬프트를 AI Studio에 입력하고 결과를 기록합니다.
 3.  **지표 계산**:
     ```bash
+    # 전체 채점 (기본값)
     python3 experiments/02_pilot_closed_source/scripts/evaluate_pilot.py
+
+    # 특정 실험만 채점
+    python3 experiments/02_pilot_closed_source/scripts/evaluate_pilot.py --mode a  # 실험 A(Web ON)만 채점
+    python3 experiments/02_pilot_closed_source/scripts/evaluate_pilot.py --mode b  # 실험 B(Closed RAG)만 채점
     ```
     - `metrics/summary_exp_a.json` 및 `summary_exp_b.json`으로 결과가 분리되어 저장됩니다.
     - `response` 필드만 입력해도 정규화된 EM(Exact Match) 로직으로 **자동 채점**이 지원됩니다.
