@@ -1,6 +1,8 @@
 import json
 import re
 import string
+import argparse
+from pathlib import Path
 from collections import defaultdict
 
 def _normalize(s: str) -> str:
@@ -16,123 +18,135 @@ def parse_xml_tag(text: str, tag: str) -> str:
     m = re.search(f"<{tag}>(.*?)</{tag}>", text, re.DOTALL)
     return m.group(1).strip() if m else ""
 
-def evaluate_pilot_study():
-    try:
-        with open("experiments/02_pilot_closed_source/results/results_exp_a.json", "r") as f:
-            data_a = json.load(f)
-        with open("experiments/02_pilot_closed_source/results/results_exp_b.json", "r") as f:
-            data_b = json.load(f)
-    except FileNotFoundError as e:
-        print(f"Error: Could not find result files. {e}")
-        return
-        
-    records_a = {r["id"]: r for r in data_a["records"]}
-    records_b = {r["id"]: r for r in data_b["records"]}
-    all_ids = set(records_a.keys()) | set(records_b.keys())
-    
-    stats_template = lambda: {"total": 0, "exp_a_correct": 0, "no_conflict_correct": 0, "conflict_ans_correct": 0, "conflict_evid_correct": 0}
-    mode_stats = defaultdict(stats_template)
-    layer_stats = defaultdict(stats_template)
-    overall = stats_template()
+def calc_metrics(stats):
+    if stats["total"] == 0:
+        return {k: 0.0 for k in stats if k.endswith("correct")}
+    return {k: (v / stats["total"] if k.endswith("correct") else v) for k, v in stats.items()}
 
-    for rid in all_ids:
-        ra = records_a.get(rid)
-        rb = records_b.get(rid)
-        
-        meta = ra or rb
-        mode_group = "outdated" if meta["mode"].startswith("outdated_") else meta["mode"]
-        layer_group = "4+" if meta["layers"] >= 4 else str(meta["layers"])
+def evaluate_pilot_study():
+    parser = argparse.ArgumentParser(description="TV-RAG Pilot Study Evaluation Tool")
+    parser.add_argument("--mode", choices=["a", "b", "all"], default="all", 
+                        help="실험 모드 선택: a (Web ON), b (Closed RAG), all (전체)")
+    args = parser.parse_args()
+
+    path_a = Path("experiments/02_pilot_closed_source/results/results_exp_a.json")
+    path_b = Path("experiments/02_pilot_closed_source/results/results_exp_b.json")
+    
+    data_a, data_b = None, None
+    
+    # Load requested files
+    if args.mode in ["a", "all"] and path_a.exists():
+        with open(path_a, "r") as f:
+            data_a = json.load(f)
+    if args.mode in ["b", "all"] and path_b.exists():
+        with open(path_b, "r") as f:
+            data_b = json.load(f)
+
+    if not data_a and not data_b:
+        print("Error: 처리할 결과 데이터가 없습니다. JSON 파일 경로를 확인하세요.")
+        return
+
+    # Statistics templates
+    stats_a = lambda: {"total": 0, "exp_a_correct": 0}
+    stats_b = lambda: {"total": 0, "no_conflict_correct": 0, "conflict_ans_correct": 0, "conflict_evid_correct": 0}
+    
+    # Mode-based & Layer-based aggregation
+    mode_stats_a = defaultdict(stats_a)
+    layer_stats_a = defaultdict(stats_a)
+    overall_a = stats_a()
+
+    mode_stats_b = defaultdict(stats_b)
+    layer_stats_b = defaultdict(stats_b)
+    overall_b = stats_b()
+
+    # --- Process Exp A ---
+    if data_a:
+        for r in data_a["records"]:
+            m_grp = "outdated" if r["mode"].startswith("outdated_") else r["mode"]
+            l_grp = "4+" if r["layers"] >= 4 else str(r["layers"])
             
-        def update_stats(stats):
-            stats["total"] += 1
+            def update_a(stats):
+                stats["total"] += 1
+                if r.get("response"):
+                    if r.get("is_correct") is not None:
+                        if r["is_correct"]: stats["exp_a_correct"] += 1
+                    else:
+                        pred = _normalize(r["response"])
+                        gt = _normalize(r["ground_truth"]["answer"])
+                        if pred == gt or gt in pred: stats["exp_a_correct"] += 1
+
+            update_a(mode_stats_a[m_grp])
+            update_a(layer_stats_a[l_grp])
+            update_a(overall_a)
+
+        # Save Exp A Summary
+        summary_a = {
+            "overall": calc_metrics(overall_a),
+            "by_mode": {m: calc_metrics(mode_stats_a[m]) for m in mode_stats_a},
+            "by_layer": {l: calc_metrics(layer_stats_a[l]) for l in layer_stats_a}
+        }
+        with open("experiments/02_pilot_closed_source/metrics/summary_exp_a.json", "w") as f:
+            json.dump(summary_a, f, indent=2)
+
+    # --- Process Exp B ---
+    if data_b:
+        for r in data_b["records"]:
+            m_grp = "outdated" if r["mode"].startswith("outdated_") else r["mode"]
+            l_grp = "4+" if r["layers"] >= 4 else str(r["layers"])
             
-            # --- Exp A Auto-grading ---
-            if ra and ra.get("response"):
-                # 수동 체크값이 있으면 그것을 쓰고, 없으면 자동 비교
-                if ra.get("is_correct") is not None:
-                    if ra["is_correct"]: stats["exp_a_correct"] += 1
-                else:
-                    pred = _normalize(ra["response"])
-                    gt = _normalize(ra["ground_truth"]["answer"])
-                    if pred == gt or gt in pred: # 포함 관계도 정답으로 간주 (완화된 EM)
-                        stats["exp_a_correct"] += 1
-            
-            # --- Exp B Auto-grading ---
-            if rb:
+            def update_b(stats):
+                stats["total"] += 1
                 # No-Conflict
-                nc = rb.get("no_conflict", {})
+                nc = r.get("no_conflict", {})
                 if nc.get("raw_response"):
                     if nc.get("is_correct") is not None:
                         if nc["is_correct"]: stats["no_conflict_correct"] += 1
                     else:
                         ans = _normalize(parse_xml_tag(nc["raw_response"], "answer") or nc["raw_response"])
-                        gt = _normalize(rb["ground_truth"]["answer"])
+                        gt = _normalize(r["ground_truth"]["answer"])
                         if ans == gt or gt in ans: stats["no_conflict_correct"] += 1
                 
                 # Conflict
-                cf = rb.get("conflict", {})
+                cf = r.get("conflict", {})
                 if cf.get("raw_response"):
-                    # Answer Check
                     if cf.get("is_answer_correct") is not None:
                         if cf["is_answer_correct"]: stats["conflict_ans_correct"] += 1
                     else:
                         ans = _normalize(parse_xml_tag(cf["raw_response"], "answer") or cf["raw_response"])
-                        gt = _normalize(rb["ground_truth"]["answer"])
+                        gt = _normalize(r["ground_truth"]["answer"])
                         if ans == gt or gt in ans: stats["conflict_ans_correct"] += 1
                     
-                    # Evidence Check
                     if cf.get("is_evidence_correct") is not None:
                         if cf["is_evidence_correct"]: stats["conflict_evid_correct"] += 1
                     else:
                         rel = parse_xml_tag(cf["raw_response"], "relevance")
-                        gt_rel = rb["ground_truth"].get("correct_relevance")
+                        gt_rel = r["ground_truth"].get("correct_relevance")
                         if rel == gt_rel: stats["conflict_evid_correct"] += 1
 
-        update_stats(mode_stats[mode_group])
-        update_stats(layer_stats[layer_group])
-        update_stats(overall)
+            update_b(mode_stats_b[m_grp])
+            update_b(layer_stats_b[l_grp])
+            update_b(overall_b)
 
-    # Metrics calculation and Summary output
-    def calc_metrics_exp_a(s):
-        return {
-            "total": s["total"],
-            "exp_a_accuracy": s["exp_a_correct"] / s["total"] if s["total"] > 0 else 0.0
+        # Save Exp B Summary
+        summary_b = {
+            "overall": calc_metrics(overall_b),
+            "by_mode": {m: calc_metrics(mode_stats_b[m]) for m in mode_stats_b},
+            "by_layer": {l: calc_metrics(layer_stats_b[l]) for l in layer_stats_b}
         }
+        with open("experiments/02_pilot_closed_source/metrics/summary_exp_b.json", "w") as f:
+            json.dump(summary_b, f, indent=2)
 
-    def calc_metrics_exp_b(s):
-        return {
-            "total": s["total"],
-            "no_conflict_accuracy": s["no_conflict_correct"] / s["total"] if s["total"] > 0 else 0.0,
-            "conflict_answer_accuracy": s["conflict_ans_correct"] / s["total"] if s["total"] > 0 else 0.0,
-            "conflict_evidence_accuracy": s["conflict_evid_correct"] / s["total"] if s["total"] > 0 else 0.0
-        }
-
-    summary_a = {
-        "overall": calc_metrics_exp_a(overall),
-        "by_mode": {m: calc_metrics_exp_a(mode_stats[m]) for m in mode_stats},
-        "by_layer": {l: calc_metrics_exp_a(layer_stats[l]) for l in layer_stats}
-    }
-
-    summary_b = {
-        "overall": calc_metrics_exp_b(overall),
-        "by_mode": {m: calc_metrics_exp_b(mode_stats[m]) for m in mode_stats},
-        "by_layer": {l: calc_metrics_exp_b(layer_stats[l]) for l in layer_stats}
-    }
-
-    with open("experiments/02_pilot_closed_source/metrics/summary_exp_a.json", "w") as f:
-        json.dump(summary_a, f, indent=2)
-    with open("experiments/02_pilot_closed_source/metrics/summary_exp_b.json", "w") as f:
-        json.dump(summary_b, f, indent=2)
-
-    print("\n=== Pilot Study Evaluation Summary (Auto-graded) ===")
-    print(f"Total Samples: {overall['total']}")
+    # --- Output Report ---
+    print(f"\n=== Pilot Study Evaluation Summary (Mode: {args.mode.upper()}) ===")
+    if data_a:
+        print(f"[Exp A - Web ON]  Total: {overall_a['total']} | Accuracy: {summary_a['overall']['exp_a_correct']:.2%}")
+    if data_b:
+        print(f"[Exp B - Web OFF] Total: {overall_b['total']}")
+        print(f"  - No Conflict Accuracy:       {summary_b['overall']['no_conflict_correct']:.2%}")
+        print(f"  - Conflict Answer Accuracy:   {summary_b['overall']['conflict_ans_correct']:.2%}")
+        print(f"  - Conflict Evidence Accuracy: {summary_b['overall']['conflict_evid_correct']:.2%}")
     print("-" * 50)
-    print(f"Exp A (Web ON) Accuracy:         {summary_a['overall']['exp_a_accuracy']:.2%}")
-    print(f"No Conflict Accuracy:            {summary_b['overall']['no_conflict_accuracy']:.2%}")
-    print(f"Conflict Answer Accuracy:        {summary_b['overall']['conflict_answer_accuracy']:.2%}")
-    print(f"Conflict Evidence Accuracy:      {summary_b['overall']['conflict_evidence_accuracy']:.2%}")
-    print("-" * 50)
-    print("Note: If 'is_correct' fields are null, results are auto-calculated from 'response'.")
+    print("분석 리포트가 experiments/02_pilot_closed_source/metrics/ 에 저장되었습니다.")
 
 if __name__ == "__main__":
     evaluate_pilot_study()
