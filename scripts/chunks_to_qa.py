@@ -217,8 +217,54 @@ def _append_gen_ledger(provider: str, model_id: str) -> None:
         logger.exception("usage ledger 기록 실패(무시)")
 
 
+def _loads_json_lenient(text: str) -> dict | None:
+    """모델이 코드펜스(```json)로 감싸거나 앞뒤 잡텍스트를 붙여도 JSON 객체를 파싱한다.
+    실패 시 원본 앞부분을 로그로 남기고 None을 반환(→ 상위에서 재시도/스킵)."""
+    if not text:
+        logger.warning("[gemini] 빈 응답")
+        return None
+    s = text.strip()
+    if s.startswith("```"):
+        s = re.sub(r"^```[a-zA-Z]*\s*", "", s)
+        s = re.sub(r"\s*```$", "", s).strip()
+
+    def _coerce(obj):
+        # 배열로 감싸 오면 첫 dict 원소를 꺼낸다
+        if isinstance(obj, dict):
+            return obj
+        if isinstance(obj, list):
+            return next((el for el in obj if isinstance(el, dict)), None)
+        return None
+
+    try:
+        got = _coerce(json.loads(s))
+        if got is not None:
+            return got
+    except json.JSONDecodeError:
+        pass
+    m = re.search(r"\{.*\}", s, re.S)  # 가장 바깥 {...} 추출 후 재시도
+    if m:
+        try:
+            return json.loads(m.group())
+        except json.JSONDecodeError:
+            pass
+    logger.warning("[gemini] JSON 파싱 실패. raw head ↓\n%s", s[:800])
+    return None
+
+
 def call_gemini(client, prompt: str) -> dict | None:
     from google.genai import types
+    # 단일 JSON 객체 형식을 강제(배열·코드펜스·형식 흔들림 방지)
+    schema = types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "mode":          types.Schema(type=types.Type.STRING),
+            "new_question":  types.Schema(type=types.Type.STRING),
+            "target_answer": types.Schema(type=types.Type.STRING),
+            "reasoning":     types.Schema(type=types.Type.STRING),
+        },
+        required=["new_question", "reasoning"],
+    )
     for attempt in range(MAX_API_RETRIES):
         try:
             rate_limit_wait()
@@ -227,6 +273,7 @@ def call_gemini(client, prompt: str) -> dict | None:
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
+                    response_schema=schema,
                     temperature=0.7,
                 ),
             )
@@ -235,7 +282,7 @@ def call_gemini(client, prompt: str) -> dict | None:
                 _acc(getattr(um, "prompt_token_count", 0), getattr(um, "candidates_token_count", 0))
             except Exception:
                 pass
-            return json.loads(response.text.strip())
+            return _loads_json_lenient(response.text)
         except Exception as e:
             if not handle_api_error(e, attempt):
                 return None
@@ -415,6 +462,7 @@ def _process_one_task(
     """단일 (record, mode) 태스크를 처리하고 결과 dict 또는 None을 반환한다."""
     record_id = record["id"]
     pair_id = f"{record_id}_{mode}"
+    logger.debug("[%s] 호출 중...", pair_id)
 
     pair = None
     rejection = ""
@@ -563,15 +611,10 @@ def chunks_to_qa(
                         done.add(pair_id)
 
                 completed += 1
-                if completed % 50 == 0:
-                    logger.info("%d / %d LLM tasks done", completed, len(tasks))
+                status = "ok" if result is not None else "skip"
+                logger.info("[%d/%d] %s (%s)", completed, len(tasks), pair_id, status)
 
     logger.info("Done → %s", output_path)
-
-    # 생성 사용량을 중앙 원장에 기록 (전체 비용 모니터링)
-    _model_id = {"gpt": GPT_MODEL, "gemini": GEMINI_MODEL,
-                 "anthropic": CLAUDE_MODEL, "vllm": VLLM_MODEL}.get(provider, provider)
-    _append_gen_ledger(provider, _model_id)
 
 
 # ---------------------------------------------------------------------------
@@ -634,8 +677,14 @@ if __name__ == "__main__":
     else:
         model_tag = get_model_alias(args.provider)
 
-    chunks_to_qa(
-        input_path=input_path,
-        output_path=DIR_QA / f"qa_{model_tag}{suffix}.jsonl",
-        provider=args.provider,
-    )
+    # 생성 사용량은 중단(Ctrl-C)·예외에도 항상 기록되도록 finally로 보장
+    _model_id = {"gpt": GPT_MODEL, "gemini": GEMINI_MODEL,
+                 "anthropic": CLAUDE_MODEL, "vllm": VLLM_MODEL}.get(args.provider, args.provider)
+    try:
+        chunks_to_qa(
+            input_path=input_path,
+            output_path=DIR_QA / f"qa_{model_tag}{suffix}.jsonl",
+            provider=args.provider,
+        )
+    finally:
+        _append_gen_ledger(args.provider, _model_id)

@@ -52,9 +52,10 @@ temporal-conflict-qa/
 ├── config.py                # 공통 설정: 모델 기본값·RPM·경로·파일명 alias
 ├── llm_client.py            # 생성용 LLM 클라이언트 + rate limiter
 │
-├── scripts/                 # ── 데이터 생성 파이프라인 (실험 공용) ──
+├── scripts/                 # ── 데이터 생성 파이프라인 + 전역 도구 (실험 공용) ──
 │   ├── hoh_to_chunks.py     #   위키 → 청크
-│   └── chunks_to_qa.py      #   청크 → 질문(QA) 생성  ★질문 품질 프롬프트가 여기
+│   ├── chunks_to_qa.py      #   청크 → 질문(QA) 생성  ★질문 품질 프롬프트가 여기
+│   └── monitor_cost.py      #   전체 비용 보기 (생성+실험 통합, 어디서든 실행)
 │
 ├── data/
 │   ├── chunks/              #   chunks_0_600.jsonl (생성 입력)
@@ -73,8 +74,7 @@ temporal-conflict-qa/
     │   ├── 00_estimate_cost.py   #   실행 전 예상 비용 (API 호출 X)
     │   ├── 01_sample_eval_set.py #   평가셋 50문항 추출
     │   ├── 02_run_models.py      #   테스트 모델에게 풀게 함
-    │   ├── 03_evaluate.py        #   채점·2×2 집계
-    │   └── monitor_cost.py       #   비용 보기 (선택)
+    │   └── 03_evaluate.py        #   채점·2×2 집계
     ├── data/
     │   ├── eval_set.jsonl        #   (01 산출) 평가 문항
     │   └── validation_sheet.csv  #   (01 산출) 사람 검수용
@@ -96,7 +96,7 @@ temporal-conflict-qa/
 # 청크 120건만 잘라서 입력 → Gemini가 질문 생성 (data/qa/qa_gemini_work.jsonl 누적)
 head -120 ../../../data/chunks/chunks_0_600.jsonl > ../../../data/chunks/chunks_work.jsonl
 python ../../../scripts/chunks_to_qa.py --input ../../../data/chunks/chunks_work.jsonl \
-       --provider gemini --gemini-model gemini-3-pro-preview
+       --provider gemini --gemini-model gemini-3.1-pro-preview
 ```
 > 안 하면 기존 데이터(`qa_llama3_1-70b-awq_0_600.jsonl`)를 그대로 써도 된다.
 
@@ -154,7 +154,7 @@ python 03_evaluate.py --model claude --judge gemini
 생성·테스트·채점 **모든 실행의 토큰·비용이 repo 루트 `usage/`에 자동 누적**된다. (실험 폴더 밖 — 생성은 실험과 별개라서.)
 
 - **`usage/usage_summary.txt`** 를 열면 전체 합계가 보인다 (매 실행 자동 갱신, 스크립트 실행 불필요).
-- 스크립트별 분해가 필요하면: `python monitor_cost.py --by-script`
+- 스크립트별 분해가 필요하면(루트 어디서든): `python3 scripts/monitor_cost.py --by-script`
 
 ---
 

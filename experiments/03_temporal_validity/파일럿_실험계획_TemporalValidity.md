@@ -104,12 +104,12 @@
 # 1차: 30건만
 head -30 data/chunks/chunks_0_600.jsonl > data/chunks/chunks_work.jsonl
 python scripts/chunks_to_qa.py --input data/chunks/chunks_work.jsonl \
-       --provider gemini --gemini-model gemini-3-pro-preview
+       --provider gemini --gemini-model gemini-3.1-pro-preview
 #   → data/qa/qa_gemini_work.jsonl (30건). 검수.
 # 이어서: 같은 work.jsonl 내용만 확장 → resume로 새 것만 append
 head -120 data/chunks/chunks_0_600.jsonl > data/chunks/chunks_work.jsonl
 python scripts/chunks_to_qa.py --input data/chunks/chunks_work.jsonl \
-       --provider gemini --gemini-model gemini-3-pro-preview
+       --provider gemini --gemini-model gemini-3.1-pro-preview
 ```
 
 **샘플 → 테스트:**
@@ -129,7 +129,7 @@ python 03_evaluate.py --model gpt --judge gemini ; python 03_evaluate.py --model
 ### 4.1 블랙박스 (최신 프론티어) — 코어
 - **GPT-5.5** (`gpt-5.5`) — OpenAI 현 flagship(2026-04 API). *(GPT-5.6은 6월 말 예정·미출시)*
 - **Claude Opus 4.8** (`claude-opus-4-8`) — Anthropic 최상위 추론 Opus(2026-05). 가격 **$5 / $25** per 1M tok(in/out).
-- **Gemini 3 Pro** (`gemini-3-pro-preview`, Google) — `--model gemini`로 동일 실행(OpenAI 호환 엔드포인트).
+- **Gemini 3 Pro** (`gemini-3.1-pro-preview`, Google) — `--model gemini`로 동일 실행(OpenAI 호환 엔드포인트).
 - (선택) Claude Fable 5(`claude-fable-5`, 2026-06 신규 상위 tier).
 - **파일럿 최소 = 서로 다른 lab의 frontier 2종**(권장: Gemini 3 Pro + Claude Opus 4.8). "약한 모델만/같은 lab만"은 C1 반박 여지 → *cross-lab frontier*가 가장 강함. 경계 시 GPT-5.5 추가.
 

@@ -10,16 +10,26 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+# .env 로드 → 아래 os.getenv 들이 .env 값을 반영(생성 파이프라인도 .env의 모델/RPM 사용)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except Exception:
+    pass
+
 # ---------------------------------------------------------------------------
 # 디렉토리
 # ---------------------------------------------------------------------------
 
-DIR_CHUNKS       = Path("data/chunks")
-DIR_QA           = Path("data/qa")
-DIR_QA_REASONING = Path("data/qa-reasoning")
-DIR_EVAL         = Path("data/eval")
-DIR_EVAL_SUMMARY = Path("data/eval_summary")
-DIR_LOGS         = Path("logs")
+# 모든 경로를 repo 루트(=config.py 위치)에 고정 → 어느 폴더에서 실행해도 동일
+_ROOT = Path(__file__).resolve().parent
+
+DIR_CHUNKS       = _ROOT / "data/chunks"
+DIR_QA           = _ROOT / "data/qa"
+DIR_QA_REASONING = _ROOT / "data/qa-reasoning"
+DIR_EVAL         = _ROOT / "data/eval"
+DIR_EVAL_SUMMARY = _ROOT / "data/eval_summary"
+DIR_LOGS         = _ROOT / "logs"
 
 CHUNKS_PATH = DIR_CHUNKS / "chunks.jsonl"
 
@@ -67,10 +77,10 @@ WIKI_USER_AGENT = (
 # LLM 모델
 # ---------------------------------------------------------------------------
 
-# 데이터셋 생성용 (chunks_to_qa, generate_reasoning)
-GEMINI_MODEL = "gemini-2.5-flash"
-GPT_MODEL    = "gpt-4.1-mini"
-CLAUDE_MODEL = "claude-opus-4-8"
+# 데이터셋 생성용 (chunks_to_qa, generate_reasoning) — .env로 override 가능
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-pro-preview")
+GPT_MODEL    = os.getenv("GPT_MODEL", "gpt-5.5")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-opus-4-8")
 
 # 평가용 (evaluate_llm)
 EVAL_GEMINI_MODEL = "gemini-2.5-flash"

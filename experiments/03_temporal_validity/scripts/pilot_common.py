@@ -130,7 +130,7 @@ MODELS: dict[str, tuple[str, str]] = {
     # 블랙박스 (최신 프론티어, 2026-06)
     "gpt":     ("openai",    os.getenv("GPT_MODEL", "gpt-5.5")),
     "claude":  ("anthropic", os.getenv("CLAUDE_MODEL", "claude-opus-4-8")),
-    "gemini":  ("gemini",    os.getenv("GEMINI_MODEL", "gemini-3-pro")),
+    "gemini":  ("gemini",    os.getenv("GEMINI_MODEL", "gemini-3.1-pro-preview")),
     # 오픈 (단일 H100, vLLM) — eval 생성자가 Llama-3.1-70B → Llama 계열은 자가생성 편향으로 제외
     "qwen35b":  ("vllm", os.getenv("QWEN35B_MODEL", "Qwen/Qwen3-35B-A3B-Instruct")),
     "gemma31b": ("vllm", os.getenv("GEMMA31B_MODEL", "google/gemma-4-31b-it")),
