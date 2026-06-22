@@ -1,0 +1,105 @@
+"""
+03 — 채점 및 집계 (§7, §8, §9).
+
+지표:
+  EM        = 1[conflict 답 == target_answer]
+  TV_cite   = 1[evidence_chunk_id ∈ conflict 인용]                 (신규, 인용 기준)
+  TV_behav  = 1[behav 가 목표 시점 쪽]                              (신규, 반사실 기준)
+              behav: conflict 답이 outdated_only와 같고 current_only와 다르면 outdated, 그 반대면 current
+  CitePrec  = 1[인용 청크 중 하나라도 conflict 답을 함의] (ALCE식, 기존 표준 foil)
+
+산출:
+  results/metrics_<model>.json   : 전체 + (current / as-of-past)별 율, 맹점비율
+  results/contingency_<model>.csv: TV_cite × CitePrec 2×2 (§9 핵심 그림)
+
+usage:
+  python 03_evaluate.py --model gpt --judge gpt
+"""
+import argparse, csv, json, os
+import pilot_common as pc
+
+
+def behav_side(conflict_ans, cur_ans, old_ans):
+    c = pc.normalize(conflict_ans)
+    if c == pc.normalize(old_ans) and c != pc.normalize(cur_ans):
+        return "outdated"
+    if c == pc.normalize(cur_ans) and c != pc.normalize(old_ans):
+        return "current"
+    return "other"
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", required=True)
+    ap.add_argument("--judge", default="gpt", help="CitePrec 판정용 모델(pilot_common.MODELS 키)")
+    ap.add_argument("--eval", default=os.path.join(os.path.dirname(__file__), "..", "data", "eval_set.jsonl"))
+    ap.add_argument("--raw_dir", default=os.path.join(os.path.dirname(__file__), "..", "results"))
+    args = ap.parse_args()
+
+    eval_by_id = {r["id"]: r for r in pc.read_jsonl(os.path.abspath(args.eval))}
+    raw_path = os.path.join(os.path.abspath(args.raw_dir), f"raw_{args.model}.jsonl")
+
+    per_item = []
+    for o in pc.read_jsonl(raw_path):
+        rec = eval_by_id[o["id"]]
+        chunk_text = {c["chunk_id"]: c["text"] for c in rec["chunks"]}
+        conf = o["conflict"]
+        ans = conf.get("answer", "")
+        cites = conf.get("cite_chunk_ids", [])
+
+        em = int(pc.normalize(ans) == pc.normalize(rec["target_answer"]))
+        tv_cite = int(rec["evidence_chunk_id"] in cites)
+        # CitePrec: 인용 청크 중 하나라도 답을 함의
+        cite_prec = 0
+        for cid in cites:
+            if cid in chunk_text and pc.judge_support(args.judge, chunk_text[cid], ans):
+                cite_prec = 1
+                break
+        # 반사실
+        side = behav_side(ans, o["current_only"].get("answer", ""), o["outdated_only"].get("answer", ""))
+        tv_behav = int(side == o["target_side"])
+
+        per_item.append({"id": o["id"], "target_side": o["target_side"], "EM": em,
+                         "TV_cite": tv_cite, "TV_behav": tv_behav, "CitePrec": cite_prec,
+                         "behav": side, "cites": cites, "answer": ans})
+
+    def agg(items):
+        n = len(items) or 1
+        m = lambda k: round(sum(it[k] for it in items) / n, 4)
+        tv0 = [it for it in items if it["TV_cite"] == 0]
+        blind = round(sum(it["CitePrec"] for it in tv0) / (len(tv0) or 1), 4)
+        return {"n": len(items), "EM": m("EM"), "TV_cite": m("TV_cite"),
+                "TV_behav": m("TV_behav"), "CitePrec": m("CitePrec"),
+                "wrong_time_cite_rate": round(1 - m("TV_cite"), 4),
+                "blind_spot_rate_P(CitePrec=1|TV_cite=0)": blind}
+
+    metrics = {"model": args.model, "overall": agg(per_item),
+               "as_of_past": agg([it for it in per_item if it["target_side"] == "outdated"]),
+               "current": agg([it for it in per_item if it["target_side"] == "current"])}
+
+    # 2×2 분할표 (TV_cite × CitePrec)
+    cells = {(tv, cp): 0 for tv in (1, 0) for cp in (1, 0)}
+    for it in per_item:
+        cells[(it["TV_cite"], it["CitePrec"])] += 1
+
+    out_dir = os.path.abspath(args.raw_dir)
+    with open(os.path.join(out_dir, f"metrics_{args.model}.json"), "w", encoding="utf-8") as f:
+        json.dump(metrics, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(out_dir, f"contingency_{args.model}.csv"), "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["", "CitePrec=PASS", "CitePrec=FAIL"])
+        w.writerow(["TV=PASS(시점-유효 인용)", cells[(1, 1)], cells[(1, 0)]])
+        w.writerow(["TV=FAIL(틀린 시점 인용)", cells[(0, 1)], cells[(0, 0)]])
+
+    print(json.dumps(metrics, ensure_ascii=False, indent=2))
+    print(f"\n★ 맹점 셀 (TV=FAIL & CitePrec=PASS) = {cells[(0,1)]}건  ← C2·C3 핵심")
+    print(f"산출 → metrics_{args.model}.json, contingency_{args.model}.csv")
+    print("\n[judge 사용량/비용]")
+    print(pc.cost_report())
+    pc.append_ledger("03_evaluate")
+    print("\n[전체 누적 — repo 루트 usage/usage_summary.txt]")
+    print(pc.ledger_total())
+
+
+if __name__ == "__main__":
+    main()

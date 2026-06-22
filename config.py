@@ -6,6 +6,7 @@
 """
 
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -31,8 +32,8 @@ MODEL_ALIAS = {
     "meta-llama-31-70b-instruct-awq-int4": "llama3_1-70b-awq",
     "gpt-4.1": "gpt4_1",
     "gpt-41": "gpt4_1",
-    "gpt": "gpt4_1",
     "gpt-4.1-mini": "gpt4_1-mini",
+    "anthropic": "claude",
 }
 
 
@@ -69,6 +70,7 @@ WIKI_USER_AGENT = (
 # 데이터셋 생성용 (chunks_to_qa, generate_reasoning)
 GEMINI_MODEL = "gemini-2.5-flash"
 GPT_MODEL    = "gpt-4.1-mini"
+CLAUDE_MODEL = "claude-opus-4-8"
 
 # 평가용 (evaluate_llm)
 EVAL_GEMINI_MODEL = "gemini-2.5-flash"
@@ -78,9 +80,11 @@ EVAL_GPT_MODEL    = "gpt-4.1"
 # Rate limit (requests per minute)
 # ---------------------------------------------------------------------------
 
-GEMINI_RPM       = 10    # free tier 기준
-GPT_RPM          = 60
-VLLM_CONCURRENCY = 8    # vLLM 병렬 요청 수 (ThreadPoolExecutor workers)
+# 블랙박스 유료 기준 기본값. 실제 account tier에 맞게 .env로 override 가능.
+GEMINI_RPM       = int(os.getenv("GEMINI_RPM", "60"))
+GPT_RPM          = int(os.getenv("GPT_RPM", "100"))
+ANTHROPIC_RPM    = int(os.getenv("ANTHROPIC_RPM", "50"))
+VLLM_CONCURRENCY = int(os.getenv("VLLM_CONCURRENCY", "8"))  # vLLM 병렬 요청 수
 
 # ---------------------------------------------------------------------------
 # 재시도 / 체크포인트

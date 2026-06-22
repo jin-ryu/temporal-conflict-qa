@@ -29,6 +29,7 @@ Provider
 
 import argparse
 import json
+import os
 import random
 import re
 import threading
@@ -43,7 +44,7 @@ from dotenv import load_dotenv
 
 from config import (
     DIR_CHUNKS, DIR_QA, CHUNKS_PATH,
-    GEMINI_MODEL, GPT_MODEL, VLLM_CONCURRENCY,
+    GEMINI_MODEL, GPT_MODEL, CLAUDE_MODEL, VLLM_CONCURRENCY,
     MAX_API_RETRIES, MAX_PARTIAL_RETRIES,
     get_model_alias, setup_logging,
 )
@@ -137,18 +138,21 @@ def build_prompt(record: dict, mode: str) -> str:
     lines.append("[INSTRUCTIONS]")
     lines.append(
         "Generate a single QA pair for the TARGET MODE above.\n"
-        "1. new_question: Write a new question inspired by the original question that asks about "
-        "information specific to that time period. "
-        "Use a NARRATIVE temporal hint — a descriptive phrase such as 'when the policy was first announced', "
-        "'at the time of the merger', 'shortly after the election', 'before the regulation took effect', etc.\n"
-        "   *** CRITICAL: The new_question must NOT contain ANY numbers that look like years (e.g. 2024, 1999), "
-        "month names with years (e.g. July 2024), quarter references (e.g. Q3 2023), "
-        "or date formats (e.g. 07/2024). Use only descriptive, narrative phrases for temporal hints. "
+        "1. new_question: Rewrite a natural question (inspired by the original) whose answer is exactly the "
+        "TARGET ANSWER, asking about the value at the TARGET MODE's time period.\n"
+        "   - Anchor the time with ONE concrete, identifiable event or milestone from that period "
+        "(e.g. 'before the team was relegated', 'when the company first turned a profit'). "
+        "Do NOT use vague anchors like 'shortly after the summer' or 'around that time'.\n"
+        "   - The question MUST be fully self-contained: do NOT refer to 'the following/named/listed players' "
+        "or any list, table, or entity that is not written out inside the question itself.\n"
+        "   - Do NOT put a temporal frame on attributes that never change (e.g. someone's nationality).\n"
+        "   - Write the way a real person would naturally ask. One sentence.\n"
+        "   *** CRITICAL: The new_question must NOT contain ANY year or explicit date (e.g. 2024, 1999, "
+        "July 2024, Q3 2023, 07/2024) — use narrative words only. "
         "If you include any year or date number, the output will be rejected. ***\n"
         "2. target_answer: Use the exact value specified in TARGET MODE above. Do not modify it.\n"
         "3. reasoning: Explain why the evidence chunk supports the answer for this mode, "
-        "and why chunks from other time periods would give incorrect answers — "
-        "using date-based temporal reasoning."
+        "and why chunks from other time periods would give incorrect answers."
     )
     lines.append("")
     lines.append("Respond strictly in the following JSON schema:")
@@ -164,6 +168,55 @@ def build_prompt(record: dict, mode: str) -> str:
 # API calls
 # ---------------------------------------------------------------------------
 
+# 생성 토큰 누적 → 실험 03 중앙 원장에 기록 (전체 비용 모니터링용)
+_GEN = {"input": 0, "output": 0, "calls": 0}
+
+
+def _acc(in_tok, out_tok) -> None:
+    _GEN["input"] += int(in_tok or 0)
+    _GEN["output"] += int(out_tok or 0)
+    _GEN["calls"] += 1
+
+
+def _append_gen_ledger(provider: str, model_id: str) -> None:
+    """생성 사용량을 repo 루트 usage/usage_ledger.jsonl 에 append (best-effort)."""
+    if _GEN["calls"] == 0:
+        return
+    try:
+        from datetime import datetime
+        price = {"gpt": ("GPT_IN_PRICE", "GPT_OUT_PRICE"),
+                 "gemini": ("GEMINI_IN_PRICE", "GEMINI_OUT_PRICE"),
+                 "anthropic": ("CLAUDE_IN_PRICE", "CLAUDE_OUT_PRICE")}.get(provider)
+        pin = float(os.environ.get(price[0], "0")) if price else 0.0
+        pout = float(os.environ.get(price[1], "0")) if price else 0.0
+        cost = _GEN["input"] / 1e6 * pin + _GEN["output"] / 1e6 * pout
+        ledger = Path(__file__).resolve().parents[1] / "usage" / "usage_ledger.jsonl"
+        ledger.parent.mkdir(parents=True, exist_ok=True)
+        with ledger.open("a", encoding="utf-8") as f:
+            f.write(json.dumps({"ts": datetime.now().isoformat(timespec="seconds"),
+                                "script": "chunks_to_qa(gen)", "model": f"{provider}:{model_id}",
+                                "calls": _GEN["calls"], "input": _GEN["input"], "output": _GEN["output"],
+                                "cost": round(cost, 4)}, ensure_ascii=False) + "\n")
+        logger.info("usage ledger: %d calls in=%d out=%d $%.4f", _GEN["calls"], _GEN["input"], _GEN["output"], cost)
+        # 사람이 읽는 합계 파일(usage_summary.txt)도 갱신
+        agg, tot = {}, [0, 0, 0, 0.0]
+        for ln in ledger.open(encoding="utf-8"):
+            if not ln.strip():
+                continue
+            r = json.loads(ln)
+            a = agg.setdefault(r["model"], [0, 0, 0, 0.0])
+            for i, k in enumerate(("calls", "input", "output", "cost")):
+                a[i] += r.get(k, 0); tot[i] += r.get(k, 0)
+        rows = [f"# 전체 토큰·비용 누적 (자동 갱신: {datetime.now().isoformat(timespec='seconds')})", "",
+                f"{'model':<26}{'calls':>7}{'in_tok':>12}{'out_tok':>12}{'$cost':>10}"]
+        for m, a in sorted(agg.items()):
+            rows.append(f"{m:<26}{a[0]:>7}{a[1]:>12}{a[2]:>12}{('$%.4f' % a[3]):>10}")
+        rows.append(f"{'TOTAL':<26}{tot[0]:>7}{tot[1]:>12}{tot[2]:>12}{('$%.4f' % tot[3]):>10}")
+        (ledger.parent / "usage_summary.txt").write_text("\n".join(rows) + "\n", encoding="utf-8")
+    except Exception:
+        logger.exception("usage ledger 기록 실패(무시)")
+
+
 def call_gemini(client, prompt: str) -> dict | None:
     from google.genai import types
     for attempt in range(MAX_API_RETRIES):
@@ -177,6 +230,11 @@ def call_gemini(client, prompt: str) -> dict | None:
                     temperature=0.7,
                 ),
             )
+            try:
+                um = response.usage_metadata
+                _acc(getattr(um, "prompt_token_count", 0), getattr(um, "candidates_token_count", 0))
+            except Exception:
+                pass
             return json.loads(response.text.strip())
         except Exception as e:
             if not handle_api_error(e, attempt):
@@ -197,7 +255,38 @@ def call_openai_compat(client, prompt: str, model: str) -> dict | None:
                 temperature=0.7,
                 max_tokens=1024,
             )
+            try:
+                u = response.usage
+                _acc(getattr(u, "prompt_tokens", 0), getattr(u, "completion_tokens", 0))
+            except Exception:
+                pass
             return json.loads(response.choices[0].message.content.strip())
+        except Exception as e:
+            if not handle_api_error(e, attempt):
+                return None
+    logger.error("API max retries exhausted")
+    return None
+
+
+def call_anthropic(client, prompt: str) -> dict | None:
+    """Anthropic(Claude) 호출. JSON mode가 없어 텍스트에서 JSON을 추출한다."""
+    for attempt in range(MAX_API_RETRIES):
+        try:
+            rate_limit_wait()
+            response = client.messages.create(
+                model=CLAUDE_MODEL,
+                max_tokens=1024,
+                temperature=0.7,
+                messages=[{"role": "user", "content": prompt + "\n\nReturn ONLY the JSON object, nothing else."}],
+            )
+            try:
+                u = response.usage
+                _acc(getattr(u, "input_tokens", 0), getattr(u, "output_tokens", 0))
+            except Exception:
+                pass
+            text = "".join(b.text for b in response.content if getattr(b, "type", "") == "text")
+            m = re.search(r"\{.*\}", text, re.S)
+            return json.loads(m.group()) if m else None
         except Exception as e:
             if not handle_api_error(e, attempt):
                 return None
@@ -214,6 +303,8 @@ def call_llm(client, prompt: str, provider: str) -> dict | None:
         return call_gemini(client, prompt)
     elif provider == "gpt":
         return call_openai_compat(client, prompt, GPT_MODEL)
+    elif provider == "anthropic":
+        return call_anthropic(client, prompt)
     elif provider == "vllm":
         return call_openai_compat(client, prompt, VLLM_MODEL)
     else:
@@ -477,6 +568,11 @@ def chunks_to_qa(
 
     logger.info("Done → %s", output_path)
 
+    # 생성 사용량을 중앙 원장에 기록 (전체 비용 모니터링)
+    _model_id = {"gpt": GPT_MODEL, "gemini": GEMINI_MODEL,
+                 "anthropic": CLAUDE_MODEL, "vllm": VLLM_MODEL}.get(provider, provider)
+    _append_gen_ledger(provider, _model_id)
+
 
 # ---------------------------------------------------------------------------
 # Entry point
@@ -485,7 +581,7 @@ def chunks_to_qa(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="hoh_chunks.jsonl → data/qa/ QA pairs")
     parser.add_argument(
-        "--provider", type=str, default="gemini", choices=["gemini", "gpt", "vllm"],
+        "--provider", type=str, default="gemini", choices=["gemini", "gpt", "anthropic", "vllm"],
         help="LLM provider (기본값: gemini)"
     )
     parser.add_argument(
@@ -501,6 +597,10 @@ if __name__ == "__main__":
         help=f"Gemini 모델명 (기본값: {GEMINI_MODEL})"
     )
     parser.add_argument(
+        "--claude-model", type=str, default=None,
+        help=f"Claude 모델명 (--provider anthropic 시, 기본값: {CLAUDE_MODEL})"
+    )
+    parser.add_argument(
         "--vllm-model", type=str, default=None,
         help="vLLM 모델명 (--provider vllm 시 필수, 예: Qwen/Qwen3-32B)"
     )
@@ -513,6 +613,8 @@ if __name__ == "__main__":
         GPT_MODEL = args.gpt_model
     if args.gemini_model:
         GEMINI_MODEL = args.gemini_model
+    if args.claude_model:
+        CLAUDE_MODEL = args.claude_model
 
     if args.provider == "vllm":
         if not args.vllm_model:

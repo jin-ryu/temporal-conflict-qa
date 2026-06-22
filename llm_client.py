@@ -11,7 +11,7 @@ import random
 import threading
 import time
 
-from config import GEMINI_RPM, GPT_RPM, MAX_API_RETRIES, VLLM_CONCURRENCY
+from config import GEMINI_RPM, GPT_RPM, ANTHROPIC_RPM, MAX_API_RETRIES, VLLM_CONCURRENCY
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,8 @@ def set_rpm(provider: str) -> None:
         _requests_per_minute = 999_999
     elif provider == "gemini":
         _requests_per_minute = GEMINI_RPM
+    elif provider == "anthropic":
+        _requests_per_minute = ANTHROPIC_RPM
     else:
         _requests_per_minute = GPT_RPM
 
@@ -99,5 +101,11 @@ def make_client(provider: str):
         import openai
         base_url = os.environ.get("VLLM_BASE_URL", "http://localhost:8000/v1")
         return openai.OpenAI(api_key="dummy", base_url=base_url)
+    elif provider == "anthropic":
+        import anthropic
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise EnvironmentError("ANTHROPIC_API_KEY가 설정되지 않았습니다.")
+        return anthropic.Anthropic(api_key=api_key)
     else:
         raise ValueError(f"Unknown provider: {provider}")
