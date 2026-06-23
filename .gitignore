@@ -7,3 +7,4 @@ __pycache__/
 .DS_Store
 /.idea/
 /data/tqa/source/
+/data/timeqa/source/
