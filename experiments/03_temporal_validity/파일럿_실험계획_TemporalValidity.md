@@ -50,16 +50,18 @@
 | ConflictBank (2408.12076) | ○(합성) | △ | ○ | 합성 | 합성 한계 |
 | DRAGged CONFLICTS (2506.08500) | ○ | ✕ | △ | temporal 62, 웹 | 소규모 |
 | HoH(2503.04800) + 자체 가공 | ○ | △ (위키 편집 diff — 정정/오류 혼입) | ○ | 위키 | legacy(보류) |
-| **TQA / Temporal Wiki(2506.07270) MIT** | **○** | **○ (연도별 revision 문단+답)** | **○** | **878 엔티티, 위키** | **★ 채택** |
+| TQA / Temporal Wiki(2506.07270) MIT | ○ | ○ (연도별 revision 문단+답) | ○ | 878 엔티티, 위키 | 보조(robustness·preprint) |
+| **★ TimeQA (Chen+ NeurIPS'21 D&B)** | **○** | **○ (사람-라벨 gold 문단+span)** | **○** | **20K·5.5K facts, 위키** | **★ 주력 채택(peer-review)** |
 
-→ **데이터 출처 변경 (HoH → TQA)**: HoH는 시점-유효 근거 라벨이 있으나 그 "outdated"가 위키 *편집 diff*라 **세상의 변화와 오류정정이 섞인다**(파일럿 검수 결과 ~50% 결함). 정정된 옛값은 *그 시점에도 틀린 값*이라 as-of-past가 아니어서 구성타당도를 해친다. **TQA는 Wikidata 시간한정 사실의 연도별 revision 문단을 직접 제공** → 변화가 전부 *진짜 세상변화*이고, 옛/새 문단이 사전 분리돼 충돌 컨텍스트 조립이 결정론적이다. 현실성(다출처)은 본 논문에서 WikiContradict로 보강.
+→ **데이터 출처 변경 (HoH → TimeQA 주력 + TQA 보조)**: HoH는 시점-유효 근거 라벨이 있으나 그 "outdated"가 위키 *편집 diff*라 **세상의 변화와 오류정정이 섞인다**(파일럿 검수 ~50% 결함, as-of-past 아님). → **TimeQA**(NeurIPS'21 peer-review)는 Wikidata 시변사실을 위키에 정렬하고 **시점별 정답 + gold 근거 문단을 사람이 라벨**해 제공 → 진짜 세상변화 + *시점-유효 근거가 이미 라벨됨*(요구 c 직접 충족, 추론 게이트 불필요). 검수 통과 ~96%. **신빙성**: TimeQA는 peer-review·처리코드 공개라 메인 베이스로 적합. **TQA**(Özer 2025, preprint·pre-paired 문단)는 같은 결과를 한 번 더 재현하는 **robustness 보조**로 둔다. 현실성(다출처)은 WikiContradict로 보강.
 
-### 3.3 TQA 기반 변환 (재현용)
+### 3.3 TimeQA 기반 변환 (주력) · TQA 보조
 
-원천 **TQA**(Temporal Wiki, Özer 2025, MIT) = 엔티티마다 `incidents[연도]` = {연도형 question, 결정론적 answer(Wikidata id), 그 시점 위키 revision 문단 `dump.body_par`, revision 영구링크}. 이를 충돌 grounding 평가 형태로 변환한다(`data_prep/tqa/tqa_to_qa.py`, **LLM 호출 없음·무료**).
+**TimeQA annotated** = 엔티티마다 위키 페이지 문단(`paras`) + 시점 구간별 {정답 + gold 근거 문단 인덱스(`para`)+span}을 **사람이 라벨**. 변환(`data_prep/timeqa/timeqa_to_qa.py`, **LLM 없음·무료**):
 
-- **Step 1 — 옛/새 시점 선택**: 엔티티의 연도들 중 새=최신, 옛=답이 다른 가장 이른 연도(실제 변화 보장). 각 연도의 `body_par`를 정리(인라인 CSS 제거)해 청크로. 옛=`outdated_0`, 새=`current`. `last_modified_time`=연도.
-- **Step 2 — 질의·라벨**: 질문은 TQA 원본(**명시적 연도형**, "…in 2010?"). target=해당 연도 답, `evidence_chunk_id`=그 연도 청크. *질문이 데이터 원본이라 LLM 생성 편향·"날짜 금지 메타anchor" 문제가 없다 — 명시적 연도가 자연·결정론적.*
+- **Step 1 — 옛/새 시점 선택**: 단일 비공백 답을 가진 시점들 중 새=가장 늦은, 옛=답이 다른 가장 이른 시점. 각 시점의 **gold 문단(`paras[para]`)** 을 청크로 — 옛=`outdated_0`, 새=`current`. `last_modified_time`=시작연도.
+- **Step 2 — 질의·라벨**: 질문은 `relations.json` 템플릿(관계 Pxx + 엔티티 + "in YYYY", **명시적 연도형**). target=해당 시점 답, `evidence_chunk_id`=그 시점 청크. *근거가 사람-라벨이라 시점-유효 근거가 보장됨.*
+- **Step 3 — 게이트**: 스포츠 클럽/국대 모호 제외, 근거-답 안전망 검사. *(보조 TQA: `data_prep/tqa/tqa_to_qa.py` — `incidents[연도].body_par`를 옛/새 청크로, 근거 변별토큰 게이트로 필터. 상세 동일.)*
 - **Step 3 — 검증**: (자동) **근거 게이트** — 답의 변별 토큰이 그 시점 문단에 실재해야 통과(정식명↔약칭 흡수, generic 역할단어 제외; 미통과 시 제외). **(수동) 표본을 사람이 확인**: 시점 결정성 + 자연스러움 + 스포츠 클럽/국대 모호·가공인물 배제(파일럿 검수 기준 ~90% 통과).
 - **레코드 스키마**:
   ```json
@@ -73,14 +75,14 @@
 
 **mode별 역할:**
 
-- **`outdated_0` (과거 지향) — 주력(기여)**: GaRAGe가 비운 칸(포지셔닝 §5.3). wrong-time 인용 비율 + 2×2 ★셀의 신호원(wrong-time ~30%여도 TV=FAIL ≈12건). *(TQA는 엔티티당 옛/새 1쌍 = 단일층 outdated_0)*
+- **`outdated_0` (과거 지향) — 주력(기여)**: GaRAGe가 비운 칸(포지셔닝 §5.3). wrong-time 인용 비율 + 2×2 ★셀의 신호원(wrong-time ~30%여도 TV=FAIL ≈12건). *(TimeQA·TQA 모두 엔티티당 옛/새 1쌍 = 단일층 outdated_0)*
 - **`current` (현재 지향) — recency-bias 대조군** *(기여가 아니라 대조)*:
   - ① **실패가 과거-지향 특유임을 격리** — current는 TV 높고 past는 낮으면 "grounding 능력은 있는데 *과거일 때만* 무너진다"가 증명됨(일반적 무능 아님).
   - ② **최신 편향 입증** — current는 최신=정답이라 잘 맞히고, past에서 그 편향이 *오답으로* 드러남 → 체계적 recency bias.
   - ③ **sanity check**. 소수(10)면 충분(통계 파워가 아니라 방향성 대비용).
 - **`current_raw` (원질문) — 제외**: 시간 신호가 없어 현재/과거 둘 다 정답이 되어 모호.
 
-각 항목: `current` 청크 ≥1 + `outdated` 청크 ≥1 **공존**, 목표 시점 결정론적, `source_idx`(엔티티) 중복 금지(leakage 방지). 경계 결과 시 100+로 확장(TQA 변환 풀 ~487 엔티티).
+각 항목: `current` 청크 ≥1 + `outdated` 청크 ≥1 **공존**, 목표 시점 결정론적, `source_idx`(엔티티) 중복 금지(leakage 방지). 경계 결과 시 100+로 확장(TimeQA 변환 풀 **~4180 엔티티**, TQA ~454).
 
 ### 3.5 데이터 변환 실행 (LLM 없음 · 무료)
 
@@ -90,20 +92,21 @@
 
 | 역할 | 주체 | 이유 |
 |---|---|---|
-| 질문(원천) | **TQA**(위키 기반) | 모델 생성 아님 → 생성 편향·비용 0 |
+| 질문(원천) | **TimeQA**(위키 기반) | 모델 생성 아님 → 생성 편향·비용 0 |
 | judge | **Gemini 3.1 Pro** | 저렴($2/$12), 테스트와 분리 |
 | 테스트(답변) | **GPT-5.5 + Claude Opus 4.8** | 헤드라인 frontier 2종 → "최고 모델조차 실패" 강함 |
 
 **변환 → 샘플 → 테스트:**
 ```bash
-# 0) TQA 엔티티 → 충돌 QA (루트에서, 무료)
-python3 data_prep/tqa/tqa_to_qa.py            # data/tqa/source/*.json → data/tqa/qa_tqa.jsonl
+# 0) TimeQA annotated → 충돌 QA (루트에서, 무료)
+python3 data_prep/timeqa/timeqa_to_qa.py      # data/timeqa/source/annotated_*.json → data/timeqa/qa_timeqa.jsonl
 # 1~4) 샘플(검수) → 테스트 → 채점
 cd experiments/03_temporal_validity/scripts
-python3 01_sample_eval_set.py --input ../../../data/tqa/qa_tqa.jsonl   # → validation_sheet 검수
+python3 01_sample_eval_set.py --input ../../../data/timeqa/qa_timeqa.jsonl   # → validation_sheet 검수
 python3 02_run_models.py --model gpt   ; python3 02_run_models.py --model claude
 python3 03_evaluate.py --model gpt --judge gemini ; python3 03_evaluate.py --model claude --judge gemini
 ```
+*(보조: 같은 파이프라인을 `data_prep/tqa/tqa_to_qa.py` → `data/tqa/qa_tqa.jsonl`로 돌려 robustness 재현.)*
 
 ---
 
@@ -123,7 +126,7 @@ python3 03_evaluate.py --model gpt --judge gemini ; python3 03_evaluate.py --mod
 - 권장 오픈 모델: **Qwen3 35B-A3B** 또는 **Gemma 4 31B** (단일 H100 여유).
 - 서빙 vLLM(`vllm serve … --quantization awq`). "프론티어조차 + 오픈도" 프레이밍 강화용 — **최소 파일럿엔 생략 가능**.
 
-> **데이터 출처 메모**: 평가 질문·답은 **TQA**(Temporal Wiki, Wikidata 시간한정 사실 + 시점별 위키 revision 문단)에서 직접 유래(모델 생성 아님). 따라서 자가생성 편향이 원천적으로 없고, judge(Gemini)·테스트(GPT/Claude)와도 무관하다. 단 §3.3 Step 3 수동 검증(시점 결정성·자연스러움)은 유지.
+> **데이터 출처 메모**: 평가 질문·답·근거는 **TimeQA**(NeurIPS'21, Wikidata 시변사실 + 시점별 위키 문단을 사람이 라벨; 보조 TQA)에서 직접 유래(모델 생성 아님). 따라서 자가생성 편향이 원천적으로 없고, judge(Gemini)·테스트(GPT/Claude)와도 무관하다. 단 §3.3 Step 3 수동 검증(시점 결정성·자연스러움)은 유지.
 
 ---
 

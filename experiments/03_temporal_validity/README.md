@@ -26,21 +26,22 @@ RAG에서 **같은 사실의 옛/새 버전이 같이 검색될 때, 최신 LLM�
 ## 전체 흐름
 
 ```
-데이터 변환            평가셋 만들기        모델에게 풀게 하기        채점·집계
-tqa_to_qa.py    →    01_sample      →    02_run_models      →    03_evaluate
- (TQA→충돌, 무료)      (50문항 추출)        (GPT·Claude 답변)        (TV·맹점 표)
-                       ↓ 사람 검수
+데이터 변환             평가셋 만들기        모델에게 풀게 하기        채점·집계
+timeqa_to_qa.py  →    01_sample      →    02_run_models      →    03_evaluate
+ (TimeQA→충돌, 무료)    (50문항 추출)        (GPT·Claude 답변)        (TV·맹점 표)
+                        ↓ 사람 검수
 ```
 
-**베이스 데이터 = TQA(Temporal Wiki, Özer 2025, MIT)**. 엔티티마다 연도별 위키
-revision 문단·결정론적 답을 제공 → 옛/새 두 시점 문단을 합쳐 **충돌 컨텍스트를
-사전 조립**. 질문은 LLM 생성이 아니라 데이터 원본에서 나오므로 **생성 편향·비용 없음**.
+**베이스 데이터 = TimeQA (Chen et al., NeurIPS 2021 D&B, peer-review)** — 엔티티마다
+시점별 정답 + **사람-라벨 gold 근거 문단**을 제공 → 옛/새 두 시점 문단을 합쳐
+**충돌 컨텍스트 조립**. 질문은 데이터 원본 템플릿이라 **생성 편향·비용 없음**.
+*(보조: TQA/Temporal Wiki(Özer 2025) — robustness 재현용)*
 
 **모델 역할 분리** (편향 방지):
 
 | 역할 | 주체 |
 |---|---|
-| 질문(데이터 원천) | **TQA**(위키 기반, 모델 아님) |
+| 질문(데이터 원천) | **TimeQA**(위키 기반, 모델 아님) |
 | 채점(judge) | **Gemini 3.1 Pro** |
 | 답변(테스트 대상) | **GPT-5.5 + Claude Opus 4.8** |
 
@@ -56,9 +57,11 @@ temporal-conflict-qa/
 ├── .env                     # API 키·모델 id·단가·RPM (자동 로드)
 │
 ├── data_prep/               # ── 데이터셋 가공 (실험과 별개, 데이터셋별 분리) ──
-│   ├── tqa/                 #   ★현재 — TQA 파이프라인
-│   │   └── tqa_to_qa.py     #     TQA 엔티티 → 충돌 QA 변환 (LLM 없음, 무료)
-│   └── hoh/                 #   legacy — HoH 파이프라인 (자체 config 포함)
+│   ├── timeqa/             #   ★주력 — TimeQA 파이프라인 (peer-review)
+│   │   └── timeqa_to_qa.py #     TimeQA annotated → 충돌 QA 변환 (LLM 없음, 무료)
+│   ├── tqa/                #   보조 — TQA/Temporal Wiki (robustness 재현)
+│   │   └── tqa_to_qa.py
+│   └── hoh/                #   legacy — HoH 파이프라인 (자체 config 포함)
 │       ├── config.py · llm_client.py
 │       ├── hoh_to_chunks.py · chunks_to_qa.py
 │       └── generate_reasoning.py · run_pipeline.py · ...
@@ -67,10 +70,11 @@ temporal-conflict-qa/
 │   └── monitor_cost.py      #   전체 비용 보기 (어디서든 실행)
 │
 ├── data/
-│   ├── tqa/                 #   ★현재
-│   │   ├── source/          #     TQA 엔티티 JSON 878개 (gitignored, MIT)
-│   │   └── qa_tqa.jsonl     #     변환 산출 = 평가셋 원천
-│   └── hoh/                 #   legacy (chunks/ · qa/ · qa-reasoning/ · original/)
+│   ├── timeqa/             #   ★주력
+│   │   ├── source/          #     TimeQA annotated_*.json + relations.json (gitignored)
+│   │   └── qa_timeqa.jsonl  #     변환 산출 = 평가셋 원천 (8360 레코드)
+│   ├── tqa/                #   보조 (source/ · qa_tqa.jsonl)
+│   └── hoh/                #   legacy (chunks/ · qa/ · qa-reasoning/ · original/)
 │
 ├── usage/                   # ── 전체 비용 (gitignored) ──
 │   ├── usage_summary.txt    #   사람이 읽는 합계 (자동 갱신) ← 이거만 열면 됨
@@ -102,15 +106,16 @@ temporal-conflict-qa/
 `.env`에 키·모델·단가가 들어 있어 자동 로드된다. 0단계는 루트에서, 1~4단계는
 `experiments/03_temporal_validity/scripts`에서 실행.
 
-### 0단계 데이터 변환 (TQA → 충돌 QA, LLM 없음·무료)
-TQA 엔티티 JSON에서 옛/새 두 시점 문단을 합쳐 충돌 컨텍스트를 만든다. 근거 품질
-게이트(답이 근거에 실재하는지)를 통과한 것만 남긴다.
+### 0단계 데이터 변환 (TimeQA → 충돌 QA, LLM 없음·무료)
+TimeQA annotated에서 답이 다른 옛/새 두 시점의 **사람-라벨 gold 문단**을 옛/새 청크로
+조립한다(근거 라벨이 제공돼 추론 불필요).
 ```bash
-# (루트에서) data/tqa/source/*.json → data/tqa/qa_tqa.jsonl
-python3 data_prep/tqa/tqa_to_qa.py
+# (루트에서) data/timeqa/source/annotated_*.json → data/timeqa/qa_timeqa.jsonl
+python3 data_prep/timeqa/timeqa_to_qa.py
 ```
-> TQA 데이터가 없으면: `git clone https://github.com/atahanoezer/TQA` 후
-> `full_data_filtered/`를 `data/tqa/source/`로 복사.
+> TimeQA 데이터가 없으면: `git clone https://github.com/wenhuchen/Time-Sensitive-QA` 후
+> `dataset/annotated_*.json` 과 `relations.json` 을 `data/timeqa/source/`로 복사.
+> *(보조 robustness용 TQA: `python3 data_prep/tqa/tqa_to_qa.py`, 데이터는 atahanoezer/TQA)*
 
 ### 1단계 예상 비용 확인
 ```bash
@@ -119,7 +124,7 @@ python 00_estimate_cost.py --models gpt,claude --judge gemini
 
 ### 2단계 평가셋 만들기 → **사람 검수**
 ```bash
-python 01_sample_eval_set.py --input ../../../data/tqa/qa_tqa.jsonl
+python 01_sample_eval_set.py --input ../../../data/timeqa/qa_timeqa.jsonl
 #   mode별 개수 지정: --quota "outdated=40,current=10" (기본). current=recency-bias 대조군.
 ```
 → 생성된 `data/validation_sheet.csv`를 열어, 각 문항이 **"과거 시점이 모호 없이 정해지고 + 질문이 자연스러운가"** 를 사람이 확인. **통과한 것만 남긴다.** (이 실험의 신뢰성은 여기서 갈림.)
