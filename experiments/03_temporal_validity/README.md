@@ -26,21 +26,26 @@ RAG에서 **같은 사실의 옛/새 버전이 같이 검색될 때, 최신 LLM�
 ## 전체 흐름
 
 ```
-(선택) 질문 재생성        평가셋 만들기        모델에게 풀게 하기        채점·집계
-chunks_to_qa.py    →    01_sample      →    02_run_models      →    03_evaluate
-  (Gemini 생성)          (50문항 추출)        (GPT·Claude 답변)        (TV·맹점 표)
-                          ↓ 사람 검수
+데이터 변환            평가셋 만들기        모델에게 풀게 하기        채점·집계
+tqa_to_qa.py    →    01_sample      →    02_run_models      →    03_evaluate
+ (TQA→충돌, 무료)      (50문항 추출)        (GPT·Claude 답변)        (TV·맹점 표)
+                       ↓ 사람 검수
 ```
 
-**모델 역할 분리** (편향 방지 — 생성/채점 모델 ≠ 답변 모델):
+**베이스 데이터 = TQA(Temporal Wiki, Özer 2025, MIT)**. 엔티티마다 연도별 위키
+revision 문단·결정론적 답을 제공 → 옛/새 두 시점 문단을 합쳐 **충돌 컨텍스트를
+사전 조립**. 질문은 LLM 생성이 아니라 데이터 원본에서 나오므로 **생성 편향·비용 없음**.
 
-| 역할 | 모델 |
+**모델 역할 분리** (편향 방지):
+
+| 역할 | 주체 |
 |---|---|
-| 질문 생성 + 채점(judge) | **Gemini 3 Pro** |
+| 질문(데이터 원천) | **TQA**(위키 기반, 모델 아님) |
+| 채점(judge) | **Gemini 3.1 Pro** |
 | 답변(테스트 대상) | **GPT-5.5 + Claude Opus 4.8** |
 
 데이터 규모: **50문항** = 과거지향 40 + 현재지향(대조군) 10.
-예상 비용: 테스트 ~$4.5 + (선택)재생성 ~$2.
+예상 비용: 테스트 ~$4.5 (**데이터 변환은 무료 — LLM 호출 없음**).
 
 ---
 
@@ -48,21 +53,27 @@ chunks_to_qa.py    →    01_sample      →    02_run_models      →    03_eva
 
 ```
 temporal-conflict-qa/
-├── .env                     # API 키·모델 id·단가·RPM (스크립트가 자동 로드)
-├── config.py                # 공통 설정: 모델 기본값·RPM·경로·파일명 alias
-├── llm_client.py            # 생성용 LLM 클라이언트 + rate limiter
+├── .env                     # API 키·모델 id·단가·RPM (자동 로드)
 │
-├── scripts/                 # ── 데이터 생성 파이프라인 + 전역 도구 (실험 공용) ──
-│   ├── hoh_to_chunks.py     #   위키 → 청크
-│   ├── chunks_to_qa.py      #   청크 → 질문(QA) 생성  ★질문 품질 프롬프트가 여기
-│   └── monitor_cost.py      #   전체 비용 보기 (생성+실험 통합, 어디서든 실행)
+├── data_prep/               # ── 데이터셋 가공 (실험과 별개, 데이터셋별 분리) ──
+│   ├── tqa/                 #   ★현재 — TQA 파이프라인
+│   │   └── tqa_to_qa.py     #     TQA 엔티티 → 충돌 QA 변환 (LLM 없음, 무료)
+│   └── hoh/                 #   legacy — HoH 파이프라인 (자체 config 포함)
+│       ├── config.py · llm_client.py
+│       ├── hoh_to_chunks.py · chunks_to_qa.py
+│       └── generate_reasoning.py · run_pipeline.py · ...
+│
+├── tools/
+│   └── monitor_cost.py      #   전체 비용 보기 (어디서든 실행)
 │
 ├── data/
-│   ├── chunks/              #   chunks_0_600.jsonl (생성 입력)
-│   └── qa/                  #   qa_*.jsonl  (생성된 질문 = 평가셋 원천)
+│   ├── tqa/                 #   ★현재
+│   │   ├── source/          #     TQA 엔티티 JSON 878개 (gitignored, MIT)
+│   │   └── qa_tqa.jsonl     #     변환 산출 = 평가셋 원천
+│   └── hoh/                 #   legacy (chunks/ · qa/ · qa-reasoning/ · original/)
 │
-├── usage/                   # ── 전체 비용 (생성+실험 통합, gitignored) ──
-│   ├── usage_summary.txt    #   사람이 읽는 합계 (매 실행 자동 갱신) ← 이거만 열면 됨
+├── usage/                   # ── 전체 비용 (gitignored) ──
+│   ├── usage_summary.txt    #   사람이 읽는 합계 (자동 갱신) ← 이거만 열면 됨
 │   └── usage_ledger.jsonl   #   원시 로그
 │
 └── experiments/03_temporal_validity/        # ── 이 실험 ──
@@ -88,17 +99,18 @@ temporal-conflict-qa/
 
 ## 실행 방법
 
-`.env`에 키·모델·단가가 들어 있어 자동 로드된다. 아래는 `experiments/03_temporal_validity/scripts`에서 실행.
+`.env`에 키·모델·단가가 들어 있어 자동 로드된다. 0단계는 루트에서, 1~4단계는
+`experiments/03_temporal_validity/scripts`에서 실행.
 
-### 0단계 (선택) 질문 재생성 — Gemini로
-기존 질문(Llama 생성)이 과거지향에서 부자연스러워, 더 좋은 모델로 다시 만든다. **조금씩 만들어 검수 후 이어서** 할 수 있다(자동 누적).
+### 0단계 데이터 변환 (TQA → 충돌 QA, LLM 없음·무료)
+TQA 엔티티 JSON에서 옛/새 두 시점 문단을 합쳐 충돌 컨텍스트를 만든다. 근거 품질
+게이트(답이 근거에 실재하는지)를 통과한 것만 남긴다.
 ```bash
-# 청크 120건만 잘라서 입력 → Gemini가 질문 생성 (data/qa/qa_gemini_work.jsonl 누적)
-head -120 ../../../data/chunks/chunks_0_600.jsonl > ../../../data/chunks/chunks_work.jsonl
-python ../../../scripts/chunks_to_qa.py --input ../../../data/chunks/chunks_work.jsonl \
-       --provider gemini --gemini-model gemini-3.1-pro-preview
+# (루트에서) data/tqa/source/*.json → data/tqa/qa_tqa.jsonl
+python3 data_prep/tqa/tqa_to_qa.py
 ```
-> 안 하면 기존 데이터(`qa_llama3_1-70b-awq_0_600.jsonl`)를 그대로 써도 된다.
+> TQA 데이터가 없으면: `git clone https://github.com/atahanoezer/TQA` 후
+> `full_data_filtered/`를 `data/tqa/source/`로 복사.
 
 ### 1단계 예상 비용 확인
 ```bash
@@ -107,8 +119,7 @@ python 00_estimate_cost.py --models gpt,claude --judge gemini
 
 ### 2단계 평가셋 만들기 → **사람 검수**
 ```bash
-python 01_sample_eval_set.py --input ../../../data/qa/qa_gemini_work.jsonl
-#   (재생성 안 했으면 --input ../../../data/qa/qa_llama3_1-70b-awq_0_600.jsonl)
+python 01_sample_eval_set.py --input ../../../data/tqa/qa_tqa.jsonl
 #   mode별 개수 지정: --quota "outdated=40,current=10" (기본). current=recency-bias 대조군.
 ```
 → 생성된 `data/validation_sheet.csv`를 열어, 각 문항이 **"과거 시점이 모호 없이 정해지고 + 질문이 자연스러운가"** 를 사람이 확인. **통과한 것만 남긴다.** (이 실험의 신뢰성은 여기서 갈림.)
@@ -154,7 +165,7 @@ python 03_evaluate.py --model claude --judge gemini
 생성·테스트·채점 **모든 실행의 토큰·비용이 repo 루트 `usage/`에 자동 누적**된다. (실험 폴더 밖 — 생성은 실험과 별개라서.)
 
 - **`usage/usage_summary.txt`** 를 열면 전체 합계가 보인다 (매 실행 자동 갱신, 스크립트 실행 불필요).
-- 스크립트별 분해가 필요하면(루트 어디서든): `python3 scripts/monitor_cost.py --by-script`
+- 스크립트별 분해가 필요하면(루트 어디서든): `python3 tools/monitor_cost.py --by-script`
 
 ---
 

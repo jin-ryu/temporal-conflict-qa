@@ -6,8 +6,8 @@ repo 루트 usage/usage_ledger.jsonl 에 누적 append 한다. 이 스크립트�
 (pilot_common 등 어떤 실험 코드에도 의존하지 않는다 — 어디서든 실행 가능)
 
 usage:
-  python3 scripts/monitor_cost.py             # 모델별 + 총계
-  python3 scripts/monitor_cost.py --by-script # 스크립트별 분해도 함께
+  python3 tools/monitor_cost.py             # 모델별 + 총계
+  python3 tools/monitor_cost.py --by-script # 스크립트별 분해도 함께
 """
 import argparse
 import json

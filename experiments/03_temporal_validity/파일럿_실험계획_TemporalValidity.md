@@ -49,24 +49,22 @@
 | ChronoQA (2508.12282) | △ | ✕ | ○ | 5,176, 뉴스 | 답 중심 |
 | ConflictBank (2408.12076) | ○(합성) | △ | ○ | 합성 | 합성 한계 |
 | DRAGged CONFLICTS (2506.08500) | ○ | ✕ | △ | temporal 62, 웹 | 소규모 |
-| **HoH(2503.04800) + 자체 가공** | **○** | **○ (청크별 라벨+evidence_chunk_id)** | **○** | **확장 가능, 위키** | **유일 적합** |
+| HoH(2503.04800) + 자체 가공 | ○ | △ (위키 편집 diff — 정정/오류 혼입) | ○ | 위키 | legacy(보류) |
+| **TQA / Temporal Wiki(2506.07270) MIT** | **○** | **○ (연도별 revision 문단+답)** | **○** | **878 엔티티, 위키** | **★ 채택** |
 
-→ (c) 시점-유효 근거 라벨을 갖춘 공개 데이터가 없어 **파일럿 1차 데이터 = HoH 기반 자체 가공 평가셋**. 현실성(다출처)은 본 논문에서 WikiContradict로 보강.
+→ **데이터 출처 변경 (HoH → TQA)**: HoH는 시점-유효 근거 라벨이 있으나 그 "outdated"가 위키 *편집 diff*라 **세상의 변화와 오류정정이 섞인다**(파일럿 검수 결과 ~50% 결함). 정정된 옛값은 *그 시점에도 틀린 값*이라 as-of-past가 아니어서 구성타당도를 해친다. **TQA는 Wikidata 시간한정 사실의 연도별 revision 문단을 직접 제공** → 변화가 전부 *진짜 세상변화*이고, 옛/새 문단이 사전 분리돼 충돌 컨텍스트 조립이 결정론적이다. 현실성(다출처)은 본 논문에서 WikiContradict로 보강.
 
-### 3.3 HoH 기반 평가셋 가공 (재현용)
+### 3.3 TQA 기반 변환 (재현용)
 
-원천 **HoH-QAs** = {현재형 question, 현재 answer·evidence·timestamp, outdated_infos[](answer·evidence·timestamp), document.title}. 이를 *citation-grounding 평가*에 필요한 형태 — 충돌 컨텍스트 + 시점-유효 근거 라벨 — 로 가공한다. (RL 학습용 산출물인 추론 CoT·train/test 분할은 본 평가에 불필요하므로 제외하고, 평가 타당성을 위한 시점 결정성·검증을 강화한다.)
+원천 **TQA**(Temporal Wiki, Özer 2025, MIT) = 엔티티마다 `incidents[연도]` = {연도형 question, 결정론적 answer(Wikidata id), 그 시점 위키 revision 문단 `dump.body_par`, revision 영구링크}. 이를 충돌 grounding 평가 형태로 변환한다(`data_prep/tqa/tqa_to_qa.py`, **LLM 호출 없음·무료**).
 
-- **Step 1 — 충돌 컨텍스트 구축**: 각 timestamp 시점의 위키 revision wikitext를 MediaWiki API로 받아 평문화 → 슬라이딩 윈도우 청킹. 현재 evidence 청크 = `current`, 각 outdated evidence 청크 = `outdated_i`, 나머지 = `distractor`. 각 청크에 `last_modified_time` 부여(outdated는 evidence 청크만 추출해 중복 distractor 방지).
-- **Step 2 — 시점 결정형 질의 구성** (레코드당 2유형):
-  - `current` (현재 지향): 명시적 "현재/최신" 신호를 포함한 질의 → target = 현재 answer, gold evidence = `current` 청크.
-  - `outdated_i` (과거 지향): outdated 시점을 가리키는 *사건 기준(event-anchored)* 표현 질의(예: "…재분류 *이전*에…"). **연도·날짜 명시 금지**(타임스탬프 매칭 차단 — 사건 기준으로 결정론적이되 비자명) → target = 해당 outdated answer, gold evidence = `outdated_i` 청크.
-  - `target_answer`는 HoH 정답을 고정 주입(hallucination 방지), `evidence_chunk_id`는 시점-유효 청크로 사전 지정.
-- **Step 3 — 검증**: (자동) `target == ground_truth` + 날짜 regex 필터. **(수동) 표본에 대해 "목표 시점이 단일 정답으로 모호 없이 결정되는가 + 질문이 자연스러운가"를 사람이 확인** — LLM 생성 질의의 한계를 보완하며, citation-grounding 평가의 타당성에 직결된다.
+- **Step 1 — 옛/새 시점 선택**: 엔티티의 연도들 중 새=최신, 옛=답이 다른 가장 이른 연도(실제 변화 보장). 각 연도의 `body_par`를 정리(인라인 CSS 제거)해 청크로. 옛=`outdated_0`, 새=`current`. `last_modified_time`=연도.
+- **Step 2 — 질의·라벨**: 질문은 TQA 원본(**명시적 연도형**, "…in 2010?"). target=해당 연도 답, `evidence_chunk_id`=그 연도 청크. *질문이 데이터 원본이라 LLM 생성 편향·"날짜 금지 메타anchor" 문제가 없다 — 명시적 연도가 자연·결정론적.*
+- **Step 3 — 검증**: (자동) **근거 게이트** — 답의 변별 토큰이 그 시점 문단에 실재해야 통과(정식명↔약칭 흡수, generic 역할단어 제외; 미통과 시 제외). **(수동) 표본을 사람이 확인**: 시점 결정성 + 자연스러움 + 스포츠 클럽/국대 모호·가공인물 배제(파일럿 검수 기준 ~90% 통과).
 - **레코드 스키마**:
   ```json
-  {"id","hoh_source_idx","mode":"current|outdated_i","new_question","target_answer",
-   "evidence_chunk_id","chunks":[{"chunk_id","label":"current|outdated_i|distractor","text","last_modified_time"}]}
+  {"id","source_idx","mode":"current|outdated_0","new_question","target_answer",
+   "evidence_chunk_id","chunks":[{"chunk_id","label":"current|outdated_0","text","last_modified_time"}]}
   ```
 
 ### 3.4 파일럿 서브셋 (확정 — 경향성 파악 최소)
@@ -75,49 +73,36 @@
 
 **mode별 역할:**
 
-- **`outdated_i` (과거 지향) — 주력(기여)**: GaRAGe가 비운 칸(포지셔닝 §5.3). wrong-time 인용 비율 + 2×2 ★셀의 신호원(wrong-time ~30%여도 TV=FAIL ≈12건). 다단계(`outdated_1+`) 우선.
+- **`outdated_0` (과거 지향) — 주력(기여)**: GaRAGe가 비운 칸(포지셔닝 §5.3). wrong-time 인용 비율 + 2×2 ★셀의 신호원(wrong-time ~30%여도 TV=FAIL ≈12건). *(TQA는 엔티티당 옛/새 1쌍 = 단일층 outdated_0)*
 - **`current` (현재 지향) — recency-bias 대조군** *(기여가 아니라 대조)*:
   - ① **실패가 과거-지향 특유임을 격리** — current는 TV 높고 past는 낮으면 "grounding 능력은 있는데 *과거일 때만* 무너진다"가 증명됨(일반적 무능 아님).
   - ② **최신 편향 입증** — current는 최신=정답이라 잘 맞히고, past에서 그 편향이 *오답으로* 드러남 → 체계적 recency bias.
   - ③ **sanity check**. 소수(10)면 충분(통계 파워가 아니라 방향성 대비용).
 - **`current_raw` (원질문) — 제외**: 시간 신호가 없어 현재/과거 둘 다 정답이 되어 모호.
 
-각 항목: `current` 청크 ≥1 + `outdated` 청크 ≥1 **공존**, 목표 시점 결정론적, `hoh_source_idx` 균형(leakage 방지). 경계 결과 시 100+로 확장.
+각 항목: `current` 청크 ≥1 + `outdated` 청크 ≥1 **공존**, 목표 시점 결정론적, `source_idx`(엔티티) 중복 금지(leakage 방지). 경계 결과 시 100+로 확장(TQA 변환 풀 ~487 엔티티).
 
-### 3.5 데이터 생성 실행 (역할 분리 · 증분)
+### 3.5 데이터 변환 실행 (LLM 없음 · 무료)
 
-기존 질문(Llama-3.1-70B 생성)이 as-of-past에서 부자연스러워, **블랙박스로 재생성**한다(생성 로직은 원본 `scripts/chunks_to_qa.py`에 일원화, 프롬프트 개선 반영됨).
+질문은 **TQA 원본**에서 나오므로 생성 모델이 필요 없다(`data_prep/tqa/tqa_to_qa.py`는 순수 변환). 편향 분리 대상은 **judge ≠ 테스트** 둘뿐이다.
 
-**역할 분리 원칙**: 편향 방지를 위해 **질문 생성 모델 · judge 모델 ≠ 테스트(답변) 모델**. (설계를 돕는 Claude는 파이프라인 밖이라 무관.)
+**역할 배정:**
 
-**권장 배정** (frontier 3종):
-
-| 역할 | 모델 | 이유 |
+| 역할 | 주체 | 이유 |
 |---|---|---|
-| 질문 생성 + judge | **Gemini 3 Pro** | 가장 저렴($2/$12), 대량 생성 유리. 테스트와 분리됨 |
+| 질문(원천) | **TQA**(위키 기반) | 모델 생성 아님 → 생성 편향·비용 0 |
+| judge | **Gemini 3.1 Pro** | 저렴($2/$12), 테스트와 분리 |
 | 테스트(답변) | **GPT-5.5 + Claude Opus 4.8** | 헤드라인 frontier 2종 → "최고 모델조차 실패" 강함 |
 
-(대안: 생성=GPT → 테스트=Claude+Gemini. *생성/judge가 테스트와 겹치지만 않으면* 됨.)
-
-**증분 생성** — 조금 만들어 검수 후 이어서. `chunks_to_qa.py`는 출력 파일을 append + 기존 id skip(resume)하므로, **입력 파일명을 고정**하고 내용만 키우면 누적된다.
+**변환 → 샘플 → 테스트:**
 ```bash
-# 1차: 30건만
-head -30 data/chunks/chunks_0_600.jsonl > data/chunks/chunks_work.jsonl
-python scripts/chunks_to_qa.py --input data/chunks/chunks_work.jsonl \
-       --provider gemini --gemini-model gemini-3.1-pro-preview
-#   → data/qa/qa_gemini_work.jsonl (30건). 검수.
-# 이어서: 같은 work.jsonl 내용만 확장 → resume로 새 것만 append
-head -120 data/chunks/chunks_0_600.jsonl > data/chunks/chunks_work.jsonl
-python scripts/chunks_to_qa.py --input data/chunks/chunks_work.jsonl \
-       --provider gemini --gemini-model gemini-3.1-pro-preview
-```
-
-**샘플 → 테스트:**
-```bash
+# 0) TQA 엔티티 → 충돌 QA (루트에서, 무료)
+python3 data_prep/tqa/tqa_to_qa.py            # data/tqa/source/*.json → data/tqa/qa_tqa.jsonl
+# 1~4) 샘플(검수) → 테스트 → 채점
 cd experiments/03_temporal_validity/scripts
-python 01_sample_eval_set.py --input ../../../data/qa/qa_gemini_work.jsonl   # 검수 후
-python 02_run_models.py --model gpt    ; python 02_run_models.py --model claude
-python 03_evaluate.py --model gpt --judge gemini ; python 03_evaluate.py --model claude --judge gemini
+python3 01_sample_eval_set.py --input ../../../data/tqa/qa_tqa.jsonl   # → validation_sheet 검수
+python3 02_run_models.py --model gpt   ; python3 02_run_models.py --model claude
+python3 03_evaluate.py --model gpt --judge gemini ; python3 03_evaluate.py --model claude --judge gemini
 ```
 
 ---
@@ -134,11 +119,11 @@ python 03_evaluate.py --model gpt --judge gemini ; python 03_evaluate.py --model
 - **파일럿 최소 = 서로 다른 lab의 frontier 2종**(권장: Gemini 3 Pro + Claude Opus 4.8). "약한 모델만/같은 lab만"은 C1 반박 여지 → *cross-lab frontier*가 가장 강함. 경계 시 GPT-5.5 추가.
 
 ### 4.2 오픈 LLM (단일 H100 80GB) — 선택
-- ⚠️ **eval 질문은 Llama-3.1-70B가 생성**(`data/qa/qa_llama3_1-70b-awq_*`). 자가생성 편향 방지를 위해 **Llama 계열은 테스트 대상에서 제외**.
-- 권장 오픈 모델: **Qwen3 35B-A3B** 또는 **Gemma 4 31B** (단일 H100 여유, 생성자와 다른 계열).
+- 질문이 모델 생성이 아니라 **TQA(위키) 원본**이라 자가생성 편향 제약이 없다 → 오픈 모델도 자유롭게 테스트 가능.
+- 권장 오픈 모델: **Qwen3 35B-A3B** 또는 **Gemma 4 31B** (단일 H100 여유).
 - 서빙 vLLM(`vllm serve … --quantization awq`). "프론티어조차 + 오픈도" 프레이밍 강화용 — **최소 파일럿엔 생략 가능**.
 
-> **데이터 출처 메모**: 평가 질문은 Llama-3.1-70B가 생성(target_answer는 HoH 정답 고정). 테스트·judge 모델(GPT/Claude/Gemini)이 모두 생성자와 달라 자가생성 편향이 없다. 단 LLM 생성 질의이므로 §3.3 Step 3 수동 검증이 필수.
+> **데이터 출처 메모**: 평가 질문·답은 **TQA**(Temporal Wiki, Wikidata 시간한정 사실 + 시점별 위키 revision 문단)에서 직접 유래(모델 생성 아님). 따라서 자가생성 편향이 원천적으로 없고, judge(Gemini)·테스트(GPT/Claude)와도 무관하다. 단 §3.3 Step 3 수동 검증(시점 결정성·자연스러움)은 유지.
 
 ---
 

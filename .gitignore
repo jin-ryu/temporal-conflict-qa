@@ -1,8 +1,9 @@
 /.env
-/logs/
+/data_prep/hoh/logs/
 /architecture.md
 /usage/
 __pycache__/
 *.pyc
 .DS_Store
 /.idea/
+/data/tqa/source/

@@ -10,26 +10,27 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+# repo 루트 = data_prep/hoh/config.py 에서 두 단계 위
+_REPO = Path(__file__).resolve().parents[2]
+
 # .env 로드 → 아래 os.getenv 들이 .env 값을 반영(생성 파이프라인도 .env의 모델/RPM 사용)
 try:
     from dotenv import load_dotenv
-    load_dotenv(Path(__file__).resolve().parent / ".env")
+    load_dotenv(_REPO / ".env")
 except Exception:
     pass
 
 # ---------------------------------------------------------------------------
-# 디렉토리
+# 디렉토리 (HoH 가공 입출력은 data/hoh/ 아래로 고정 — 실행 위치 무관)
 # ---------------------------------------------------------------------------
 
-# 모든 경로를 repo 루트(=config.py 위치)에 고정 → 어느 폴더에서 실행해도 동일
-_ROOT = Path(__file__).resolve().parent
-
-DIR_CHUNKS       = _ROOT / "data/chunks"
-DIR_QA           = _ROOT / "data/qa"
-DIR_QA_REASONING = _ROOT / "data/qa-reasoning"
-DIR_EVAL         = _ROOT / "data/eval"
-DIR_EVAL_SUMMARY = _ROOT / "data/eval_summary"
-DIR_LOGS         = _ROOT / "logs"
+_HOH             = _REPO / "data" / "hoh"
+DIR_CHUNKS       = _HOH / "chunks"
+DIR_QA           = _HOH / "qa"
+DIR_QA_REASONING = _HOH / "qa-reasoning"
+DIR_EVAL         = _REPO / "data" / "eval"          # 옛 실험(01) 평가 산출
+DIR_EVAL_SUMMARY = _REPO / "data" / "eval_summary"
+DIR_LOGS         = Path(__file__).resolve().parent / "logs"   # data_prep/hoh/logs (생성 코드 옆)
 
 CHUNKS_PATH = DIR_CHUNKS / "chunks.jsonl"
 

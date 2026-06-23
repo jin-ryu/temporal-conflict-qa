@@ -2,7 +2,7 @@
 LLM API 공통 모듈.
 
 make_client, rate limiter, error handling 등
-scripts/chunks_to_qa.py와 eval/evaluate_llm.py에서 공유한다.
+chunks_to_qa.py와 옛 실험(01)에서 공유한다.
 """
 
 import logging

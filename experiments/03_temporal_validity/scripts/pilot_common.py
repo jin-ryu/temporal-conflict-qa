@@ -2,7 +2,7 @@
 Temporal Validity 파일럿 — 공통 유틸 (프롬프트·파싱·정규화·모델 호출·judge).
 
 데이터 레코드 스키마 (data/qa/*.jsonl):
-  {id, hoh_source_idx, mode, new_question, target_answer, evidence_chunk_id,
+  {id, source_idx, mode, new_question, target_answer, evidence_chunk_id,
    chunks:[{chunk_id, label:"current|outdated|outdated_i|distractor", text, last_modified_time}]}
 
 설계 근거: 파일럿_실험계획_TemporalValidity.md §5~§7, §12

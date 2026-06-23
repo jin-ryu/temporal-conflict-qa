@@ -38,7 +38,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from dotenv import load_dotenv
 
@@ -190,7 +190,7 @@ def _append_gen_ledger(provider: str, model_id: str) -> None:
         pin = float(os.environ.get(price[0], "0")) if price else 0.0
         pout = float(os.environ.get(price[1], "0")) if price else 0.0
         cost = _GEN["input"] / 1e6 * pin + _GEN["output"] / 1e6 * pout
-        ledger = Path(__file__).resolve().parents[1] / "usage" / "usage_ledger.jsonl"
+        ledger = Path(__file__).resolve().parents[2] / "usage" / "usage_ledger.jsonl"
         ledger.parent.mkdir(parents=True, exist_ok=True)
         with ledger.open("a", encoding="utf-8") as f:
             f.write(json.dumps({"ts": datetime.now().isoformat(timespec="seconds"),

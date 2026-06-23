@@ -24,7 +24,7 @@ import argparse, csv, os, random
 from collections import Counter
 import pilot_common as pc
 
-KEEP = ("id", "hoh_source_idx", "mode", "new_question", "target_answer",
+KEEP = ("id", "source_idx", "mode", "new_question", "target_answer",
         "evidence_chunk_id", "chunks")
 
 
@@ -78,9 +78,9 @@ def main():
         for r in cands:
             if picked >= count:
                 break
-            if r["hoh_source_idx"] in used:   # leakage 방지: 소스 중복 금지
+            if r["source_idx"] in used:   # leakage 방지: 소스 중복 금지
                 continue
-            used.add(r["hoh_source_idx"])
+            used.add(r["source_idx"])
             row = {k: r[k] for k in KEEP}
             row["target_side"] = target_side(r["mode"])
             selected.append(row)
