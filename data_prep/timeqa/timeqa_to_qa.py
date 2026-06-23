@@ -60,6 +60,22 @@ def clean(text: str, cap: int = 2000) -> str:
     return _WS.sub(" ", text or "").strip()[:cap]
 
 
+def normalize_answer(s: str) -> str:
+    """TimeQA span의 토큰화 공백 정리: 'NYRBA , Inc' → 'NYRBA, Inc'."""
+    s = re.sub(r"\s+([,.;:)])", r"\1", (s or "").strip())
+    s = re.sub(r"\(\s+", "(", s)
+    return _WS.sub(" ", s).strip()
+
+
+def is_near_dup(a: str, b: str) -> bool:
+    """옛/새 답이 사실상 같은(약한 충돌) 경우: 부분문자열 또는 토큰 과대중복."""
+    al, bl = a.lower(), b.lower()
+    if al in bl or bl in al:
+        return True
+    t1, t2 = set(re.findall(r"[a-z0-9]+", al)), set(re.findall(r"[a-z0-9]+", bl))
+    return bool(t1 and t2) and len(t1 & t2) / len(t1 | t2) >= 0.6
+
+
 def is_ambiguous_team(*answers: str) -> bool:
     return any(_NAT_TEAM.search(a or "") or _YOUTH_TEAM.search(a or "") for a in answers)
 
@@ -90,7 +106,7 @@ def valid_periods(ex: dict):
         y = year_of(time_range[0] if time_range else "")
         if y is None:
             continue
-        out.append((y, ans[0]["answer"].strip(), ans[0].get("para", 0)))
+        out.append((y, normalize_answer(ans[0]["answer"]), ans[0].get("para", 0)))
     return out
 
 
@@ -101,8 +117,8 @@ def pick_pair(periods):
         return None
     new = periods[-1]
     for old in periods[:-1]:
-        if old[1].lower() != new[1].lower():
-            return old, new
+        if old[1].lower() != new[1].lower() and not is_near_dup(old[1], new[1]):
+            return old, new   # 답이 *실질적으로* 다른(near-dup 아닌) 가장 이른 시점
     return None
 
 
