@@ -1,3 +1,3 @@
 ,CitePrec=PASS,CitePrec=FAIL
-TV=PASS(시점-유효 인용),40,0
-TV=FAIL(틀린 시점 인용),15,3
+TV=PASS(시점-유효 인용),41,0
+TV=FAIL(틀린 시점 인용),16,1

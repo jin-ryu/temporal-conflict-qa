@@ -2,23 +2,23 @@
   "model": "gemini",
   "overall": {
     "n": 58,
-    "EM": 0.6379,
-    "TV_cite": 0.6897,
+    "EM": 0.6552,
+    "TV_cite": 0.7069,
     "TV_behav": 0.7692,
     "TV_behav_n_valid": 52,
-    "CitePrec": 0.9483,
-    "wrong_time_cite_rate": 0.3103,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.8333
+    "CitePrec": 0.9828,
+    "wrong_time_cite_rate": 0.2931,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9412
   },
   "as_of_past": {
     "n": 48,
-    "EM": 0.5833,
-    "TV_cite": 0.6458,
+    "EM": 0.6042,
+    "TV_cite": 0.6667,
     "TV_behav": 0.7381,
     "TV_behav_n_valid": 42,
-    "CitePrec": 0.9375,
-    "wrong_time_cite_rate": 0.3542,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.8235
+    "CitePrec": 0.9792,
+    "wrong_time_cite_rate": 0.3333,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9375
   },
   "current": {
     "n": 10,

@@ -259,7 +259,7 @@ def _retry(fn, n=4):
 
 
 def call_model(name: str, system: str, user: str, temperature: float = 0.0,
-               max_tokens: int = 2048) -> str:   # thinking 모델(Gemini 3.1 Pro 등)이 답 truncate 안 되게
+               max_tokens: int = 4096) -> str:   # thinking 모델(Gemini 3.1 Pro 등): 추론+답+인용 여유 (2048→4096)
     """모델 호출 + usage(토큰) 자동 누적(USAGE). 비용은 cost_report()로 확인."""
     backend, model_id = MODELS[name]
     if backend in ("openai", "vllm", "gemini"):  # 모두 OpenAI 호환 client 재사용
