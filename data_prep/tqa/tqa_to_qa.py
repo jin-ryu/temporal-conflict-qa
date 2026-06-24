@@ -96,19 +96,47 @@ def is_ambiguous_team(*answers: str) -> bool:
     return any(_NAT_TEAM.search(a or "") or _YOUTH_TEAM.search(a or "") for a in answers)
 
 
+def is_near_dup(a: str, b: str) -> bool:
+    """옛/새 답이 사실상 같은(약한 충돌): 부분문자열 또는 토큰 과대중복."""
+    al, bl = a.lower(), b.lower()
+    if al in bl or bl in al:
+        return True
+    t1, t2 = set(re.findall(r"[a-z0-9]+", al)), set(re.findall(r"[a-z0-9]+", bl))
+    return bool(t1 and t2) and len(t1 & t2) / len(t1 | t2) >= 0.6
+
+
+def chunks_too_similar(a: str, b: str) -> bool:
+    """옛/새 근거가 사실상 같은 문서(앞 200자 동일 or 토큰 자카드 ≥0.9) → 충돌 아님."""
+    if a == b or a[:200] == b[:200]:
+        return True
+    ta, tb = set(a.lower().split()), set(b.lower().split())
+    return bool(ta and tb) and len(ta & tb) / len(ta | tb) >= 0.9
+
+
+_YEAR_RE = re.compile(r"\b(20[0-2][0-9])\b")
+
+
+def mentions_future(body: str, year: int) -> bool:
+    """옛 스냅샷이 (라벨연도+2)보다 미래 연도를 언급 = 늦은 fallback(진짜 옛 문서 아님)."""
+    return any(int(y) > year + 2 for y in _YEAR_RE.findall(body))
+
+
 def pick_pair(incidents: dict):
-    """유효한 옛/새 연도 쌍을 고른다. 새=가장 최근, 옛=답이 다른 가장 이른 연도."""
+    """유효한 옛/새 연도 쌍. 새=가장 최근, 옛=답이 *실질적으로 다르고 근거 본문도 다른* 가장 이른 연도."""
     valid = {y: inc for y, inc in incidents.items()
              if y.isdigit() and ans_name(inc) and body_of(inc)}
     years = sorted(valid, key=int)
     if len(years) < 2:
         return None
     new_y = years[-1]
-    new_ans = ans_name(valid[new_y])
+    new_ans, new_body = ans_name(valid[new_y]), body_of(valid[new_y])
     for old_y in years[:-1]:
-        if ans_name(valid[old_y]).lower() != new_ans.lower():
+        oa = ans_name(valid[old_y])
+        if (oa.lower() != new_ans.lower()
+                and not is_near_dup(oa, new_ans)               # 약한 충돌 제외
+                and body_of(valid[old_y]) != new_body):        # 근거 본문이 같으면 충돌 아님
             return old_y, valid[old_y], new_y, valid[new_y]
-    return None  # 모든 연도가 같은 답 → 실제 변화 없음(충돌 아님)
+    return None
 
 
 def convert_entity(path: str, cap: int):
@@ -127,6 +155,10 @@ def convert_entity(path: str, cap: int):
     # 스포츠 클럽↔국가대표/유스 혼합 제외("which team" 단일정답 모호)
     if is_ambiguous_team(old_ans, new_ans):
         return None, "team_ambiguous"
+    if chunks_too_similar(old_body, new_body):     # 옛/새 근거가 사실상 같은 문서 → 충돌 아님
+        return None, "near_identical_evidence"
+    if mentions_future(old_body, int(old_y)):      # 옛 스냅샷이 미래 언급 → 늦은 fallback(가짜 옛 문서)
+        return None, "stale_old_snapshot"
     # 품질 게이트: 각 근거 문단이 자기 시점 답을 뒷받침해야 함(시점-유효 근거 보장)
     if not (answer_in_evidence(old_ans, old_body) and answer_in_evidence(new_ans, new_body)):
         return None, "evidence_mismatch"
