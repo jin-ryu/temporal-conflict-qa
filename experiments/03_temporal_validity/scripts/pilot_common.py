@@ -247,12 +247,15 @@ def write_summary(ledger_path: str = LEDGER, out_path: str = SUMMARY) -> None:
 
 
 def _retry(fn, n=4):
-    """일시적 Connection error/rate-limit 재시도 (백오프 1.5·3·4.5초)."""
+    """일시적 Connection error/rate-limit/5xx 재시도 (백오프 1.5·3·4.5초).
+    인증·권한·잘못된요청·모델없음(400/401/403/404)은 재시도 무의미 → 즉시 실패."""
     import time
     for i in range(n):
         try:
             return fn()
-        except Exception:
+        except Exception as e:
+            if getattr(e, "status_code", None) in (400, 401, 403, 404):
+                raise   # 키 오류 등 — 재시도해도 동일, 27분 낭비 방지
             if i == n - 1:
                 raise
             time.sleep(1.5 * (i + 1))
