@@ -1,0 +1,30 @@
+{
+  "model": "gemini",
+  "overall": {
+    "n": 50,
+    "EM": 0.3,
+    "TV_cite": 0.92,
+    "TV_behav": 0.44,
+    "CitePrec": 0.88,
+    "wrong_time_cite_rate": 0.08,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.5
+  },
+  "as_of_past": {
+    "n": 40,
+    "EM": 0.3,
+    "TV_cite": 0.9,
+    "TV_behav": 0.325,
+    "CitePrec": 0.95,
+    "wrong_time_cite_rate": 0.1,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.5
+  },
+  "current": {
+    "n": 10,
+    "EM": 0.3,
+    "TV_cite": 1.0,
+    "TV_behav": 0.9,
+    "CitePrec": 0.6,
+    "wrong_time_cite_rate": 0.0,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.0
+  }
+}
