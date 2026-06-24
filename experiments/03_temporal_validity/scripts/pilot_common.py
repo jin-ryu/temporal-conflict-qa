@@ -45,6 +45,18 @@ def normalize(s: str | None) -> str:
     return " ".join(toks)
 
 
+def ans_equiv(a: str | None, b: str | None) -> bool:
+    """답 동등성(무료 의미매칭 근사): 정규화 동일 | 부분문자열 | 토큰 자카드≥0.6.
+    정식명↔약칭("Tottenham Hotspur"↔"...F.C."), 뒷붙음("Jordi Pujol"↔"...i Soley") 흡수."""
+    na, nb = normalize(a), normalize(b)
+    if not na or not nb:
+        return False
+    if na == nb or na in nb or nb in na:
+        return True
+    ta, tb = set(na.split()), set(nb.split())
+    return len(ta & tb) / len(ta | tb) >= 0.6
+
+
 def f1(pred: str, gold: str) -> float:
     p, g = normalize(pred).split(), normalize(gold).split()
     if not p or not g:
@@ -234,8 +246,20 @@ def write_summary(ledger_path: str = LEDGER, out_path: str = SUMMARY) -> None:
         f.write(ledger_total(ledger_path) + "\n")
 
 
+def _retry(fn, n=4):
+    """일시적 Connection error/rate-limit 재시도 (백오프 1.5·3·4.5초)."""
+    import time
+    for i in range(n):
+        try:
+            return fn()
+        except Exception:
+            if i == n - 1:
+                raise
+            time.sleep(1.5 * (i + 1))
+
+
 def call_model(name: str, system: str, user: str, temperature: float = 0.0,
-               max_tokens: int = 512) -> str:
+               max_tokens: int = 2048) -> str:   # thinking 모델(Gemini 3.1 Pro 등)이 답 truncate 안 되게
     """모델 호출 + usage(토큰) 자동 누적(USAGE). 비용은 cost_report()로 확인."""
     backend, model_id = MODELS[name]
     if backend in ("openai", "vllm", "gemini"):  # 모두 OpenAI 호환 client 재사용
@@ -248,19 +272,19 @@ def call_model(name: str, system: str, user: str, temperature: float = 0.0,
         else:  # vllm
             client = OpenAI(base_url=os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1"),
                             api_key=os.getenv("VLLM_API_KEY", "EMPTY"))
-        r = client.chat.completions.create(
+        r = _retry(lambda: client.chat.completions.create(
             model=model_id, temperature=temperature, max_tokens=max_tokens,
             messages=[{"role": "system", "content": system},
-                      {"role": "user", "content": user}])
+                      {"role": "user", "content": user}]))
         u = getattr(r, "usage", None)
         record_usage(name, getattr(u, "prompt_tokens", 0), getattr(u, "completion_tokens", 0))
         return r.choices[0].message.content or ""
     if backend == "anthropic":
         import anthropic
         client = anthropic.Anthropic()  # ANTHROPIC_API_KEY
-        r = client.messages.create(
-            model=model_id, max_tokens=max_tokens, temperature=temperature,
-            system=system, messages=[{"role": "user", "content": user}])
+        r = _retry(lambda: client.messages.create(   # Opus 4.8은 temperature deprecated → 미전달
+            model=model_id, max_tokens=max_tokens,
+            system=system, messages=[{"role": "user", "content": user}]))
         u = getattr(r, "usage", None)
         record_usage(name, getattr(u, "input_tokens", 0), getattr(u, "output_tokens", 0))
         return "".join(b.text for b in r.content if getattr(b, "type", "") == "text")

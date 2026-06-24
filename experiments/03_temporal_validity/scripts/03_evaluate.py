@@ -20,10 +20,12 @@ import pilot_common as pc
 
 
 def behav_side(conflict_ans, cur_ans, old_ans):
-    c = pc.normalize(conflict_ans)
-    if c == pc.normalize(old_ans) and c != pc.normalize(cur_ans):
+    """conflict 답이 어느 단일문서 답을 따라갔나 (① 의미매칭 ans_equiv 사용)."""
+    eq_old = pc.ans_equiv(conflict_ans, old_ans)
+    eq_cur = pc.ans_equiv(conflict_ans, cur_ans)
+    if eq_old and not eq_cur:
         return "outdated"
-    if c == pc.normalize(cur_ans) and c != pc.normalize(old_ans):
+    if eq_cur and not eq_old:
         return "current"
     return "other"
 
@@ -55,21 +57,29 @@ def main():
             if cid in chunk_text and pc.judge_support(args.judge, chunk_text[cid], ans):
                 cite_prec = 1
                 break
-        # 반사실
-        side = behav_side(ans, o["current_only"].get("answer", ""), o["outdated_only"].get("answer", ""))
-        tv_behav = int(side == o["target_side"])
+        # 반사실 (행동 기준)
+        cur_ans = o["current_only"].get("answer", "")
+        old_ans = o["outdated_only"].get("answer", "")
+        side = behav_side(ans, cur_ans, old_ans)
+        # ② 유효성: 단일문서 답이 서로 갈려야(=문서가 답을 가른다) TV_behav가 의미있음.
+        #    옛=새 단일문서 답이 동등하면(두 문서가 같은 답 지지/모델이 불변) 반사실 판정 불가 → 제외.
+        behav_valid = bool(ans.strip()) and not pc.ans_equiv(cur_ans, old_ans)
 
         per_item.append({"id": o["id"], "target_side": o["target_side"], "EM": em,
-                         "TV_cite": tv_cite, "TV_behav": tv_behav, "CitePrec": cite_prec,
-                         "behav": side, "cites": cites, "answer": ans})
+                         "TV_cite": tv_cite, "CitePrec": cite_prec, "behav": side,
+                         "behav_valid": behav_valid, "cites": cites, "answer": ans})
 
     def agg(items):
         n = len(items) or 1
         m = lambda k: round(sum(it[k] for it in items) / n, 4)
         tv0 = [it for it in items if it["TV_cite"] == 0]
         blind = round(sum(it["CitePrec"] for it in tv0) / (len(tv0) or 1), 4)
+        # TV_behav: 반사실이 유효한 문항(단일문서 답이 갈림)에서만 집계
+        bv = [it for it in items if it["behav_valid"]]
+        tv_behav = round(sum(1 for it in bv if it["behav"] == it["target_side"]) / (len(bv) or 1), 4)
         return {"n": len(items), "EM": m("EM"), "TV_cite": m("TV_cite"),
-                "TV_behav": m("TV_behav"), "CitePrec": m("CitePrec"),
+                "TV_behav": tv_behav, "TV_behav_n_valid": len(bv),
+                "CitePrec": m("CitePrec"),
                 "wrong_time_cite_rate": round(1 - m("TV_cite"), 4),
                 "blind_spot_rate_P(CitePrec=1|TV_cite=0)": blind}
 

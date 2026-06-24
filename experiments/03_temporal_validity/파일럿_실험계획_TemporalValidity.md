@@ -50,19 +50,19 @@
 | ConflictBank (2408.12076) | ○(합성) | △ | ○ | 합성 | 합성 한계 |
 | DRAGged CONFLICTS (2506.08500) | ○ | ✕ | △ | temporal 62, 웹 | 소규모 |
 | HoH(2503.04800) + 자체 가공 | ○ | △ (위키 편집 diff — 정정/오류 혼입) | ○ | 위키 | legacy(보류) |
-| TQA / Temporal Wiki(2506.07270) MIT | ○ | ○ (연도별 revision 문단+답) | ○ | 878 엔티티, 위키 | 보조(robustness·preprint) |
-| **★ TimeQA (Chen+ NeurIPS'21 D&B)** | **○** | **○ (사람-라벨 gold 문단+span)** | **○** | **20K·5.5K facts, 위키** | **★ 주력 채택(peer-review)** |
+| **★ TQA / Temporal Wiki(2506.07270) MIT** | **○** | **○ (연도별 *실제 revision* 문단 + Wikidata 답)** | **○** | **878 엔티티, 위키** | **★ 주력 채택** |
+| TimeQA (NeurIPS'21 D&B) | △ | △ (단일 현재페이지 → 합성 타임스탬프) | ○ | 20K, 위키 | 조사 후 제외 |
 
-→ **데이터 출처 변경 (HoH → TimeQA 주력 + TQA 보조)**: HoH는 시점-유효 근거 라벨이 있으나 그 "outdated"가 위키 *편집 diff*라 **세상의 변화와 오류정정이 섞인다**(파일럿 검수 ~50% 결함, as-of-past 아님). → **TimeQA**(NeurIPS'21 peer-review)는 Wikidata 시변사실을 위키에 정렬하고 **시점별 정답 + gold 근거 문단을 사람이 라벨**해 제공 → 진짜 세상변화 + *시점-유효 근거가 이미 라벨됨*(요구 c 직접 충족, 추론 게이트 불필요). 검수 통과 ~96%. **신빙성**: TimeQA는 peer-review·처리코드 공개라 메인 베이스로 적합. **TQA**(Özer 2025, preprint·pre-paired 문단)는 같은 결과를 한 번 더 재현하는 **robustness 보조**로 둔다. 현실성(다출처)은 WikiContradict로 보강.
+→ **데이터 출처 (HoH·TimeQA 제외 → TQA 주력)**: temporal 데이터셋 **24종 전수조사** 결과, "옛/새 *실제 버전* 문서 + 깨끗한 답 + 시점-유효 라벨이 한 문맥에 공존"하는 구조는 **TQA에만** 존재(나머지는 단일문서·freshness·답만). HoH=편집diff(정정 혼입), TimeQA=*단일 현재페이지*를 쪼개 합성 타임스탬프(퇴화) → 둘 다 부적합. **TQA**는 TempLAMA(Wikidata)에서 질문·답을 뽑고 **각 연도의 실제 위키 revision 스냅샷**을 근거로 줘 *진짜 버전 충돌*이 결정론적. **신빙성**: TQA는 preprint라, peer-review가 필요하면 *TQA의 레시피(Wikidata 시간한정자 + 위키 revision)를 직접 재현*해 보강한다(그 자체가 resource 기여). 현실성(다출처)은 WikiContradict로 보강.
 
-### 3.3 TimeQA 기반 변환 (주력) · TQA 보조
+### 3.3 TQA 기반 변환 (주력)
 
-**TimeQA annotated** = 엔티티마다 위키 페이지 문단(`paras`) + 시점 구간별 {정답 + gold 근거 문단 인덱스(`para`)+span}을 **사람이 라벨**. 변환(`data_prep/timeqa/timeqa_to_qa.py`, **LLM 없음·무료**):
+원천 **TQA**(Temporal Wiki, Özer 2025) = 엔티티별 `incidents[연도]` = {연도형 question, Wikidata 답, 그 시점 위키 revision 본문 `body_par`, oldid}. 변환(`data_prep/tqa/tqa_to_qa.py`, **LLM 없음·무료**). **상세 스펙(입력·출력 구조·스텝·필터)은 `data_prep/tqa/README.md` 참조.** 요지:
 
-- **Step 1 — 옛/새 시점 선택**: 단일 비공백 답을 가진 시점들 중 새=가장 늦은, 옛=답이 다른 가장 이른 시점. 각 시점의 **gold 문단(`paras[para]`)** 을 청크로 — 옛=`outdated_0`, 새=`current`. `last_modified_time`=시작연도.
-- **Step 2 — 질의·라벨**: 질문은 `relations.json` 템플릿(관계 Pxx + 엔티티 + "in YYYY", **명시적 연도형**). target=해당 시점 답, `evidence_chunk_id`=그 시점 청크. *근거가 사람-라벨이라 시점-유효 근거가 보장됨.*
-- **Step 3 — 게이트**: 스포츠 클럽/국대 모호 제외, 근거-답 안전망 검사. *(보조 TQA: `data_prep/tqa/tqa_to_qa.py` — `incidents[연도].body_par`를 옛/새 청크로, 근거 변별토큰 게이트로 필터. 상세 동일.)*
-- **Step 3 — 검증**: (자동) **근거 게이트** — 답의 변별 토큰이 그 시점 문단에 실재해야 통과(정식명↔약칭 흡수, generic 역할단어 제외; 미통과 시 제외). **(수동) 표본을 사람이 확인**: 시점 결정성 + 자연스러움 + 스포츠 클럽/국대 모호·가공인물 배제(파일럿 검수 기준 ~90% 통과).
+- **Step 1** 옛/새 시점: 새=최신, 옛=*답 다름 + near-dup 아님 + body_par 다름*인 가장 이른 연도.
+- **Step 2** 청크: 각 연도 `body_par` 정리(인라인 CSS 제거·2000자) → 옛=`outdated_0`/새=`current`, `last_modified_time`=연도.
+- **Step 3** 질문·라벨: **TQA 원본 질문**(명시적 연도형), 정답=Wikidata 값, `evidence_chunk_id`=그 시점 청크.
+- **Step 4** 게이트: `team_ambiguous`·`near_identical_evidence`·`stale_old_snapshot`·`evidence_mismatch` 제외 → **878→309 엔티티(618 레코드)**. **자동 검증** `data_prep/validate_qa.py`(무결성 PASS) + **수동** 표본 검수(시점결정성·자연스러움·가공인물 배제).
 - **레코드 스키마**:
   ```json
   {"id","source_idx","mode":"current|outdated_0","new_question","target_answer",
@@ -82,7 +82,7 @@
   - ③ **sanity check**. 소수(10)면 충분(통계 파워가 아니라 방향성 대비용).
 - **`current_raw` (원질문) — 제외**: 시간 신호가 없어 현재/과거 둘 다 정답이 되어 모호.
 
-각 항목: `current` 청크 ≥1 + `outdated` 청크 ≥1 **공존**, 목표 시점 결정론적, `source_idx`(엔티티) 중복 금지(leakage 방지). 경계 결과 시 100+로 확장(TimeQA 변환 풀 **~4180 엔티티**, TQA ~454).
+각 항목: `current` 청크 ≥1 + `outdated` 청크 ≥1 **공존**, 목표 시점 결정론적, `source_idx`(엔티티) 중복 금지(leakage 방지). 경계 결과 시 100+로 확장(TQA 변환 풀 **~309 엔티티**).
 
 ### 3.5 데이터 변환 실행 (LLM 없음 · 무료)
 
@@ -92,19 +92,20 @@
 
 | 역할 | 주체 | 이유 |
 |---|---|---|
-| 질문(원천) | **TimeQA**(위키 기반) | 모델 생성 아님 → 생성 편향·비용 0 |
-| judge | **Gemini 3.1 Pro** | 저렴($2/$12), 테스트와 분리 |
-| 테스트(답변) | **GPT-5.5 + Claude Opus 4.8** | 헤드라인 frontier 2종 → "최고 모델조차 실패" 강함 |
+| 질문(원천) | **TQA**(위키 revision 기반) | 모델 생성 아님 → 생성 편향·비용 0 |
+| judge | **Claude Opus 4.8** | 테스트와 분리(Claude를 테스트서 빼 분석 편향도 방지) |
+| 테스트(답변) | **GPT-5.5 + Gemini 3.1 Pro** | cross-lab frontier 2종 → "최고 모델조차 실패" 강함 |
 
 **변환 → 샘플 → 테스트:**
 ```bash
-# 0) TimeQA annotated → 충돌 QA (루트에서, 무료)
-python3 data_prep/timeqa/timeqa_to_qa.py      # data/timeqa/source/annotated_*.json → data/timeqa/qa_timeqa.jsonl
+# 0) TQA 엔티티 → 충돌 QA (루트에서, 무료)
+python3 data_prep/tqa/tqa_to_qa.py            # data/tqa/source/*.json → data/tqa/qa_tqa.jsonl
+python3 data_prep/validate_qa.py data/tqa/qa_tqa.jsonl   # 무결성 검증
 # 1~4) 샘플(검수) → 테스트 → 채점
 cd experiments/03_temporal_validity/scripts
-python3 01_sample_eval_set.py --input ../../../data/timeqa/qa_timeqa.jsonl   # → validation_sheet 검수
-python3 02_run_models.py --model gpt   ; python3 02_run_models.py --model claude
-python3 03_evaluate.py --model gpt --judge gemini ; python3 03_evaluate.py --model claude --judge gemini
+python3 01_sample_eval_set.py --input ../../../data/tqa/qa_tqa.jsonl   # → validation_sheet 검수
+python3 02_run_models.py --model gpt   ; python3 02_run_models.py --model gemini
+python3 03_evaluate.py --model gpt --judge claude ; python3 03_evaluate.py --model gemini --judge claude
 ```
 *(보조: 같은 파이프라인을 `data_prep/tqa/tqa_to_qa.py` → `data/tqa/qa_tqa.jsonl`로 돌려 robustness 재현.)*
 
@@ -126,7 +127,7 @@ python3 03_evaluate.py --model gpt --judge gemini ; python3 03_evaluate.py --mod
 - 권장 오픈 모델: **Qwen3 35B-A3B** 또는 **Gemma 4 31B** (단일 H100 여유).
 - 서빙 vLLM(`vllm serve … --quantization awq`). "프론티어조차 + 오픈도" 프레이밍 강화용 — **최소 파일럿엔 생략 가능**.
 
-> **데이터 출처 메모**: 평가 질문·답·근거는 **TimeQA**(NeurIPS'21, Wikidata 시변사실 + 시점별 위키 문단을 사람이 라벨; 보조 TQA)에서 직접 유래(모델 생성 아님). 따라서 자가생성 편향이 원천적으로 없고, judge(Gemini)·테스트(GPT/Claude)와도 무관하다. 단 §3.3 Step 3 수동 검증(시점 결정성·자연스러움)은 유지.
+> **데이터 출처 메모**: 평가 질문·답·근거는 **TQA**(Temporal Wiki, TempLAMA/Wikidata 질문·답 + 실제 위키 revision 스냅샷)에서 직접 유래(모델 생성 아님). 따라서 자가생성 편향이 원천적으로 없고, judge(Claude)·테스트(GPT/Gemini)와도 무관하다. 단 수동 검증(시점 결정성·자연스러움)은 유지.
 
 ---
 

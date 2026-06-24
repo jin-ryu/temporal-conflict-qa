@@ -1,51 +1,494 @@
 id,mode,new_question,target_answer,gold_evidence_text,OK_시점결정성,OK_자연스러움,비고
-timeqa_wiki_Mih_ly_Kozma_P54_outdated_0,outdated_0,Which team did Mihály Kozma play for in 1975?,Thor Waterschei,"Mihály Kozma ( born 1 November 1949 ) was a Hungarian football midfielder , who played for Budapest Honvéd FC and Belgiums Thor Waterschei",,,
-timeqa_wiki_Jan_Bartram_P54_outdated_0,outdated_0,Which team did Jan Bartram play for in 1988?,Bayer 05 Uerdingen,"Jan Lewis Bartram ( born 6 March 1962 as Jan Louis Bartram ) , known simply as Jan Bartram , is a Danish former professional association football player in the midfielder position . He played for Scottish team Rangers and Bayer 05 Uerdingen in Germany , as well as Danish teams AGF and Brøndby IF . He earned 32 caps and scored five goals for the Denmark national team and was in the Danish squad for the 1986 FIFA World Cup .",,,
-timeqa_wiki_Lawrence_Macdonald_P937_outdated_0,outdated_0,Where did Lawrence Macdonald work in 1826?,Edinburgh,"After approximately four year he returned to Edinburgh , and there produced busts of Professor John Wilson and George Combe , the phrenologist . In 1829 , he sent his bust of John Marshall , MP , to the Royal Academy , and he was a frequent contributor to the succeeding exhibitions . In the autumn of 1829 , he exhibited in the Royal Institution , Edinburgh , his colossal group of ‘Ajax bearing the dead body of Patroclus and combating ‘an warrior’ and other works ; and he was second to his friend Charles Maclaren , editor of the ‘Scotsman,‘ in his bloodless duel with Dr . James Browne , editor of the ‘Caledonian Mercury,’ fought near Edinburgh in November 1829 , which arose partly out of an article in the ‘Mercury’ ( 6 November ) on Macdonald’s works and the ‘Scotsman‘s’ criticisms upon them . In the same year he was elected a member of the Scottish Academy , where in 1832 , he exhibited several busts , including those of J . Gibson Lochhart and the Earl Erroll ; but be seldom contributed here , and resigned his membership in 1858 . He appeared in the list of honorary members in 1867 . At this time he is shown as living at 10 Cumberland Street in Edinburghs Second New Town .",,,
-timeqa_wiki_Tom_Meschery_P108_outdated_0,outdated_0,Which employer did Tom Meschery work for in 1960?,Reno High School,"Meschery published his first book of poems in 1970 , and returned to school after his coaching stint , receiving his Master of Fine Arts degree from the University of Iowa in 1974 . He studied poetry with Mark Strand , U.S . poet laureate , at the University of Washington . After receiving his teaching credentials at the University of Nevada , Reno , Meschery taught high school English at Reno High School in Reno , Nevada , until his retirement from teaching in 2005 . He is also a poet , whose works often relate to basketball , teaching , and being a Russian immigrant . In 2002 , Meschery was inducted into the Nevada Writers Hall of Fame .",,,
-timeqa_wiki_Hartland_Covered_Bridge_P1435_outdated_0,outdated_0,Which site was the heritage designation of Hartland Covered Bridge in 1977?,National Historic Site,"A pedestrian walkway was added to the bridge in 1945 . In 1966 , vandals attempted to burn the bridge down . In 1970 , heavy trucks were barred from crossing the bridge . The bridge was declared a National Historic Site in 1980 , and a Provincial Historic Site in 1999 .",,,
-timeqa_wiki_Mechanical_Engineering_Industry_Association_P488_outdated_0,outdated_0,Who was the chair of Mechanical Engineering Industry Association in 1892?,Hugo Jacobi,"- 1892–1893 Hugo Jacobi , GHH , Sterkrade",,,
-timeqa_wiki_Mike_Watson_Baron_Watson_of_Invergowrie_P39_current,current,"Which position did Mike Watson, Baron Watson of Invergowrie hold in 2003?",deputy convener of the enterprise and culture committee.,"When Jack McConnell became First Minister in 2001 , Watson entered the Scottish Executive as Minister for Tourism , Culture and Sport . He left the Executive in 2003 , having lost his position in a reshuffle after the 2003 election . He subsequently became deputy convener of the enterprise and culture committee .",,,
-timeqa_wiki_Elias_Disney_P551_outdated_0,outdated_0,What was the residence of Elias Disney in 1905?,3515 South Vernon Avenue in the Fourth Ward,"By 1890 , the Disneys lived at 3515 South Vernon Avenue in the Fourth Ward . Disney worked as a carpenter . On October 31 , 1891 , Disney bought a lot at 1249 Tripp . By 1892 , he had built a house on it . The neighborhood was called Hermosa and had been settled by Scottish , German , and Scandinavian immigrants . Their younger three children were born there .",,,
-timeqa_wiki_Allington_Castle_P127_outdated_0,outdated_0,Who was the owner of Allington Castle in 1492?,Henry Wyatt,"Allington Castle was acquired in 1492 by Sir Henry Wyatt , a prominent supporter of Henry Tudor , who was later to become King Henry VII . He undertook major alterations , dividing the courtyard into two unequal parts by constructing a two-storeyed building which contained what may have been one of the first long galleries in England . He also added a half-timbered block adjoining the curtain wall , which was used as the castles kitchens and stables . Henry VII visited it during Wyatts tenure . Henry VIII also visited in 1527 , 1530 and 1536 , as did Cardinal Wolsey in 1527 and Catherine Parr in 1544 . Henry was said to have been so concerned for his personal safety while staying in the castles north-east tower that he had the single entry , a spiral staircase , blocked off by a dry stone wall each night that he was there .",,,
-timeqa_wiki_Lowell_State_College_P2561_outdated_0,outdated_0,What was the name of Lowell State College in 1894?,Lowell Normal School,Lowell Normal School ( 1894-1932 ) .,,,
-timeqa_wiki_KF_Sk_nderbeu_Kor_P286_current,current,Who was the head coach of the team KF Skënderbeu Korçë in 2019?,Ilir Daja,- Ilir Daja ( Jan 2017 - Jun 2018 ),,,
-timeqa_wiki_Jos_Serrarens_P39_outdated_0,outdated_0,Which position did Jos Serrarens hold in 1929?,Senate of the Netherlands,"Petrus Josephus Servatius ( Jos ) Serrarens ( 12 November 1888 – 26 August 1963 ) was a Dutch politician and judge . From 1920 to 1953 Serrarens was the Secretary General of the International Federation of Christian Trade Unions . He was member of the Senate of the Netherlands and later the House of Representatives . Although not having completed any legal training , he became a judge at the European Court of Justice , where he worked from 1952 until 1958 .",,,
-timeqa_wiki_Andy_Herron_P54_current,current,Which team did Andy Herron play for in 2012?,Fort Lauderdale,"He returned to the United States in January 2012 when he signed with Fort Lauderdale Strikers of the North American Soccer League . In summer 2013 he left Fort Lauderdale to join Atlanta Silverbacks , but left them in August 2013 without any game played for them .",,,
-timeqa_wiki_David_Gauke_P39_outdated_0,outdated_0,Which position did David Gauke hold in 2005?,member of the Procedure Select committee,"Gauke was elected to the House of Commons at the 2005 general election for Hertfordshire South West following the retirement of Richard Page . Gauke won the seat with a majority of 8,473 , making his maiden speech on 9 June 2005 . Between 2005 and 2008 , he served as a member of the Procedure Select committee . He was a member of the Treasury Select Committee between 2006 and 2007 , before joining the Opposition front bench as Shadow Treasury Minister .",,,
-timeqa_wiki_P_bram_P6_outdated_0,outdated_0,Who was the head of Příbram in 1997?,Josef Vacek,"Both parties strengthened their position in the Příbram council for the second elections in a row , while the Christian Democrats of the former mayor Josef Vacek lost both two remaining seats , Vacek himself did not act as the party leader , but he was unsuccessfully running for re-election .",,,
-timeqa_wiki_Sheila_Copps_P39_outdated_0,outdated_0,Which position did Sheila Copps hold in 1981?,Member of Parliament,"She is married to Austin Thorne ( her third husband ) , and has one daughter , Danelle ( from her second marriage ) . She was the first sitting Member of Parliament in Canadian history to give birth .",,,
-timeqa_wiki_Benjamin_Fordyce_Barker_P69_outdated_0,outdated_0,Where was Benjamin Fordyce Barker educated in 1833?,"Bowdoin College in 1833, graduating with the degree of A. B. in 1837","He was born at Wilton , Maine , May 2 , 1818 , the son of Doctor John Barker and Phebe Abbott . His father , a practitioner at Wilton , was formerly for two years an army surgeon in the War of 1812 . Fordyces early education was under the tutelage of his parents until eleven years of age , then began his classical training under his uncle John Abbott , at China , Maine . From thence he went to Farmington , Maine , to attend the school of Professor Green ; next he went to Limerick , Maine , to complete his preparation for college ; this he did under the guidance of his uncle by marriage , the Reverend Charles Freeman . He entered Bowdoin College in 1833 , graduating with the degree of A . B . in 1837 ; he then entered the Medical Department in the same University and was graduated with the degree of M . D . in 1841 , previously having received an A . M . in 1840 .",,,
-timeqa_wiki_Andy_Butler_P54_outdated_0,outdated_0,Which team did Andy Butler play for in 2002?,Scunthorpe United,"Butler started his career at Scunthorpe United . He made his debut for the Iron , then in the Third Division , on 20 September 2003 as a 34th-minute substitute in a 1–1 draw with Leyton Orient at Brisbane Road . His full debut came three days later , a 2–3 defeat to Burnley at Glanford Park in the third round of the 2003–04 League Cup . Midway through the season Butler signed a four-year contract .",,,
-timeqa_wiki_Morgaro_Gomis_P54_outdated_0,outdated_0,Which team did Morgaro Gomis play for in 2004?,Windsor & Eton,"Gomis spent several years playing in English non-League football . In 2004 , he signed for Windsor & Eton and featured in 18 league matches , scoring once . In January 2005 , Gomis moved to Dagenham & Redbridge but the move quickly became controversial after an agent became involved in a contract row with the club . Gomis left in March 2005 without making an appearance and rejoined Windsor , playing in five matches before the end of the season . Gomis had a short stay with Barnet at the start of the 2005–06 season – where he featured in a matchday squad once as an unused substitute – but his month-to-month contract was not renewed and he moved to Lewes . He made his league debut in a 5–2 defeat of Weston-super-Mare on 15 Octoberthe club websites match report suggested that manager Steve King may well have unearthed another little gem in Morgaro Gomis , whose contribution after arriving on the field as a 55th minute substitute was key to the eventual success.and played in fourteen Conference South matches , scoring once , during the season .",,,
-timeqa_wiki_Ryuzo_Morioka_P54_outdated_0,outdated_0,Which team did Ryuzo Morioka play for in 1994?,Kashima Antlers,"Morioka was born in Yokohama on 7 October 1975 . After graduating from high school , he joined Kashima Antlers in 1994 . He moved to Shimizu S-Pulse in August 1995 . He played many matches as center back . The club won 1996 J.League Cup and 2001 J1 League . In Asia , the club won the champions 1999–2000 Asian Cup Winners Cup and te 3rd place 2000–01 Asian Cup Winners Cup . However his opportunity to play decreased from 2005 . He moved to J2 League club Kyoto Sanga FC in 2007 . He played as captain and the club was promoted to J1 League in 2007 . He retired end of 2008 season .",,,
-timeqa_wiki_Cher_Wang_P108_outdated_0,outdated_0,Which employer did Cher Wang work for in 1982?,First International Computer,"Wang joined First International Computer ( FIC ) in 1982 . Wang and others founded VIA in 1987 and HTC in 1997 . In May 2011 , Forbes ranked her , with husband Wen Chi Chen , as the wealthiest person in Taiwan , with a net worth of US$8.8 billion . In August 2012 , Wang was named No . 56 on Forbes list of The Worlds 100 Most Powerful Women . As of 2014 , she is listed as the 54th most powerful woman in the world by Forbes .",,,
-timeqa_wiki_Peter_Tauber_P39_current,current,Which position did Peter Tauber hold in 2017?,Parliamentary State Secretary at the Federal Ministry of Defence,"Following the 2017 elections , Tauber was appointed Parliamentary State Secretary at the Federal Ministry of Defence , under the leadership of minister Ursula von der Leyen .",,,
-timeqa_wiki_Ilie_Balaci_P54_outdated_0,outdated_0,Which team did Ilie Balaci play for in 1973?,Universitatea Craiovas,"Balaci was a product of Universitatea Craiovas youth system . He made his first team debut in 1973 , at the age of 16 , and won the league title in his first season . He soon managed to become one of the youngest players ever to score in the Romanian League . Balaci went on to play twelve seasons with Craiova , helping them to win two consecutive league titles in 1980 and 1981 . He also won the Romanian Cup four times , in the years 1977 , 1978 , 1981 and 1983 . He became an integral part of the team helping them reach the 1982–83 UEFA Cup semi-finals , before moving to Olt Scorniceşti in the winter of 1984 . In December 1982 , he signed a pre-contract with Italian side AC Milan , but the transfer did not materialize because of the communist regime in Romania .",,,
-timeqa_wiki_William_T_Barry_P39_current,current,Which position did William T. Barry hold in 1829?,U.S. Postmaster General,"Barry became U.S . Postmaster General in Andrew Jacksons administration , serving from 1829 to 1835 . He was the only member of Jacksons original Cabinet not to resign as a result of the Petticoat Affair , which involved the social ostracism of Margaret ONeill Eaton , the wife of Secretary of War John H . Eaton by a coalition of Cabinet members wives led by Second Lady Floride Calhoun . Barry , like Jackson , had sided with the Eatons .",,,
-timeqa_wiki_Amberg_P6_outdated_0,outdated_0,Who was the head of Amberg in 1952?,Josef Filbig,"- 1933–1945 : Josef Filbig , NSDAP",,,
-timeqa_wiki_Joan_Fontaine_P26_outdated_0,outdated_0,Who was the spouse of Joan Fontaine in 1939?,Brian Aherne,"Fontaine was married and divorced four times . Her first marriage was to actor Brian Aherne , in 1939 in Del Monte , California ; they divorced in April 1945 .",,,
-timeqa_wiki_Fulda_P6_outdated_0,outdated_0,Who was the head of Fulda in 1998?,Dr. Alois Rhiel,- Dr . Alois Rhiel ( CDU ) : 1998–2003,,,
-timeqa_wiki_Rom_n_Golobart_P54_outdated_0,outdated_0,Which team did Román Golobart play for in 2009?,Wigan Athletic,Wigan Athletic .,,,
-timeqa_wiki_Pietro_Sambi_P39_current,current,Which position did Pietro Sambi hold in 1998?,nuncio,"Pietro Sambi ( 27 June 1938 – 27 July 2011 ) was an Italian Roman Catholic prelate who served in the diplomatic service of the Holy See from 1969 until his death in 2011 . He had the rank of archbishop and the title of nuncio from 1985 , fulfilling assignments in Burundi , Indonesia , Cyprus , Israel , Jerusalem and Palestine , and the United States .",,,
-timeqa_wiki_Shahdon_Winchester_P54_outdated_0,outdated_0,Which team did Shahdon Winchester play for in 2008?,Naparima College,"At the age of 12 , Winchester made his debut for Naparima College in San Fernando , Trinidad . In his five years with Naps , Shahdon led the team to the Secondary Schools Football League ( SSFL ) South Zone title on four occasions , including the national Intercol Big Five crown in 2007 . He was named among the top five best league players in each of his final two years at Naps , which included a league-leading 16 goals in 2008 . Winchester subsequently received the individual award for Best Forward of the Year .",,,
-timeqa_wiki_Lauren_Holly_P26_outdated_0,outdated_0,Who was the spouse of Lauren Holly in 1991?,Danny Quinn,"Holly has been married three times . Her first marriage was to actor Danny Quinn , the son of Anthony Quinn . The two married in 1991 , and divorced two years later in 1993 . In 1994 , she met Jim Carrey during auditions for . She did not get offered the part , but the two developed a relationship while working together during the filming of Dumb and Dumber . In 1996 they were married . The marriage lasted less than a year , and they divorced in 1997 . In 2001 , she married Francis Greco , a Canadian-born investment banker . The couple adopted three children , sons Henry , George , and Alexander Holly-Greco . In 2008 , while married to Greco , she became a Canadian citizen . The couple divorced in 2014 .",,,
-timeqa_wiki_Anna_Ter_Avetikian_P27_outdated_0,outdated_0,What citizenship did Anna Ter-Avetikian hold in 1908?,Russian Empire,"Anna Tigranovna Ter-Avetikian was born on 23 October 1908 in Yerevan , which at the time was in the Erivan Governorate of the Russian Empire . At the time that Armenia was annexed to Russia from the Ottoman Empire , her ancestors were granted a noble title from Nicholas I of Russia for providing assistance and medical supplies to General Ivan Paskevichs troops . She came from a family of architects and city developers who were noted for creating such works as the first drinking water system of Yerevan , the first hospital of the city , as well as other landmarks . Her father , Tigran Ter-Avetikian and his brother , Yervand , created the Philharmonic Hall of Yerevan , the City Council building on Shahumyan Square , and other noted works .",,,
-timeqa_wiki_ACS_Poli_Timi_oara_P286_current,current,Who was the head coach of the team ACS Poli Timișoara in 2018?,Leo Grozavu,"- Leo Grozavu ( Feb 6 , 2018–Apr 15 , 2018 )",,,
-timeqa_wiki_City_of_Rocks_National_Reserve_P1435_outdated_0,outdated_0,Which site was the heritage designation of City of Rocks National Reserve in 1964?,Section 36 within City of Rocks,"The Idaho Legislature declared Section 36 within City of Rocks as a state park under the jurisdiction of the Idaho Land Board on February 27 , 1957 . In 1964 , a much larger area ( more than ) was designated a National Historic Landmark . On March 15 , 1973 , Section 36 was transferred to the Idaho Department of Parks and Recreation from the Department of Lands . The following year , the area was designated a National Natural Landmark . The National Park Service studied the site in the 1970s and 80s as a proposed national monument .",,,
-timeqa_wiki_Hamburger_SV_P286_outdated_0,outdated_0,Who was the head coach of the team Hamburger SV in 1978?,Branko Zebec,"In 1978 , Branko Zebec was appointed trainer of HSV . The Yugoslav led the club to its first ever Bundesliga title in his first season in charge . Keegan top scored for die Rothosen and was awarded the Ballon dOr for a second successive year .",,,
-timeqa_wiki_Barham_Salih_P39_current,current,Which position did Barham Salih hold in 2018?,President of Iraq,He is the former Prime Minister of the Kurdistan Region and a former deputy prime minister of the Iraqi federal government . He was elected and assumed office as the President of Iraq on 2 October 2018 .,,,
-timeqa_wiki_GER_Class_S69_P137_outdated_0,outdated_0,What was the operator of GER Class S69 in 1911?,The Great Eastern Railway,"The Great Eastern Railway ( GER ) Class S69 , also known as 1500 Class , and later classified B12 by the London and North Eastern Railway ( LNER ) is a class of 4-6-0 steam locomotive designed to haul express passenger trains from London Liverpool Street station along the Great Eastern Main Line . Originally they were designed by S . D . Holden , but were much rebuilt , resulting in several subclasses .",,,
-timeqa_wiki_Aleksei_Zharkov_P108_outdated_0,outdated_0,Which employer did Aleksei Zharkov work for in 1971?,Yermolova Theatre,Aleksei Zharkov graduated from Moscow Art Theater School ( acting course of Alexander Karev ) . Between 1971-1988 Zharkov was an actor of the Yermolova Theatre . In 1988–2000 years - an actor of Chekhov Moscow Art Theatre . Zharkov returned to Yermolova theater in 2000 .,,,
-timeqa_wiki_Game_Grumps_P371_outdated_0,outdated_0,Who was the presenter of Game Grumps in 2012?,Jon Jafari,- Jon Jafari – Main host ( 2012–2013 ) ; primary editor ( 2012 ),,,
-timeqa_wiki_Edwin_van_der_Sar_P54_outdated_0,outdated_0,Which team did Edwin van der Sar play for in 1985?,Ajax,Ajax .,,,
-timeqa_wiki_Segenet_Kelemu_P69_outdated_0,outdated_0,Where was Segenet Kelemu educated in 1974?,Addis Ababa University,"In 1974 , Kelemu became the first woman from her region to join Addis Ababa University—where she was one of five girls in a class of 200—graduating , on top of her class , with a Bachelors degree in 1979 . She then relocated to the US . At Montana State University , she earned a masters degree in plant pathology and genetics in 1985 . She subsequently attended Kansas State University , earning a PhD in molecular biology and plant pathology in 1989 . Her PhD thesis was Molecular cloning and characterization of an avirulence gene from Xanthomonas campestris pv . oryzae . Kelemu undertook postdoctoral research on the molecular determinants of pathogenesis at Cornell University from 1989 to 1992 .",,,
-timeqa_wiki_Luttrellstown_Castle_P127_outdated_0,outdated_0,Who was the owner of Luttrellstown Castle in 1691?,Luttrellstown,Luttrellstown Castle,,,
-timeqa_wiki_Air_Component_Command_P4791_current,current,Who commanded Air Component Command in 2018?,Carl-Johan Edström,- 2018–2018 : Carl-Johan Edström,,,
-timeqa_wiki_Landmark_hotel_and_casino_P127_outdated_0,outdated_0,Who was the owner of Landmark in 1969?,Hughes Tool Company,"Billionaire Howard Hughes , through Hughes Tool Company , purchased the Landmark in 1969 at a cost of $17.3 million . Hughes spent approximately $3 million to add his own touches to the resort before opening it on July 1 , 1969 , with 400 slot machines and 503 hotel rooms . In addition to a ground-floor casino , the resort also had a second , smaller casino on the 29th floor ; it was the first high-rise casino in Nevada . Aside from the second casino , the five-story cupola dome at the top of the tower also featured restaurants , lounges , and a night club .",,,
-timeqa_wiki_Robert_Philp_P39_current,current,Which position did Robert Philp hold in 1908?,Opposition Leader,"In 1908 Kidston , alienated from the Labor party , relied on Philps support to pass legislation approving construction of private railways . By October the two leaders had sufficient in common that they negotiated a merger of their two parties , ending Philps career as Opposition Leader .",,,
-timeqa_wiki_David_Doyle_soccer_P54_outdated_0,outdated_0,Which team did David Doyle play for in 1987?,Kansas City Comets,"The Kansas City Comets of Major Indoor Soccer League drafted Doyle in the first round ( third overall ) in the 1987 MISL College Draft . He was the 1987–1988 MISL Rookie of the Year . When the Comets folded in 1991 , Doyle signed as a free agent with the Dallas Sidekicks . He went on to play twelve seasons with the Sidekicks . Following the 1991–1992 season , the league collapsed and the Sidekicks moved to the Continental Indoor Soccer League ( CISL ) , a summer indoor league . The Sidekicks won the first CISL championship but finished runner-up in 1992 . That fall , Doyle signed with the St . Louis Ambush which played winter soccer in the National Professional Soccer League . He alternated between the Sidekicks and the Ambush for the next two years . In 1996 , he was the leading U.S . indoor soccer player with 47 goals . He repeated as scoring champion in 1999 with 29 goals . Doyle also spent the 1997–1998 NPSL season with the Wichita Wings . In 1998 , the Sidekicks spent the season in the Premier Soccer Alliance then moved to the World Indoor Soccer League for three seasons ( 1999–2001 ) . In 2002 , they moved to the newly established Major Indoor Soccer League . The team folded two seasons later and Doyle retired from playing professionally . Doyle is one of a select 4 players to have won 3 or more championships with the Dallas Sidekicks .",,,
-timeqa_wiki_Zac_Thompson_P54_outdated_0,outdated_0,Which team did Zac Thompson play for in 2012?,Bury,"On 15 October 2012 , Thompson and teammate Dominic Poleon joined League One side Bury in a month-long loan deal . Both youngsters would be working under the newly appointed Bury manager Kevin Blackwell , who had a seventeen-year association with Warnock as player and coach between 1986 and 2003 and had managed Thompsons parent club between 2004 and 2006 . He was assigned the number 33 shirt and made his debut for the Shakers in the home game versus Carlisle United . He scored his first professional goal from a Poleon assist in the game on the 36th minute as Bury registered a 1–1 draw after conceding a late equaliser . The energy and commitment of the youngsters lead to instant praise from Blackwell after the game ; observing that the two young lads from Leeds were absolutely out on their feet after that . For them , the warm up matters , every time they train matters , when they travel in – it matters and Im really pleased with both of them , the whole team .",,,
-timeqa_wiki_John_de_Chastelain_P463_outdated_0,outdated_0,John de Chastelain became a member of what organization or association in 1995?,Legion of Merit,"In 1985 , de Chastelain was appointed Commander of the Order of Military Merit and in 1991 , Commander of the Order of St John ; in 1993 , he received the Commendation Medal of Merit and Honour of Greece , and was appointed Officer of the Order of Canada ; in 1995 , he was appointed Commander of the Legion of Merit ( U.S.A. ) ; in 1999 , he was made a Companion of Honour ; and in 2014 , he was promoted to Companion of the Order of Canada . Archie Cairns composed a jig for bagpipes in his honour in 1992 .",,,
-timeqa_wiki_Lewis_Price_P54_outdated_0,outdated_0,Which team did Lewis Price play for in 2005?,Ipswich Town,Ipswich Town .,,,
-timeqa_wiki_Tambov_P1376_outdated_0,outdated_0,Tambov was the capital of what in 1719?,Tambov province,"In 1719 it became the main city of the then-established Tambov province . The province became part of the Azov province , which in 1732 was renamed after its capital city , Voronezh . Trade routes passed through Tambov , connecting it with Moscow , the cities of the Black Earth Region and the Volga Region . The roads were served by about 500 Tambov coachmen , but farmers remained the main population of the city . Due to the large amount of unplowed land in the Tambov province , animal husbandry developed widely , and with it trade in livestock and especially wool , which was in high demand in the Russian markets . Tambov wool became the reason for the creation of the first cloth factories in Tambov .",,,
+hoh_73_outdated_0,outdated_0,"As of September 2024, who is the current President of the Los Angeles City Council?",Paul Krekorian,"The Los Angeles City Council is the lawmaking body for the city government of Los Angeles, California, the second largest city in the United States. It has 15 members who each represent the 15 city council districts that are spread throughout the city's 501 square miles of land. The head of the City Council is the President, who presides over meetings of the council, gives assignments to City Council committees, handles parliamentary duties, and serves as Acting Mayor of Los Angeles when the Mayor is unable to perform their duties. The current President is Paul Krekorian, a Democrat from the 2nd district. The current President pro Tempore is Marqueece Harris-Dawson from the 8th district.",,,
+hoh_586_current,current,"As of September 2024, where do Titaanit play their home matches?",Kotka Ice Rink,"Kotkan Titaanit (""Kotka Titans"") is an ice-hockey club founded in 1974 in Kotka, which at its best has played four season at Finland's second highest level. Titaanit play their home match at Kotka Ice Rink, which can hold nearly two thousand (1958) viewers. Early years
+The predecessor of Titaanit was Sunilan Sisu. Titaanit played the second highest level of Finland in Finland in the mid-1990s. It was then ranked 11th in the 1995–1996 season and ranked 12th in the next season.",,,
+hoh_159_outdated_0,outdated_0,"As of July 2024, what team does Connor Robertson's brother David play for as a relief pitcher?",New York Mets,"he would spend the entire 2009 season in the minor leagues and the Mets released him at the conclusion of the 2009 season. Robertson pitched for the Southern Maryland Blue Crabs in the 2010 season in their rotation and in the bullpen; he has not pitched professionally since the conclusion of the Blue Crabs 2010 season. Personal life
+His brother David is a relief pitcher for the New York Mets. Pitch repertoire
+Robertson throws a hard, sinking fastball that has been clocked as high as . He also has a sweeping slider and a changeup.",,,
+hoh_251_current,current,"As of July 2024, what organization owns roughly 70% of the houses in Salterbeck?",Riverside Housing Association,"Salterbeck is a housing estate on the south side of Workington, Cumbria, England, which was built during the 1930s on farmland for steelworkers and their families relocating to the area. Roughly 70% of the houses are now owned by Riverside Housing Association and the remainder are privately owned. Salterbeck is bordered by Westfield and Mossbay to the north and Harrington to the south. Governance
+Workington is in the parliamentary constituency of Salterbeck, Mark Jenkinson (2019-2024)is the Member of parliament. From 2024 parts of Workington and Copeland constituencies will be merged to form the new Whitehaven and Workington constituency.",,,
+hoh_147_outdated_0,outdated_0,"As of June 2024, where does Line D (yellow) of the Porto Metro terminate on the southern side of the Douro river?",Santo Ovídio,"Consequently, the Infante bridge was built for urban traffic, replacing the Dom Luís I, which was dedicated to the light rail on the second and higher of the bridge's two levels. Six lines are open: lines A (blue), B (red), C (green) and E (purple) all begin at Estádio do Dragão (home to FC Porto) and terminate at Senhor de Matosinhos, Póvoa de Varzim (via Vila do Conde), ISMAI (via Maia) and Francisco Sá Carneiro airport respectively. Line D (yellow) currently runs from Hospital S. João in the north to Santo Ovídio on the southern side of the Douro river. Line F (orange), from Senhora da Hora (Matosinhos) to Fânzeres (Gondomar).",,,
+hoh_587_outdated_0,outdated_0,"As of October 2024, how many players have won the Premier League with two clubs?",Eight,"In 2009, he moved to Manchester City, where he was joined a year later by his younger brother, Yaya Touré, helping City earn their first league title in 44 years. In 2013, Touré signed for Liverpool. He is one of the eight players who have won the Premier League with two clubs, having won it with Arsenal and City. He also won the Scottish Premiership and Scottish League Cup with Celtic. He remains to date the African player with the most Premier League appearances (353 in total).",,,
+hoh_359_outdated_0,outdated_0,"As of June 2024, what is Eric Benét Jordan's profession, aside from being an R&B singer-songwriter?",Musician,"Eric Benét Jordan (born October 15, 1966) is an American R&B singer-songwriter and musician. He has been nominated for four Grammy Awards. Early life and education 
+Benét was born on October 15, 1966, in Mobile, Alabama. He was raised in Milwaukee, Wisconsin, the youngest of five siblings. Benét expressed an interest in music at an early age, but was initially encouraged by his father, a police officer who died of cancer, to attend college and pursue a ""stable"" career.",,,
+hoh_152_outdated_0,outdated_0,"As of September 2024, what is Brian McBride's ranking among the all-time leading goalscorers for the United States national team?",Fifth,"Brian Robert McBride (born June 19, 1972) is an American former soccer player who played as a forward for Columbus Crew, Fulham and Chicago Fire. He is the fifth-highest all-time leading goalscorer for the United States national team. For much of his career, he played in United States with stints in both Germany and England. During his time at Fulham, McBride became a fan favorite, as well as team captain. He was eventually voted ""Player of the Season"" two times.",,,
+hoh_6_outdated_0,outdated_0,"As of June 2024, who is the current Master of the Horse?",Lord de Mauley,"They are youths aged from twelve to sixteen, selected by the sovereign in person, to attend on him or her at state ceremonies. At King Charles III's coronation they assisted the Groom of the Stool in carrying the royal train. Modern role
+thumb|left|Lord de Mauley as Master of the Horse during the coronation of Charles III in 2023
+The current Master of the Horse is Lord de Mauley. Today the Master of the Horse has a primarily ceremonial office, and rarely appears except on state occasions, and especially when the Sovereign is mounted. The Crown Equerry has daily oversight of the Royal Mews, which provides vehicular transport for the Sovereign, both cars and horse-drawn carriages.",,,
+hoh_592_outdated_0,outdated_0,"As of September 2024, what is the last match considered when determining the caps and goals for the Cuba national football team players?",Russia,"Team image
+ Kit sponsorship 
+ Kit supplier Period  Joma  2023–present
+
+Results and fixtures
+The following is a list of match results in the last 12 months, as well as any future matches that have been scheduled. 2023
+
+2024
+
+2025
+
+Coaching history
+
+ José Tapia (1930–1934) 
+ Gavin Newton (1934–1935)
+ José Tapia (1935–1938)
+ Marcelino Minsal (1947–1949)
+ František Churda (1963–1964) 
+ Karoly Kósa (1966) 
+ László Mohácsi (1967)
+ Kim Yong-ha (1970–1971)
+ Sergio Padrón (1976)
+ Tibor Ivanics (1980–1981) 
+ Roberto Hernández (1985–1988) 
+ Giovanni Campari (1990–1996)
+ William Bennett (1996–2000)
+ Miguel Company (2000–2004)
+ Luis Armelio Garcia (2004–2005)
+ Raúl González (2006–2007)
+ Reinhold Fanz (2008)
+ Raúl González (2008–2012)
+ Chandler González (2012)
+ Walter Benítez (2012–2015)
+ Raúl González (2015–2016)
+ Julio Valero (2016)
+ Raúl Mederos (2016–2019)
+ Pablo Elier Sánchez (2019–2023)
+ Yunielys Castillo (2023–present)
+
+Players
+
+Current squad
+The following players were called up for the 2026 FIFA World Cup qualification matches against Honduras and Cayman Islands on 6 and 11 June 2024. Caps and goals correct as of 20 November 2023, after the match against Russia. Recent call-ups
+The following players have also been called up to the Cuba squad within the last twelve months. INJ Player withdrew from the squad due to an injury.",,,
+hoh_577_outdated_0,outdated_0,"As of August 2024, which school is one of very few in the country showing significant academic success among schools with equivalent levels of poverty?",Patrick Henry,"U.S. News & World Report ranked Patrick Henry as the 68th best in Minnesota in 2022. Among schools with equivalent levels of poverty, Patrick Henry is one of very few in the country showing significant academic success. For many years, Henry struggled with low enrollment and poor academic quality. Since the 1990s, however, the school has benefited from the introduction of the IB program, corporate grants, a mentorship program for new teachers, and the strong leadership of former principals Cheryl Creecy, Michael Huerth (a recipient of the Milken Family Foundation's National Education Award), and Paul McMahan.",,,
+hoh_441_outdated_0,outdated_0,"As of September 2024, what term was Clover Moore re-elected to in the most recent election?",A fifth term,"The Right Honourable the Lord Mayor of Sydney is the head of the Council of the City of Sydney, which is the local government area covering the central business district of Sydney in the State of New South Wales, Australia. The Lord Mayor has been directly elected since 1995, replacing the previous system of being internally elected annually by the Councillors, and serves a four-year term. The most recent election was held on 4 December 2021, at which the incumbent Lord Mayor, Clover Moore, was re-elected to a fifth term. The Lord Mayor is assisted in their work by a Deputy Lord Mayor, who is elected on an annual basis by the elected councillors. Office history
+The office of the Mayor of Sydney along with the City of Sydney was created on 20 July 1842 pursuant to the Sydney City Incorporation Act 1842 by Governor Sir George Gipps.",,,
+hoh_426_outdated_0,outdated_0,"As of October 2024, where is TelevisaUnivision headquartered in the United States?",New York,"TelevisaUnivision (formerly known as Univision Communications) is a Mexican-American media company headquartered in New York and Mexico City that owns American Spanish language broadcast network Univision and free-to-air channels in Mexico such as Las Estrellas, Canal 5, Foro, and NU9VE alongside a collection of specialty television channels and production studios. 45% of the company is held by the Mexican telecommunications and broadcasting company Grupo Televisa, which was a major programming partner for Univision until the company sold their content assets to Univision in 2022. Since its founding in the early 1960s as Spanish International Network (SIN), the United States' first Spanish language television network, the company has catered to Hispanic and Latino Americans. It is currently a multimedia conglomerate, with free-to-air and specialty, digital and audio networks, including 65 television stations, online and mobile apps and products. History
+thumb|left|Former logo used until December 31, 2012.|212x212px
+Univision Communications Inc.",,,
+hoh_344_current,current,"As of November 2024, who is the headteacher of St Crispin's School?",Railton Blyth,"1992-2012: Alex Biddle""Into the new millennium with Alex Biddle (1992 until today)"" St Crispin's School: The Story So Far. Wokingham, Berkshire: St Crispin's School, 2003, pp16-17. 2013-2022: Ginny Rhodes
+
+, the headteacher is Railton Blyth. Notable alumni
+
+Luke Bedford, composer
+Rob Bloomfield, producer and drummer in Does It Offend You, Yeah? Stephen Hughes, footballerSt Crispin’s School website page on famous students accessed August 2007
+Peter Lewington, Berkshire and Warwickshire cricketerPeter Lewington profile from Cricinfo
+Robert Dickie, footballer
+Meg Bellamy, actress
+
+Further reading
+St Crispin's School: The Story So Far.",,,
+hoh_232_outdated_0,outdated_0,"As of July 2024, who produces Cadbury Creme Egg confectionery in Canada?",Cadbury Adams,"Cadbury Creme Egg (originally named Fry's Creme Egg) is a chocolate confection produced in the shape of an egg. It originated from the British chocolatier Fry's in 1963 before being renamed by Cadbury in 1971. The product consists of a thick chocolate shell containing a sweet white and yellow filling that resembles fondant. The filling mimics the albumen and yolk of a soft boiled egg. The confectionery is produced by Cadbury in the United Kingdom, by The Hershey Company in the United States, and by Cadbury Adams in Canada.",,,
+hoh_404_current,current,"As of September 2024, who is the athletic director of East Chicago Central High School?",Grayling Gordon,"Central students' proficiency in math is 12% (Lower than the Indiana state average of 54%). Students' proficiency in reading/language arts is 33% (Lower than the Indiana state average of 62%). Central High School placed in the bottom 50% of all schools in Indiana for overall test scores (Math proficiency is bottom 50%, and reading proficiency is bottom 50%). Athletics
+The athletic director is Grayling Gordon. The Cardinals compete in the Great Lakes Conference (GLC) as well as in the state championship series sponsored by the Indiana High School Athletic Association (IHSAA) which governs athletic activities in Indiana.",,,
+hoh_252_outdated_0,outdated_0,"As of September 2024, what team is Kevin Schindler associated with in a management capacity?",Havnar Bóltfelag,"Kevin Schindler (born 21 May 1988) is a German former professional footballer who plays as a right winger. He is player and manager of Faroe Islands Premier League side Havnar Bóltfelag. Club career
+Schindler was born in Delmenhorst. While under contract with Bundesliga side Werder Bremen, he went on loan to Hansa Rostock, FC Augsburg and MSV Duisburg. In July 2017, United Soccer League club FC Cincinnati signed Schindler.",,,
+hoh_265_outdated_0,outdated_0,"As of November 2024, who is the Municipal President (Mayor) of San Pedro?",Miguel Treviño de Hoyos,"Ministry of Education, Culture, Sports, Science and Technology (MEXT). Retrieved on May 10, 2014. Government
+The  Municipal President (Mayor) of San Pedro is Miguel Treviño de Hoyos, an independent candidate. San Pedro Garza Garcia was founded in 1596. The land was converted into a large plantation called ""Los Nogales"" which produced crops like corn, wheat, and beans.",,,
+hoh_264_outdated_0,outdated_0,"As of September 2024, how many major expansion packs have been released for Guild Wars 2?",Five,"By August 2015, over 5 million copies had been sold, at which point the base game became free-to-play. By August 2021, over 16 million accounts have been created. On 16 August 2022, it was announced that Guild Wars 2 will be releasing on Steam as part of the game's 10th year anniversary celebration. Five major expansion packs have been released for the game thus far; Heart of Thorns (2015), Path of Fire (2017), End of Dragons (2022), Secrets of the Obscure (2023), and Janthir Wilds (2024). A sixth expansion pack is in development, slated for 2025.",,,
+hoh_170_outdated_0,outdated_0,"As of October 2024, who is the head coach of the football team at Adrian College?",Jim Deere,"Tarr in 1903. Since then, the program has won 16 conference championships, the first in 1911 and the most recent in 2012 and 2014. The head coach is Jim Deere who took over in 2010. Intramural sports
+Intramurals are part of Adrian College and the athletic department. Some of the intramural teams include Flag Football, 5-on-5 Basketball, Coed Volleyball League, Broomball, 7-on-7 Soccer, and 3-on-3 Basketball.Intramural Sports, Adrian College
+
+Fraternities and sororities
+Greek life on campus includes five nationally recognized fraternities: Alpha Tau Omega, Pi Kappa Alpha, Theta Chi, Sigma Alpha Epsilon and Tau Kappa Epsilon.",,,
+hoh_393_outdated_0,outdated_0,"As of October 2024, who is the current president of the Jacksonville City Council?",Ronald Salem,"Under Florida's government transparency laws, all official council business must be conducted in meetings open to the public. Composition
+The Jacksonville City Council is composed of nineteen members who are elected for a four-year term and serve as part-time legislators. In May of each year, the Council elects a President and Vice President to serve one-year terms beginning the first of July. The current president is Ronald Salem ((R)At-Large Seat 2)
+
+The nineteen members are not all elected in the same manner; some are elected from districts, and others are elected at large. However, once elected, there is no distinction between council members elected at-large and from regular districts.",,,
+hoh_440_outdated_0,outdated_0,"As of November 2024, who is the current representative of the Saskatchewan New Democratic Party in the constituency of Saskatoon Eastview?",Matt Love,"As noted below, plans for the southwest extension of Circle Drive initially caused some concern; construction of an interchange at Clarence Avenue and Circle, in the planning since the 1960s, was completed by the late 2000s, facilitating resident access to the freeway and to the Stonebridge commercial area to the southeast. Government and politics
+Avalon exists within the federal electoral district of Saskatoon—Grasswood. It is currently represented by Kevin Waugh of the Conservative Party of Canada, first elected in 2015. Provincially, the neighbourhood is within the constituency of Saskatoon Eastview. It is currently represented by Matt Love of the Saskatchewan New Democratic Party, first elected in 2020.",,,
+hoh_222_current,current,"As of November 2024, what is the match after which the caps and goals are correct for the Malta national football team?",Moldova,"Kits 
+
+Kit provider Periodleft|30x30px Adidas1978–1988left|30x30px Umbro1988–1990left|30x30px Lotto1990–1999left|30x30px Kronos1999–2001left|30x30px Erreà2001–2005left|30x30px Diadora2005–2009left|30x30px Givova2009–2022left|30x30px Erreà2022–
+
+ Results and fixtures 
+
+The following is a list of match results in the last 12 months, as well as any future matches that have been scheduled. 2023 
+
+ 2024 
+
+ Coaching staff 
+
+ Head coach (caretaker) Davide MazzottaAssistant coach  Piero Panzanaro Goalkeeping coach  Mario Capece Technical coordinator  Ivan WoodsFitness coaches  Luca Pagani  Francesco Zanasi Match analyst  Facundo Styk Team manager  Keith Fenech
+
+ Coaching history 
+
+ManagerMalta careerPlayedWonDrawnLostWin % 1957–1961 1961–1964 1966 1966 1969 1970 1973 1974–1976 John1976–1978 1978–1983 1984–1987 1988–1991 1991–1993 1993–1995 1996 1996–1997 1997–2001 2001–2003 2003–2006 2006–2009 2009–2011 2012 2012–2017 2017–2018 2018–2019 2019–2022 2022 2023–2024  2024–
+
+ Players 
+
+ Current squad 
+The following players were called-up for the Nations League match against Moldova on 13 October 2024. Caps and goals correct as of 13 October 2024, after the match against Moldova. Recent call-ups 
+The following players have been called up within the last 12 months. INJ
+ RET
+
+INJ Player is injured
+COV Withdrew due to covid
+PRE Preliminary squad / standby
+RET Retired from the national team
+SUS Serving suspension
+WD Player withdrew from the squad due to non-injury issue.",,,
+hoh_328_current,current,"As of December 2024, which Croatian club is Ivan Radeljić the manager of?",Croatia Zmijavci,"Ivan Radeljić (born 14 September 1980) is a Bosnian football manager and a former player who played as a defender. He is the manager of the Croatian club Croatia Zmijavci. Club career
+Radeljić has spent a long period playing in Croatian football league for different clubs. He moved to Germany and signed a contract with FC Energie Cottbus in January 2008. He played 16 matches in his first Bundesliga season.",,,
+hoh_473_outdated_0,outdated_0,"As of September 2024, which constituency does the parish of Great Bedwyn now fall within?",Devizes constituency,"In 1895 the southern portion of Great Bedwyn parish (south of the railway, including Wolfhall and East Grafton) became a new parish called Grafton. Wolfhall was transferred to Burbage parish in 1988. Parliamentary representation
+Great Bedwyn was a parliamentary borough which elected two Members of Parliament (MPs) to the House of Commons from 1295 until 1832, when the borough was abolished by the Great Reform Act. The parish now falls within the Devizes constituency. Notable people 
+A branch of the Hungerford family of Farleigh Hungerford owned land in the area.",,,
+hoh_311_current,current,"As of October 2024, who is the current principal of St. Matthew Catholic High School?",Dana Power,"St. Matthew Catholic High School is located at 6550 Bilberry Drive in the Orléans district of Ottawa, Ontario, Canada. The current principal is Dana Power. The school broke the Guinness world record for largest unbroken human chain, called the Bear Hug. The event was in support of Cancer research.Orleans Online | Local News
+
+ History 
+
+When St.",,,
+hoh_582_outdated_0,outdated_0,"As of September 2024, in which tier of the English rugby union league system does Rotherham Rugby Union Football Club currently play?",Fourth tier,"Rotherham Rugby Union Football Club, or Rotherham Titans is a rugby union club from Rotherham, South Yorkshire, currently playing in the fourth tier of the English rugby union league system, following their relegation from the National League 1 at the end of the 2019–2020 season. Rotherham achieved multiple promotions within the league structure in the 1990s and early 2000s. This meteoric rise ultimately culminated in two unsuccessful spells in the English Premiership. Rotherham is perhaps best known for the Rugby Football Union blocking its entry into the Premiership, its subsequent legal challenges, and a partially successful appeal to the Office of Fair Trading to break an alleged Premiership cartel. Rotherham have developed several international players, including David Strettle, Hendre Fourie and Erik Lund.",,,
+hoh_58_current,current,"As of November 2024, which team does Grzegorz Kmiecik play for as a striker?",Pogórze Gierałtowice,"Grzegorz Kmiecik (born 17 April 1984) is a Polish footballer who plays as a striker for Pogórze Gierałtowice. He is a son of former Polish international Kazimierz Kmiecik. He is a trainee of Wisła Kraków. Honours
+Wisła Kraków
+ Ekstraklasa: 2007–08
+
+Babia Góra Sucha Beskidzka
+ Klasa A Wadowice: 2018–19
+
+References
+
+Category:1984 births
+Category:Living people
+Category:Footballers from Kraków
+Category:Men's association football forwards
+Category:Polish men's footballers
+Category:Wisła Kraków players
+Category:GKS Katowice players
+Category:GKS Bełchatów players
+Category:Polonia Warsaw players
+Category:ŁKS Łódź players
+Category:Zagłębie Sosnowiec players
+Category:Stal Stalowa Wola players
+Category:SV Würmla players
+Category:Sandecja Nowy Sącz players
+Category:Tur Turek players
+Category:Szczakowianka Jaworzno players
+Category:Limanovia Limanowa players
+Category:Ekstraklasa players
+Category:I liga players
+Category:II liga players
+Category:III liga players
+Category:IV liga players
+Category:Polish expatriate men's footballers
+Category:Expatriate men's footballers in Austria
+Category:Polish expatriate sportspeople in Austria
+Category:Polish football managers
+Category:Men's association football player-managers",,,
+hoh_74_outdated_0,outdated_0,"As of September 2024, who is the current President pro Tempore of the Los Angeles City Council?",Marqueece Harris-Dawson,"The Los Angeles City Council is the lawmaking body for the city government of Los Angeles, California, the second largest city in the United States. It has 15 members who each represent the 15 city council districts that are spread throughout the city's 501 square miles of land. The head of the City Council is the President, who presides over meetings of the council, gives assignments to City Council committees, handles parliamentary duties, and serves as Acting Mayor of Los Angeles when the Mayor is unable to perform their duties. The current President is Paul Krekorian, a Democrat from the 2nd district. The current President pro Tempore is Marqueece Harris-Dawson from the 8th district.",,,
+hoh_541_outdated_0,outdated_0,"As of September 2024, which team does Benito Santiago Jr. currently play for in the Baloncesto Superior Nacional (BSN)?",Vaqueros de Bayamón,"On December 13, 2007, Santiago was named in the Mitchell Report. ""At the end of the 2003 season, Mike Murphy, a Giants clubhouse attendant, was cleaning out Santiago's locker when he found a sealed package of syringes,"" the report read. ""Murphy brought the syringes to the training room, handed them to [Stan] Conte, and told Conte that he had found them in Santiago's locker. Conte responded that he ""would take care of it."" Murphy recalled that the Giants’ assistant athletic trainer Dave Groeschner also was present in the training room during this conversation.""
+
+ Personal life 
+Santiago has a son named Benito Santiago Jr., who is a Puerto Rican professional basketball player who currently plays for the Vaqueros de Bayamón in the Baloncesto Superior Nacional (BSN), the top tier basketball league in Puerto Rico. See also 
+
+ List of Major League Baseball career putouts as a catcher leaders
+ List of Major League Baseball players from Puerto Rico
+ List of Major League Baseball players named in the Mitchell Report
+ San Diego Padres award winners and league leaders
+
+References
+
+ External links 
+
+Category:1965 births
+Category:Living people
+Category:Beaumont Golden Gators players
+Category:Chicago Cubs players
+Category:Cincinnati Reds players
+Category:Dunedin Blue Jays players
+Category:Florida Marlins players
+Category:Gold Glove Award winners
+Category:Kansas City Royals players
+Category:Las Vegas Stars (baseball) players
+Category:Major League Baseball catchers
+Category:Major League Baseball players from Puerto Rico
+Category:Major League Baseball Rookie of the Year Award winners
+Category:Miami Marlins (FSL) players
+Category:National League All-Stars
+Category:National League Championship Series MVPs
+Category:Norfolk Tides players
+Category:Philadelphia Phillies players
+Category:Pittsburgh Pirates players
+Category:Puerto Rican expatriate baseball players in Canada
+Category:Reno Padres players
+Category:San Diego Padres players
+Category:San Francisco Giants players
+Category:Silver Slugger Award winners
+Category:Baseball players from Ponce, Puerto Rico
+Category:St.",,,
+hoh_424_outdated_0,outdated_0,"As of November 2024, what is the ranking of the Canadian dollar as a reserve currency in the world?",Seventh,"It is divided into 100 cents (¢). Owing to the image of a common loon on its reverse, the dollar coin, and sometimes the unit of currency itself, may be referred to as the loonie by English-speaking Canadians and foreign exchange traders and analysts. Accounting for approximately 2% of all global reserves,  the Canadian dollar is the seventh-most held reserve currency in the world, behind the U.S. dollar, euro, yen, sterling, renminbi, and Australian dollar. The Canadian dollar is popular with central banks because of Canada's relative economic soundness, the Canadian government's strong sovereign position, and the stability of the country's legal and political systems.",,,
+hoh_564_outdated_0,outdated_0,"As of October 2024, where was the society's annual meeting co-hosted by the European Association for the Study of Science and Technology (EASST) held?",Barcelona,"The Society for Social Studies of Science (4S) is a non-profit scholarly association devoted to the social studies of science and technology (STS).About the Society for Social Studies of Science. It was founded in 1975 and as of 2008 its international membership exceeds 1,200. In 2016, over 2,000 people attended the society's annual meeting in Barcelona, co-hosted by the European Association for the Study of Science and Technology (EASST). Its 40th anniversary celebration at Cornell University was attended by notable STS scholars such as Trevor Pinch, Sheila Jasanoff, and Bruno Latour. Its charter was drafted in 1975,Arnold Thackray, ""Many Happy Returns,"" 4S Review 1, no.",,,
+hoh_425_outdated_0,outdated_0,"As of July 2024, who is the current coach of the Northeastern Men's Soccer team?",Chris Gbandhi,"The team has played the Boston Red Sox in Spring training exhibition games. Soccer
+
+Men's soccer
+
+The Northeastern Men's Soccer team began at the university as a varsity sport in 1984 under the direction of Winston Smith. The team joined America East for the 1988 season and moved to the Colonial Athletic Association for the 2005 season. The team enjoyed their most successful season in 2012, winning the conference championship and moving on to the second round of the NCAA Championships. The team is currently coached by Chris Gbandhi.",,,
+hoh_544_outdated_0,outdated_0,"As of November 2024, where is mixed-use residential development planned?",Villiers Island,"Thus, a second channel is being created running south from the Don River, and then west between Commissioners Street and the Shipping Channel to provide a second outlet for the river. Parks and wetlands will be constructed along this new water course, which will form the east and south side of the new island. The Keating Channel and Toronto Harbour are on the north and west side of the new island respectively. Mixed-use residential development is planned for Villiers Island. Streets  
+The district is bounded on the north by Lake Shore Boulevard and on the east by Leslie Street.",,,
+hoh_579_outdated_0,outdated_0,"As of August 2024, which high school has one of the largest math teams in the city, managed by coach John Heisel?",Henry,"The sport was dropped at Patrick Henry. By 2010, both all hockey teams at all seven Minneapolis public high schools were merged into a collective Minneapolis boys team and girls team. Beyond the sports, Henry has a vast array of other extracurriculars, the most notable of which being their math and robotics teams. Henry has one of the largest math teams in the city; coach John Heisel has managed to recruit a considerable number of students every year. Henry's robotics team, Herobotics, is known as one of the top teams in the state of Minnesota; they have won many awards, and advanced to the FIRST Championship seven times in their ten-year history.",,,
+hoh_593_outdated_0,outdated_0,"As of November 2024, what type of CONCACAF Nations League matches were the players called up for?",CONCACAF Nations League A matches,"In September 2019, five players (Yordan Santa Cruz, Andy Baquero, David Urgelles, Orlendis Benítez and Alejandro Portal) defected to Canada during the 2019–20 CONCACAF Nations League before and after a match against Canada. During the 2023 CONCACAF Gold Cup, four players (Roberney Caballero, Denilson Milanés, Neisser Sandó and Jassael Herrera) defected while the team was preparing to travel from Miami to Houston for their last two group stage matches. Another player, Sandy Sánchez, also defected after the last group stage game against Canada, with a member of the medical staff reportedly following suit. Team image
+ Kit sponsorship 
+ Kit supplier Period  Joma  2023–present
+
+Results and fixtures
+The following is a list of match results in the last 12 months, as well as any future matches that have been scheduled. 2023
+
+2024
+
+2025
+
+Coaching history
+
+ José Tapia (1930–1934) 
+ Gavin Newton (1934–1935)
+ José Tapia (1935–1938)
+ Marcelino Minsal (1947–1949)
+ František Churda (1963–1964) 
+ Karoly Kósa (1966) 
+ László Mohácsi (1967)
+ Kim Yong-ha (1970–1971)
+ Sergio Padrón (1976)
+ Tibor Ivanics (1980–1981) 
+ Roberto Hernández (1985–1988) 
+ Giovanni Campari (1990–1996)
+ William Bennett (1996–2000)
+ Miguel Company (2000–2004)
+ Luis Armelio Garcia (2004–2005)
+ Raúl González (2006–2007)
+ Reinhold Fanz (2008)
+ Raúl González (2008–2012)
+ Chandler González (2012)
+ Walter Benítez (2012–2015)
+ Raúl González (2015–2016)
+ Julio Valero (2016)
+ Raúl Mederos (2016–2019)
+ Pablo Elier Sánchez (2019–2023)
+ Yunielys Castillo (2023–present)
+
+Players
+
+Current squad
+The following players were called up for the 2024–25 CONCACAF Nations League A matches against  on 10 and 14 October 2024.",,,
+hoh_563_outdated_0,outdated_0,"As of September 2024, what is Kristiyan Dobrev's current role in football?",Assistant coach of Lokomotiv Sofia,"Kristiyan Dobrev (; born 23 September 1978 in Sofia) is a Bulgarian former professional footballer and assistant coach of Lokomotiv Sofia. Career
+Dobrev was raised in Lokomotiv Sofia's youth teams. Between 1998 and 2003 he played for Naftex Burgas, Dobrudzha Dobrich, and Cherno More Varna. In June 2003 he returned to Lokomotiv Sofia. He was sent on loan to Lech Poznań in January 2007 until the end of the 2006/2007 season.",,,
+hoh_391_outdated_0,outdated_0,"As of June 2024, who is the superintendent of Woodland Community Consolidated School District 50?",Lori Casey,"Woodland School District 50 is in Lake County, Illinois. The school has approximately 800 students per grade and is the seventh largest school district in Illinois. The district's superintendent is Lori Casey. The student population is 5,600 students in the grades of Kindergarten through eighth grade. There are four schools: the primary school, the elementary school, the intermediate school, and the middle school.",,,
+hoh_395_outdated_0,outdated_0,"As of August 2024, what university do the two colleges strive to fulfill the mission of?",SAGU,"The university's handbook lists homosexuality as an offense for which a student can be expelled. In 2008 3 members of LGBT rights group Soulforce were arrested for trying to start a protest on campus. Academics 
+In 2004, the academic divisions of the university realigned into two colleges, the College of Bible & Church Ministries and the College of Arts & Professions. Both colleges maintain Bible-based curriculum and strive to fulfill the mission of SAGU. Since 2000, SAGU has added 24 new academic programs, bringing the total to more than 60 programs.",,,
+hoh_25_outdated_0,outdated_0,"As of October 2024, what is the nearest airport to Kuppalli?",Mangalore International Airport,"By rail 
+The nearest railway station is in Shimoga. Numerous trains run from Bengaluru and Mysore to Shimoga. By air 
+The nearest airport is  Mangalore International Airport. References 
+
+ External links 
+
+ Official site dedicated to Kuvempu
+
+Category:Villages in Shimoga district",,,
+hoh_418_outdated_0,outdated_0,"As of September 2024, who is the Chancellor of Collegium Civitas?",Magdalena Wypych,"Since its inception, Collegium Civitas has been committed to providing modern, world-class higher education standards to both Polish and international students. Collegium Civitas was the first non-public university in Poland to welcome foreign students in 1997. As of 2024, the Rector is Professor Stanisław Mocek, the President is Professor Jadwiga Koralewicz, and the Chancellor is Magdalena Wypych. Degrees
+The university offers a wide range of bachelor's and master's degree programs taught in Polish, English and bilingual (Polish-English) across four primary disciplines: International Relations, Sociology, Management, and Journalism and New Media. Collegium Civitas has also the right to grant PhD degrees in Sociology, and Politics and Administration.",,,
+hoh_584_outdated_0,outdated_0,"As of August 2024, who is the head coach of the American Samoa national football team?",Tunoa Lui,"The American Samoa men's national football team () represents American Samoa in men's international association football and is controlled by the Football Federation American Samoa, the governing body of the sport in the territory. American Samoa's home ground is the Pago Park Soccer Stadium in Pago Pago and their head coach is Tunoa Lui. History
+
+ Early history 
+In 1983, American Samoa entered a football team in the South Pacific Games for the first time. The territory's official first match took place in Apia, Western Samoa on August 20, 1983, and ended in a 3–1 defeat to Western Samoa. Two days later, the team recorded their first win with a 3–0 victory against Wallis and Futuna however, they were eliminated from the competition at the group stage following a 3–2 loss to Tonga on August 24.",,,
+hoh_271_outdated_0,outdated_0,"As of October 2024, what match is used as the reference point for the correctness of caps and goals?",The match against San Marino,"Results and fixtures
+
+The following is a list of match results in the last 12 months, as well as any future matches that have been scheduled. 2023
+
+2024
+
+ 2024–25 UEFA Nations League 
+
+ Group D2 
+
+Coaching staff
+Current coaching staff
+
+Manager history
+Former forward and second all-time top goalscorer for Moldova, Serghei Cleșcenco is the current head coach of the national team since December 2021. As of 10 September 2024
+
+CoachPeriodPlayedWinDrawnLoss% Won1991–199219921992–1997 (interim)19981998–19991999–200120012002–200520062007–20092010–20112012–20142014–2015 (interim)20152016–20172018–201920192019–202020212021–
+
+ Players 
+
+Current squad
+The following players were selected for the UEFA Nations League matches against  Andorra and  Malta on 10 and 13 October 2024, respectively. Caps and goals are correct as of 10 September 2024, after the match against San Marino. Recent call-ups
+The following players have also been called up to the Moldova squad within the last 12 months.",,,
+hoh_211_outdated_0,outdated_0,"As of August 2024, what is the newest member of the World Trade Organization?",Afghanistan,"In 2007 Liberia and Comoros applied directly for full membership. Some international intergovernmental organizations are also granted observer status to WTO bodies.International Intergovernmental Organizations Granted Observer Status to WTO Bodies, World Trade Organization The Palestinian Authority submitted a request for WTO observer status in October 2009 and again in April 2010. Afghanistan is the newest member, joining effective 29 July 2016. Russia was one of the only two large economies outside of the WTO after Saudi Arabia joined in 2005. It had begun negotiating to join the WTO's predecessor in 1993.",,,
+hoh_491_outdated_0,outdated_0,"As of November 2024, who is the head of the Department of Medicine?",Prof. Nyo Nyo Wah,"Nyo Me May Thyn
+
+Department of Pharmacology - Prof. Myat Myat Soe
+
+Department of Forensic Medicine- Prof. Zaw Zaw Oo
+
+Department of Preventive & Social Medicine - Prof. Pa Pa Soe
+
+Department of Medicine - Prof. Nyo Nyo Wah
+
+Department of Surgery - Prof.",,,
+hoh_423_outdated_0,outdated_0,"As of June 2024, who is featured on the obverse of the standard set of Canadian coin designs?",Elizabeth II,"Ever since, the price for a cash transaction is rounded to the nearest five cents. The penny continues to be legal tender, although they are only accepted as payment and not given back as change. The standard set of designs has Canadian symbols, usually wildlife, on the reverse, and an effigy of Elizabeth II on the obverse. Some pennies, nickels, and dimes remain in circulation that bear the effigy of George VI. It is also common for American coins to be found among circulation due to the close proximity to the United States and the fact that the sizes of the coins are similar.",,,
+hoh_409_current,current,"As of October 2024, in which tier of Swedish football is Degerfors IF playing?",Superettan,"Degerfors () is a locality and the seat of Degerfors Municipality, Örebro County, Sweden, with 7,160 inhabitants in 2010. Degerfors is the sixth-largest city in Örebro County. It is located at the southern shore of lake Möckeln, 13 km (8 mi) south of neighboring Karlskoga. Degerfors evolved around the ironworks, that is nowadays owned by the Finnish conglomerate Outokumpu Oyj. It is also home to the football club Degerfors IF, which is playing in the second tier of Swedish football, Superettan.",,,
+hoh_104_outdated_0,outdated_0,"As of November 2024, what is the match against which the caps and goals of the Cameroon national football team players are correct?",The second match against Kenya,"Kit suppliers 
+
+ Kit supplier Period Notes  Le Coq Sportif 1982–1987  Adidas 1988–1993  Mitre 1993–1995  Lotto 1995–1996  Adidas 1996–1997  Puma 1998–2018  Le Coq Sportif 2019–2022  One All Sports 2022–2024
+
+ Results and fixtures 
+
+The following is a list of match results in the last 12 months, as well as any future matches that have been scheduled. 2023 
+
+ 2024 
+
+2025
+
+ Coaching staff 
+ Position Name Head coach  Marc Brys Assistant coaches  Joachim Mununga  Ndtoungou Mpile Martin  Pagou David Goalkeeping coach  Idriss Carlos Kameni Video analyst  Giannis Xilouris Fitness coach  Christophe Manouvrier Doctor  Dr. Fotso Gwabap Patrick Joel Physiotherapist  Daniel Che Awah Physiotherapist  Elias Kaleguem Fomekong General Coordinator of National teams   Benoit Christian Angbwa Assistant coordinator 1  Serge Reinold Pensy Assistant coordinator 2   Sarah Ntui Team manager  Nicolas Alnoudji Team Media officer  Elie Thierry Ndoh Liaison officer  Arnold Ebolo Abada Technical director  Engelbert Janvier Mbarga Ondoa
+
+Coaching history
+
+ Technical Committee (1960–1965)
+  Dominique Colonna (1965–1970)
+  Raymond Fobete (1970)
+  Peter Schnittger (1970–1973)
+  Vladimir Beara (1973–1975)
+  Ivan Ridanović (1976–1979)
+  Branko Žutić (1980–1982)
+  Jean Vincent (1982)
+  Radivoje Ognjanović (1982–1984)
+  Claude Le Roy (1985–1988, 1998)
+  Valery Nepomnyashchy (1988–1990)
+  Philippe Redon (1990–1993)
+  Jean Manga-Onguéné (1993–1994, 1997–1998)
+  Léonard Nseké (1994)
+  Henri Michel (1994)
+  Jules Nyongha (1994–1996, 2007)
+  Henri Depireux (1996–1997)
+  Pierre Lechantre (1998–2001)
+  Robert Corfou (2001)
+  Jean-Paul Akono (2001, 2012–2013)
+  Winfried Schäfer (2001–2004)
+  Artur Jorge (2004–2006)
+  Arie Haan (2006–2007)
+  Otto Pfister (2007–2009)
+  Thomas N'Kono (2009)
+  Paul Le Guen (2009–2010)
+  Javier Clemente (2010–2011)
+  Denis Lavagne (2011–2012)
+  Volker Finke (2013–2015)
+  Alexandre Belinga (2015–2016)
+  Hugo Broos (2016–2017)
+  Rigobert Song (2017–2018, 2022–2024)
+  Clarence Seedorf (2018–2019)
+  Toni Conceição (2019–2022)
+  Marc Brys (2024–)
+
+Players
+
+Current squad
+The following players have been selected for the 2025 Africa Cup of Nations qualification  matches against Kenya on 11 and 14 October 2024 . Caps and goals correct as of 14 October 2024, after the second match against Kenya. Recent call-ups
+The following players have also been called up for the team in the last twelve months and are still available for selection.",,,
+hoh_114_outdated_0,outdated_0,"As of June 2024, how many times has Estonia won the Baltic Cup tournament?",Four,"They have since repeated this feat by qualifying for the  UEFA Euro 2024 qualifying play-offs through being the best group winner in 2022–23 UEFA Nations League D. Estonia has also participated in the local sub-regional Baltic Cup championship, which takes place every two years between the countries of Estonia, Latvia and Lithuania. Estonia has won the three-nation Baltic Cup tournament four times — most recently in 2020 — which is less than either of the other two teams in the tournament, Latvia and Lithuania. The record for the most international caps by an international is held by Martin Reim with 157, who held the European record in 2009 until November of that year. The record for most goals is held by Andres Oper with 38.",,,
+hoh_210_outdated_0,outdated_0,"As of July 2024, which club does Mohammad Fazal play for as a left-back?",Nordic United,"Mohammad Fazal (; born 29 May 2002) is a professional footballer who plays as a left-back for Ettan Fotboll club Nordic United. Born in Denmark, he represents the Pakistan national team. Club career
+
+ Early career 
+Fazal started his youth career with FC Roskilde, subsequently moving to the club's under-19 team. He was scouted by Inter Milan in November 2018 at the age of 16 and was invited for trials. The following year he was transferred to Lyngby BK under-19 team.",,,
+hoh_477_outdated_0,outdated_0,"As of July 2024, which Erovnuli Liga club is Irakli Modebadze currently working as a coach at?",Dila Gori,"Irakli Modebadze (; born 4 October 1984) is a retired Georgian professional footballer, currently working as a coach at Erovnuli Liga club Dila Gori. He is the two-time champion of the Georgian top division and the top-scorer of the 2015 season. Modebadze has played for the senior team as well as for each of the national youth teams. Career
+Modebadze started his career at Valensia Tbilisi. From 2002 until 2007 he played for Ukrainian side FC Metalurh Zaporizhzhia.",,,
+hoh_578_outdated_0,outdated_0,"As of August 2024, what is the name of the public secondary school located in the Camden neighborhood of Minneapolis, Minnesota?",Patrick Henry High School,"Patrick Henry High School, or simply Patrick Henry, is a public secondary school in Minneapolis, Minnesota, United States. It is located in the city's Camden neighborhood. The school is named for American Founding Father Patrick Henry and is referred to colloquially by community members as ""Patrick Henry"" or ""Henry"". It had a student population of about 1,000 by the early 2020s. In 2023, the school board approved renaming the building to Camden High School with the change set to take effect during the 2024-25 school year.",,,
+hoh_576_current,current,"As of September 2024, which high school is associated with the robotics team Herobotics?",Camden High School,"The sport was dropped at Camden. By 2010, both all hockey teams at all seven Minneapolis public high schools were merged into a collective Minneapolis boys team and girls team. Beyond the sports, Camden has a vast array of other extracurriculars, the most notable of which being their math and robotics teams. Camden has one of the largest math teams in the city; coach John Heisel has managed to recruit a considerable number of students every year. Camden's robotics team, Herobotics, is known as one of the top teams in the state of Minnesota; they have won many awards, and advanced to the FIRST Championship seven times in their ten-year history.",,,
+hoh_180_outdated_0,outdated_0,"As of September 2024, which team was Slovenia's most recent match against?",Portugal,"thumb|170px|Boštjan Cesar is Slovenia's all-time most capped player. +Most appearancesRankPlayerCapsGoalsCareer1Boštjan Cesar101102003–20182Bojan Jokić10012006–20193Jasmin Kurtić9222012–present4Valter Birsa9072006–20185Josip Iličić83172010–present6Samir Handanović8102004–20157Milivoje Novaković80322006–2017Zlatko Zahovič80351992–20049Mišo Brečko7702004–201510Milenko Ačimovič74131998–2007Aleš Čeh7411992–2002
+
++Top goalscorersRankPlayerGoalsCapsRatioCareer1Zlatko Zahovič35801992–20042Milivoje Novaković32802006–20173Josip Iličić17832010–present4Sašo Udovič16421993–20005Ermin Šiljak14481994–20056Milenko Ačimovič13741998–20077Andraž Šporar12572016–present8Benjamin Šeško11332021–presentTim Matavž11392010–202010Primož Gliha10281992–1998Boštjan Cesar101012003–2018
+
+Team records
+Biggest victory: 7–0 vs. Oman, 8 February 1999
+Heaviest defeat: 0–5 vs. France, 12 October 2002
+Most consecutive victories: 4
+From 5 June 1999 against Latvia to 4 September 1999 against Georgia
+From 18 November 2009 against Russia to 13 June 2010 against Algeria
+From 6 September 2020 against Moldova to 14 October 2020 against Moldova
+From 17 November 2022 against Romania to 26 March 2023 against San Marino
+From 7 September 2023 against Northern Ireland to 17 October 2023 against Northern Ireland
+Most consecutive matches without defeat: 10, from 20 November 2023 against Kazakhstan to 1 July 2024 against Portugal
+Most consecutive defeats: 4 (achieved on five occasions, most recently in 2014)
+Most consecutive matches without victory: 9, from 6 September 2018 against Bulgaria to 7 June 2019 against Austria
+Most consecutive matches without scoring: 4
+From 13 October 2004 against Norway to 26 March 2005 against Germany
+From 5 March 2014 against Algeria to 8 September 2014 against Estonia
+Most consecutive matches without conceding a goal: 6, from 3 September 2020 against Greece to 11 November 2020 against Azerbaijan
+Most consecutive matches scoring: 14, from 19 June 2023 against Denmark to 20 June 2024 against Serbia
+
+Competitive record
+
+FIFA World Cup
+
+FIFA World Cup recordQualification recordYearRoundSquad1930 to 1990Part of Part of  1994Did not enterDid not enter 1998 Did not qualify5th8017520  2002Group stage300327Squad2nd (PO)126602011 2006Did not qualify4th103341013 2010Group stage311133Squad2nd (PO)12723206 2014Did not qualify3rd105051411 20184th10433127 20224th104241312   2026To be determinedTo be determined   2030 2034Total6114510—722917269480
+
+UEFA European Championship
+
+UEFA European Championship recordQualification recordYearRoundSquad1960 to 1992 Part of   Part of  1996 Did not qualify5th103251313  2000Group stage302145Squad2nd (PO)126331516 2004 Did not qualify2nd (PO)104331614  20086th12327916  20124th10424117 20163rd (PO)125251914 20204th104241611 2024Round of 16404022Squad2nd10712209  2028 To be determined  To be determined  2032Total706167—86361733119100
+
+UEFA Nations League
+UEFA Nations League recordSeasonDivisionGroupRound2018–19C3Group stage 4th 6 0 3 3 5 838th2020–21C3Group stage 1st 6 4 2 0 8 133rd2022–23B4Group stage 3rd 6 1 3 2 6 1025th2024–25B3 To be determinedTotal185851919—
+
+ Head-to-head record 
+The following table shows Slovenia's all-time international record, correct as of 1 July 2024 after the match against Portugal. Team          7  4  2  1  6  2  +4   2  1  0  1  1  2  −1   1  0  0  1  0  2  −2   1  1  0  0  2  1  +1   1  1  0  0  2  0  +2   4  1  0  3  2  5  –3   1  0  1  0  0  0  0   5  1  2  2  5  8  −3   2  0  1  1  0  2  −2   4  0  0  4  4  10  −6   5  0  2  3  3  9  −6   1  1  0  0  1  0  +1   1  0  1  0  0  0  0   1  0  0  1  0  1  −1   11  1  4  6  10  19  –9   12  6  3  3  19  11  +8   5  1  1  3  2  7  −5   7  0  2  5  4  15  −11   7  0  2  5  4  10  −6   9  6  1  2  13  5  +8   4  3  1  0  12  3  +9   4  1  1  2  4  5  −1   3  0  0  3  2  10  −8   4  2  1  1  5  4  +1   1  0  0  1  0  1  −1   1  1  0  0  2  0  +2   1  1  0  0  6  0  +6   7  0  4  3  3  11  −8   1  0  0  1  1  5  −4   4  3  0  1  5  3  +2   4  3  0  1  15  7  +8   5  2  3  0  8  5  +3   7  2  1  4  3  5  −2   1  0  0  1  0  3  −3   2  2  0  0  4  2  +2   2  2  0  0  3  1  +2   5  4  0  1  9  2  +7   6  2  2  2  11  7  +4   4  4  0  0  9  1  +8   9  7  2  0  17  3  +14   1  1  0  0  2  1  +1   4  4  0  0  10  1  +9   3  2  1  0  4  1  +3   2  0  0  2  0  3  −3   1  1  0  0  3  1  +2   7  1  2  4  7  13  −6   7  3  1  3  7  5  +2   11  2  3  6  10  17  −7   2  2  0  0  11  0  +11   1  0  0  1  1  3  −2   8  2  3  3  9  9  0   2  1  1  0  2  0  +2   3  1  1  1  4  2  +2   9  3  3  3  12  14  −2   7  2  1  4  8  11  −3   7  7  0  0  26  0  +26   1  1  0  0  2  0  +2   5  0  3  2  3  7  −4   9  1  7  1  12  14  −2   8  3  4  1  9  6  +3   1  0  0  1  0  1  −1   2  0  0  2  2  5  −3   4  0  2  2  1  4  −3   9  2  1  6  8  17  −9   1  1  0  0  3  1  +2   2  1  1  0  3  2  +1   2  1  0  1  2  1  +1   6  2  3  1  7  7  0   2  0  2  0  3  3  0   3  1  1  1  5  5  0   2  0  0  2  0  4  −4   1  0  1  0  0  0  0Total29510878109373345+28
+
+ Honours 
+
+ Minor tournaments 
+ Rothmans International Tournament
+Winners: 1994
+Runners-up: 1996
+ Cyprus International Tournament
+Runners-up: 1998, 2006
+ Oman International Tournament
+Runners-up: 1999, 2000
+ Carlsberg Cup
+Third place: 2002
+
+ Other awards 
+ Best Mover of the Year: 1999
+
+See also
+
+Slovenia national football B team
+Slovenia national under-21 football team
+Slovenia national under-19 football team
+Slovenia national under-17 football team
+Sport in Slovenia
+
+References
+
+External links
+
+ Football Association of Slovenia official website 
+ FIFA team profile
+ UEFA team profile
+
+ 
+Category:European national association football teams
+Category:Football in Slovenia",,,
+hoh_244_outdated_0,outdated_0,"As of November 2024, which show is the most recent recipient of the Daytime Emmy Award for Outstanding Drama Series Writing Team?",Days of Our Lives,"ABC has been the network the most successful, with a total of eighteen wins. In 1997, All My Children and The Young and the Restless tied, which was the first tie in this category. As of the 2022 ceremony, Days of Our Lives is the most recent recipient of the award. Winners and nominees
+Listed below are the winners of the award for each year, as well as the other nominees. + Table key Indicates the winner
+
+1970s
+ Year Program NetworkRef 1974 (1st) The Edge of Night  The Doctors General Hospital 1975 (2nd) Another World  Days of Our LivesThe Young and the Restless 1976 (3rd)  Days of Our Lives All My Children The Edge of Night  Guiding LightThe Young and the Restless 1977 (4th) Ryan's Hope All My Children Another World  As the World Turns Days of Our Lives 1978 (5th) Ryan's Hope All My Children Days of Our Lives Guiding Light 1979 (6th)Ryan's Hope All My Children Days of Our LivesThe Young and the Restless
+
+1980s
+ Year Program NetworkRef 1980 (7th) Ryan's Hope All My Children The Edge of Night  One Life to Live 1981 (8th) Guiding Light All My Children General Hospital One Life to Live 1982 (9th) Guiding Light All My Children The Edge of Night  One Life to Live 1983 (10th) Ryan's Hope All My Children General Hospital One Life to Live 1984 (11th) Ryan's Hope All My Children General Hospital One Life to Live 1985 (12th) All My ChildrenAnother World Days of Our Lives Guiding Light 1986 (13th)Guiding Light  As the World Turns General HospitalThe Young and the Restless 1987 (14th)  One Life to Live Days of Our LivesThe Young and the Restless 1988 (15th) All My ChildrenThe JudgeSanta BarbaraSuperior Court 1989 (16th) Santa BarbaraAnother World As the World Turns Guiding Light
+
+1990s
+ Year Program NetworkRef 1990 (17th) Guiding Light  All My Children One Life to LiveSanta BarbaraThe Young and the Restless 1991 (18th) Santa Barbara All My ChildrenAs the World TurnsThe Young and the Restless 1992 (19th) The Young and the Restless All My ChildrenGuiding Light One Life to Live 1993 (20th) Guiding Light  All My Children As the World TurnsThe Young and the Restless 1994 (21st) One Life to Live Another World Days of Our LivesThe Young and the Restless 1995 (22nd) General Hospital All My Children One Life to LiveThe Young and the Restless 1996 (26th) All My ChildrenAnother World As the World Turns One Life to Live 1997 (27th) All My Children The Young and the Restless Days of Our Lives General Hospital 1998 (27th) All My Children Days of Our Lives General HospitalThe Young and the Restless 1999 (26th) General Hospital All My Children Days of Our LivesGuiding LightThe Young and the Restless
+
+2000s
+ Year Program NetworkRe 2000 (27th)The Young and the Restless As the World Turns The Bold and the Beautiful General Hospital 2001 (28th) As the World Turns All My Children General HospitalPassionsThe Young and the Restless 2002 (29th) As the World Turns All My Children One Life to LivePassions 2003 (30th) General Hospital All My Children As the World Turns The Bold and the BeautifulGuiding LightPassionsThe Young and the Restless 2004 (31st) As the World Turns All My Children General HospitalThe Young and the Restless 2005 (32nd) As the World Turns General HospitalGuiding LightThe Young and the Restless 2006 (33rd) The Young and the Restless  As the World Turns The Bold and the Beautiful One Life to Live  2007 (34th) Guiding Light  The Bold and the Beautiful General HospitalThe Young and the Restless 2008 (35th)One Life to Live The Bold and the Beautiful General HospitalGuiding LightThe Young and the Restless 2009 (36th) General Hospital All My Children  The Bold and the Beautiful One Life to Live 
+
+2010s
+ Year Program NetworkRef 2010 (37th) The Bold and the Beautiful  All My Children  As the World Turns  The Young and the Restless  2011 (38th) The Young and the Restless  As the World Turns  The Bold and the Beautiful  Days of Our Lives  2012 (39th) Days of Our Lives  All My Children  General Hospital The Young and the Restless  2013 (40th)The Bold and the Beautiful   General Hospital One Life to Live  The Young and the Restless   2014 (41st)The Young and the RestlessThe Bold and the Beautiful Days of Our Lives    2015 (42nd)The Bold and the BeautifulDays of Our Lives    General HospitalThe Young and the Restless 2016 (43rd) The Bold and the Beautiful   General Hospital   The Young and the Restless  2017 (44th) The Young and the Restless   The Bold and the Beautiful  Days of Our Lives   General Hospital  2018 (45th) Days of Our Lives   The Bold and the Beautiful  General Hospital  The Young and the Restless  2019 (46th) The Young and the Restless   The Bold and the Beautiful  Days of Our Lives  General Hospital 
+
+2020s
+ Year Program NetworkRef 2020 (47th)The Bold and the Beautiful  Days of Our Lives General Hospital  The Young and the Restless  2021 (48th) The Young and the Restless   The Bold and the Beautiful  General Hospital  2022 (49th) Days of Our Lives   Beyond Salem  General Hospital The Young and the Restless  2023 (50th) The Young and the Restless    The Bay  Popstar!",,,
+hoh_148_outdated_0,outdated_0,"As of October 2024, who is the drummer in RAS-1's solo act?",Joel Aguilar,"RAS-1 (Richard Arthur Smith) is a musician (guitarist/singer) who was in the band Long Beach Shortbus with former Sublime bassist Eric Wilson and Willard ""trey"" Pangborn of Falling Idols, along with drummer Damien Ramirez. RAS-1 was also one of the founding members of Long Beach Dub Allstars along with Eric Wilson and former Sublime drummer Bud Gaugh He now is playing in his solo act RAS-1, with Jack Keller on bass and Joel Aguilar on drums. . Early life
+Richard Arthur Smith is the son of singer Dora Gail Smith formerly of the all girl Long Beach jazz quartet Dream. Early bands
+As a teenager, RAS-1 was in a psychedelic rock band called The Griffin with his cousin J-sun, the current singer/poet of the band Stonewing.",,,
+hoh_573_outdated_0,outdated_0,"As of September 2024, what classical music station does Charles Alexis Nove currently present the weekday breakfast show for?",Scala Radio,"Charles Alexis Nove (born 29 June 1960 in London, England) is a British radio broadcaster who currently presents the weekday breakfast show for classical music station Scala Radio. Biography
+Early career
+The son of Soviet historian Alexander Nove, his earliest presentational experience was at Glasgow's Hospital Broadcasting Service in 1976. From 1981 he was a member of BBC Radio 2's continuity team and, in common with many of the station's announcers and newsreaders, he had many stints presenting the station's overnight and early morning output, culminating as regular host of the weekend overnight show for several years until 1998. Nove has in the past served as a co-presenter and announcer on the original Come DancingBBC Genome listings and announcer again for the gameshow Wipeout in the 1990s. In 1991 he commentated for BBC One on the Lord Mayor's Show.Genome listing He has also served as a BBC TV continuity announcer and, apart from his association with Radio 2, has presented radio programmes on Jazz FM, Magic FM and many others.",,,
+hoh_165_outdated_0,outdated_0,"As of October 2024, who is the current president of the Australian Medical Association?",Steve Robson,"The AMA has traditionally been a conservative (rather than progressive) body. The AMA officially endorses trials to use pill testing. The AMA offers an Indigenous Medical Scholarship. It has formed an Equity, Inclusion and Diversity Committee. The current president is Steve Robson.",,,
