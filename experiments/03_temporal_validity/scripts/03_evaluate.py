@@ -15,8 +15,24 @@
 usage:
   python 03_evaluate.py --model gpt --judge gpt
 """
-import argparse, csv, json, os
+import argparse, csv, json, os, re
 import pilot_common as pc
+
+_G = {"the", "of", "and", "a", "an", "in", "at", "for", "is", "was", "to"}
+
+
+def support_proxy(passage, answer):
+    """무료 결정론적 CitePrec (ALCE의 NLI 판정 근사 — 답이 짧은 엔티티라 유효).
+    답 정식명이 통째로 포함되거나, 변별토큰(>3자)의 과반이 청크에 있으면 '뒷받침'."""
+    a, b = (answer or "").lower().strip(), (passage or "").lower()
+    if not a:
+        return 0
+    if a in b:
+        return 1
+    spec = [w for w in re.findall(r"[a-z0-9]+", a) if len(w) > 3 and w not in _G]
+    if not spec:
+        return int(a in b)
+    return int(sum(1 for w in spec if w in b) * 2 >= len(spec))
 
 
 def behav_side(conflict_ans, cur_ans, old_ans):
@@ -33,7 +49,8 @@ def behav_side(conflict_ans, cur_ans, old_ans):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
-    ap.add_argument("--judge", default="gpt", help="CitePrec 판정용 모델(pilot_common.MODELS 키)")
+    ap.add_argument("--judge", default="proxy",
+                    help="CitePrec 판정: 'proxy'(무료 결정론적·기본) 또는 모델키(gpt/claude…, 유료 LLM)")
     ap.add_argument("--eval", default=os.path.join(os.path.dirname(__file__), "..", "data", "eval_set.jsonl"))
     ap.add_argument("--raw_dir", default=os.path.join(os.path.dirname(__file__), "..", "results"))
     args = ap.parse_args()
@@ -51,10 +68,14 @@ def main():
 
         em = int(pc.normalize(ans) == pc.normalize(rec["target_answer"]))
         tv_cite = int(rec["evidence_chunk_id"] in cites)
-        # CitePrec: 인용 청크 중 하나라도 답을 함의
+        # CitePrec: 인용 청크 중 하나라도 답을 함의 (proxy=무료 결정론, 그 외=유료 LLM judge)
+        use_proxy = args.judge in ("proxy", "none")
         cite_prec = 0
         for cid in cites:
-            if cid in chunk_text and pc.judge_support(args.judge, chunk_text[cid], ans):
+            if cid not in chunk_text:
+                continue
+            ok = support_proxy(chunk_text[cid], ans) if use_proxy else pc.judge_support(args.judge, chunk_text[cid], ans)
+            if ok:
                 cite_prec = 1
                 break
         # 반사실 (행동 기준)
@@ -104,11 +125,14 @@ def main():
     print(json.dumps(metrics, ensure_ascii=False, indent=2))
     print(f"\n★ 맹점 셀 (TV=FAIL & CitePrec=PASS) = {cells[(0,1)]}건  ← C2·C3 핵심")
     print(f"산출 → metrics_{args.model}.json, contingency_{args.model}.csv")
-    print("\n[judge 사용량/비용]")
-    print(pc.cost_report())
-    pc.append_ledger("03_evaluate")
-    print("\n[전체 누적 — repo 루트 usage/usage_summary.txt]")
-    print(pc.ledger_total())
+    if args.judge in ("proxy", "none"):
+        print("\n[judge=proxy] 무료 결정론적 채점 — API 비용 0")
+    else:
+        print("\n[judge 사용량/비용]")
+        print(pc.cost_report())
+        pc.append_ledger("03_evaluate")
+        print("\n[전체 누적 — repo 루트 usage/usage_summary.txt]")
+        print(pc.ledger_total())
 
 
 if __name__ == "__main__":

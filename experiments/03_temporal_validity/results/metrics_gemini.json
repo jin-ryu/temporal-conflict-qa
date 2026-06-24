@@ -1,0 +1,33 @@
+{
+  "model": "gemini",
+  "overall": {
+    "n": 58,
+    "EM": 0.6379,
+    "TV_cite": 0.6897,
+    "TV_behav": 0.7692,
+    "TV_behav_n_valid": 52,
+    "CitePrec": 0.9483,
+    "wrong_time_cite_rate": 0.3103,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.8333
+  },
+  "as_of_past": {
+    "n": 48,
+    "EM": 0.5833,
+    "TV_cite": 0.6458,
+    "TV_behav": 0.7381,
+    "TV_behav_n_valid": 42,
+    "CitePrec": 0.9375,
+    "wrong_time_cite_rate": 0.3542,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.8235
+  },
+  "current": {
+    "n": 10,
+    "EM": 0.9,
+    "TV_cite": 0.9,
+    "TV_behav": 0.9,
+    "TV_behav_n_valid": 10,
+    "CitePrec": 1.0,
+    "wrong_time_cite_rate": 0.1,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  }
+}
