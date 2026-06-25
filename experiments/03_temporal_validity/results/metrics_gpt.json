@@ -1,0 +1,33 @@
+{
+  "model": "gpt",
+  "overall": {
+    "n": 58,
+    "EM": 0.7414,
+    "TV_cite": 0.8793,
+    "TV_behav": 0.9038,
+    "TV_behav_n_valid": 52,
+    "CitePrec": 1.0,
+    "wrong_time_cite_rate": 0.1207,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  },
+  "as_of_past": {
+    "n": 48,
+    "EM": 0.7083,
+    "TV_cite": 0.875,
+    "TV_behav": 0.8837,
+    "TV_behav_n_valid": 43,
+    "CitePrec": 1.0,
+    "wrong_time_cite_rate": 0.125,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  },
+  "current": {
+    "n": 10,
+    "EM": 0.9,
+    "TV_cite": 0.9,
+    "TV_behav": 1.0,
+    "TV_behav_n_valid": 9,
+    "CitePrec": 1.0,
+    "wrong_time_cite_rate": 0.1,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  }
+}

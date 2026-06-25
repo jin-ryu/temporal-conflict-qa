@@ -269,16 +269,20 @@ def call_model(name: str, system: str, user: str, temperature: float = 0.0,
         from openai import OpenAI
         if backend == "openai":
             client = OpenAI()  # OPENAI_API_KEY
+            # GPT-5.x 등 추론모델: max_tokens→max_completion_tokens, temperature 커스텀 미지원(생략)
+            extra = {"max_completion_tokens": max_tokens}
         elif backend == "gemini":  # Gemini의 OpenAI 호환 엔드포인트
             client = OpenAI(api_key=os.getenv("GEMINI_API_KEY"),
                             base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+            extra = {"max_tokens": max_tokens, "temperature": temperature}
         else:  # vllm
             client = OpenAI(base_url=os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1"),
                             api_key=os.getenv("VLLM_API_KEY", "EMPTY"))
+            extra = {"max_tokens": max_tokens, "temperature": temperature}
         r = _retry(lambda: client.chat.completions.create(
-            model=model_id, temperature=temperature, max_tokens=max_tokens,
+            model=model_id,
             messages=[{"role": "system", "content": system},
-                      {"role": "user", "content": user}]))
+                      {"role": "user", "content": user}], **extra))
         u = getattr(r, "usage", None)
         record_usage(name, getattr(u, "prompt_tokens", 0), getattr(u, "completion_tokens", 0))
         return r.choices[0].message.content or ""
