@@ -121,10 +121,12 @@ SYSTEM_PROMPT = (
 )
 
 
-def build_user_message(question: str, chunks: list[dict], rng: random.Random):
-    """청크를 무작위 순서로 렌더링 + (1-based display index -> chunk_id) 매핑 반환."""
+def build_user_message(question: str, chunks: list[dict], rng: random.Random, shuffle: bool = True):
+    """청크 렌더링 + (1-based display index -> chunk_id) 매핑 반환.
+    shuffle=True: 무작위 순서(기본, 위치편향 통제). shuffle=False: 받은 순서 그대로(위치 ablation용)."""
     shuffled = list(chunks)
-    rng.shuffle(shuffled)
+    if shuffle:
+        rng.shuffle(shuffled)
     idx2chunk = {}
     lines = [f"[Query] {question}", ""]
     for k, c in enumerate(shuffled, start=1):
