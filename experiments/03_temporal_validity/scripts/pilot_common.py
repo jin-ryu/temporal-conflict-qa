@@ -144,8 +144,9 @@ MODELS: dict[str, tuple[str, str]] = {
     "claude":  ("anthropic", os.getenv("CLAUDE_MODEL", "claude-opus-4-8")),
     "gemini":  ("gemini",    os.getenv("GEMINI_MODEL", "gemini-3.1-pro-preview")),
     # 오픈 (단일 H100, vLLM) — eval 생성자가 Llama-3.1-70B → Llama 계열은 자가생성 편향으로 제외
-    "qwen35b":  ("vllm", os.getenv("QWEN35B_MODEL", "Qwen/Qwen3-35B-A3B-Instruct")),
-    "gemma31b": ("vllm", os.getenv("GEMMA31B_MODEL", "google/gemma-4-31b-it")),
+    "qwen3_32b":     ("vllm", os.getenv("QWEN3_32B_MODEL", "Qwen/Qwen3-32B")),
+    "qwen3_8b":      ("vllm", os.getenv("QWEN3_8B_MODEL", "Qwen/Qwen3-8B")),
+    "mistral_small": ("vllm", os.getenv("MISTRAL_SMALL_MODEL", "mistralai/Mistral-Small-3.2-24B-Instruct-2506")),
 }
 
 
@@ -157,8 +158,9 @@ PRICING: dict[str, tuple[float, float]] = {
     "gpt":     (float(os.getenv("GPT_IN_PRICE", "0")),    float(os.getenv("GPT_OUT_PRICE", "0"))),
     "claude":  (float(os.getenv("CLAUDE_IN_PRICE", "0")), float(os.getenv("CLAUDE_OUT_PRICE", "0"))),
     "gemini":  (float(os.getenv("GEMINI_IN_PRICE", "0")), float(os.getenv("GEMINI_OUT_PRICE", "0"))),
-    "qwen35b": (0.0, 0.0),
-    "gemma31b": (0.0, 0.0),
+    "qwen3_32b": (0.0, 0.0),
+    "qwen3_8b": (0.0, 0.0),
+    "mistral_small": (0.0, 0.0),
 }
 
 USAGE: dict[str, dict[str, int]] = {}  # model -> {input, output, calls}
@@ -275,10 +277,13 @@ def call_model(name: str, system: str, user: str, temperature: float = 0.0,
             client = OpenAI(api_key=os.getenv("GEMINI_API_KEY"),
                             base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
             extra = {"max_tokens": max_tokens, "temperature": temperature}
-        else:  # vllm
+        else:  # vllm (로컬 또는 ngrok 터널)
             client = OpenAI(base_url=os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1"),
-                            api_key=os.getenv("VLLM_API_KEY", "EMPTY"))
+                            api_key=os.getenv("VLLM_API_KEY", "EMPTY"),
+                            default_headers={"ngrok-skip-browser-warning": "1"})  # ngrok 무료 경고 우회
             extra = {"max_tokens": max_tokens, "temperature": temperature}
+            if "qwen3" in model_id.lower():  # Qwen3 thinking 끄기 → <think> 없이 인용 파싱 깔끔
+                extra["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
         r = _retry(lambda: client.chat.completions.create(
             model=model_id,
             messages=[{"role": "system", "content": system},

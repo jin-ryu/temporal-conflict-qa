@@ -1,0 +1,33 @@
+{
+  "model": "qwen3_32b",
+  "overall": {
+    "n": 58,
+    "EM": 0.4483,
+    "TV_cite": 0.5172,
+    "TV_behav": 0.5098,
+    "TV_behav_n_valid": 51,
+    "CitePrec": 0.9828,
+    "wrong_time_cite_rate": 0.4828,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9643
+  },
+  "as_of_past": {
+    "n": 48,
+    "EM": 0.4167,
+    "TV_cite": 0.4583,
+    "TV_behav": 0.4762,
+    "TV_behav_n_valid": 42,
+    "CitePrec": 0.9792,
+    "wrong_time_cite_rate": 0.5417,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9615
+  },
+  "current": {
+    "n": 10,
+    "EM": 0.6,
+    "TV_cite": 0.8,
+    "TV_behav": 0.6667,
+    "TV_behav_n_valid": 9,
+    "CitePrec": 1.0,
+    "wrong_time_cite_rate": 0.2,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  }
+}
