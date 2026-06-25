@@ -53,6 +53,20 @@
 ### F5 — 파일럿(n=48) → 본실험(n=180) 안정성
 - 핵심 지표(wrong_time, CitePrec, β) 모두 ±2~3pp 이내 유지 → 신호는 우연 아님, 신뢰구간 축소.
 
+## 4b. Position Ablation — 충돌 실패의 메커니즘 (n=180)
+시점-유효(evidence) 청크를 컨텍스트 **맨앞(first) / 맨뒤(last)** 에 강제 배치해 위치 효과 측정. Δ = TV_cite(first) − TV_cite(last). 클수록 위치 의존(모델이 *맨뒤 문서*를 고름 = in-context recency).
+
+| Model | Δ n=48 (pilot) | **Δ n=180** | 위치 편향 |
+|---|---|---|---|
+| Mistral-24B | −0.42 | **−0.41** | 강함 |
+| Qwen3-32B | −0.33 | **−0.18** | 중간 (pilot 과대평가) |
+| Qwen3-8B | −0.04 | **−0.07** | 거의 없음 |
+
+- **위치 편향은 모델별 스펙트럼** — 보편적 recency 아님. (Mistral 강 / Qwen32B 중 / 8B 무).
+- **충돌 실패는 위치로 환원 불가**: Qwen3-32B는 conflict-drop −38pp인데 위치효과 −18%, Qwen3-8B는 drop −41pp인데 위치효과 −7% → *낙폭의 상당 부분은 위치 아닌 시간추론 실패*.
+- → **메커니즘 = in-context position bias(일부 모델) + temporal-reasoning failure(공통)의 혼합.**
+- **해결법 함의**: 위치 기반 리랭킹(evidence를 맨뒤로)은 모델특정·부분적 → *시점-유효 청크 selection(틀린시점 제거)이 robust*.
+
 ## 5. Position vs Prior Work
 - **temporal validity = 인용품질의 제3축** — correctness(ALCE, Gao 2023) · faithfulness(Wallat 2025, ICTIR)와 직교.
 - 본 실패는 *correct·faithful해 보이는데(TV_behav 0.42~0.75로 문서를 실제 사용)* **시점만 틀림** → Wallat의 post-rationalization으로 설명되지 않는 *별도 범주*.
@@ -64,7 +78,7 @@
 - 채점은 **유료 LLM judge 없이** 결정론적 포함검사(ALCE-NLI 근사) → 완전 재현 가능.
 
 ## 7. TODO
-- [ ] **위치 ablation 재실행 (n=48 → 180)** — open 3모델, recency 메커니즘 큰 셋 확인 (무료).
+- [x] **위치 ablation 재실행 (n=48 → 180)** — open 3모델 완료(§4b): 위치 편향 모델별, 충돌 실패는 위치로 환원 불가.
 - [ ] **faithfulness 분류 분석** — 각 실패를 post-rationalization(Wallat) vs faithful-but-wrong-time(本)으로 분류 (counterfactual = 문서 제거 시 답 변화).
 - [ ] 다른 attribution 지표(citation-recall, AutoAIS/TRUE NLI)도 동일 맹점 보이나 — ★ 일반화.
 - [ ] 데이터 300~500 확장(필요시 LLM 분류기 + 골드 검증).
