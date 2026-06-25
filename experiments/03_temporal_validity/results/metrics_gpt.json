@@ -1,33 +1,33 @@
 {
   "model": "gpt",
   "overall": {
-    "n": 58,
-    "EM": 0.7414,
-    "TV_cite": 0.8793,
-    "TV_behav": 0.9038,
-    "TV_behav_n_valid": 52,
+    "n": 219,
+    "EM": 0.6986,
+    "TV_cite": 0.8265,
+    "TV_behav": 0.8617,
+    "TV_behav_n_valid": 188,
     "CitePrec": 1.0,
-    "wrong_time_cite_rate": 0.1207,
+    "wrong_time_cite_rate": 0.1735,
     "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
   },
   "as_of_past": {
-    "n": 48,
-    "EM": 0.7083,
-    "TV_cite": 0.875,
-    "TV_behav": 0.8837,
-    "TV_behav_n_valid": 43,
+    "n": 180,
+    "EM": 0.6667,
+    "TV_cite": 0.8167,
+    "TV_behav": 0.8323,
+    "TV_behav_n_valid": 155,
     "CitePrec": 1.0,
-    "wrong_time_cite_rate": 0.125,
+    "wrong_time_cite_rate": 0.1833,
     "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
   },
   "current": {
-    "n": 10,
-    "EM": 0.9,
-    "TV_cite": 0.9,
+    "n": 39,
+    "EM": 0.8462,
+    "TV_cite": 0.8718,
     "TV_behav": 1.0,
-    "TV_behav_n_valid": 9,
+    "TV_behav_n_valid": 33,
     "CitePrec": 1.0,
-    "wrong_time_cite_rate": 0.1,
+    "wrong_time_cite_rate": 0.1282,
     "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
   }
 }

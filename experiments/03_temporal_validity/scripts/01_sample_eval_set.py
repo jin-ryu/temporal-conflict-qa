@@ -60,21 +60,40 @@ def main():
     ap.add_argument("--quota", default="outdated=40,current=10",
                     help="mode별 개수. 예: 'outdated=40,current=10' / 'outdated_0=20,outdated_1=15,current=10'")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--keep_existing", action="store_true",
+                    help="기존 eval_set.jsonl 항목을 *그대로 보존*하고 부족분만 새로 채움 "
+                         "(유료 모델 raw resume 보장 — 기존 id 안 바뀜). quota는 *목표 총량*.")
     args = ap.parse_args()
     rng = random.Random(args.seed)
     quota = parse_quota(args.quota)
+    out_dir = os.path.abspath(args.out_dir)
 
     # 후보: current_raw 제외 + 충돌 컨텍스트 보유
     pool = [r for r in pc.read_jsonl(args.input)
             if r["mode"] != "current_raw" and has_conflict(r)]
 
     used, selected = set(), []
+
+    # --keep_existing: 기존 eval_set 항목을 *id 단위로* 그대로 고정(같은 id·mode → frontier raw 100% resume)
+    existing_path = os.path.join(out_dir, "eval_set.jsonl")
+    if args.keep_existing and os.path.exists(existing_path):
+        pool_by_id = {r["id"]: r for r in pool}
+        for r in pc.read_jsonl(existing_path):
+            src = pool_by_id.get(r["id"])   # 같은 id(=source+mode)가 genuine 풀에 살아있어야 보존
+            if not src or src["source_idx"] in used:
+                continue
+            used.add(src["source_idx"])
+            row = {k: src[k] for k in KEEP}
+            row["target_side"] = target_side(src["mode"])
+            selected.append(row)
+        print(f"  보존(keep_existing): {len(selected)}개 — 부족분만 추가")
     for key, count in quota:
         cands = [r for r in pool if matches(r["mode"], key)]
         rng.shuffle(cands)
         # outdated는 다단계(outdated_1+)를 먼저 (stable sort로 셔플 순서 유지)
         cands.sort(key=lambda r: 0 if (r["mode"].startswith("outdated") and r["mode"] != "outdated_0") else 1)
-        picked = 0
+        # 이미 보존된(keep_existing) 같은 key 항목은 목표량에서 차감
+        picked = sum(1 for s in selected if matches(s["mode"], key))
         for r in cands:
             if picked >= count:
                 break

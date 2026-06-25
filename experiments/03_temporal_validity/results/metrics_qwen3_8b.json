@@ -1,33 +1,33 @@
 {
   "model": "qwen3_8b",
   "overall": {
-    "n": 58,
-    "EM": 0.3966,
-    "TV_cite": 0.4483,
-    "TV_behav": 0.4423,
-    "TV_behav_n_valid": 52,
-    "CitePrec": 1.0,
-    "wrong_time_cite_rate": 0.5517,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+    "n": 219,
+    "EM": 0.3973,
+    "TV_cite": 0.4612,
+    "TV_behav": 0.4844,
+    "TV_behav_n_valid": 192,
+    "CitePrec": 0.9817,
+    "wrong_time_cite_rate": 0.5388,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9746
   },
   "as_of_past": {
-    "n": 48,
-    "EM": 0.375,
-    "TV_cite": 0.4167,
-    "TV_behav": 0.3953,
-    "TV_behav_n_valid": 43,
-    "CitePrec": 1.0,
-    "wrong_time_cite_rate": 0.5833,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+    "n": 180,
+    "EM": 0.3389,
+    "TV_cite": 0.4389,
+    "TV_behav": 0.4214,
+    "TV_behav_n_valid": 159,
+    "CitePrec": 0.9833,
+    "wrong_time_cite_rate": 0.5611,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9802
   },
   "current": {
-    "n": 10,
-    "EM": 0.5,
-    "TV_cite": 0.6,
-    "TV_behav": 0.6667,
-    "TV_behav_n_valid": 9,
-    "CitePrec": 1.0,
-    "wrong_time_cite_rate": 0.4,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+    "n": 39,
+    "EM": 0.6667,
+    "TV_cite": 0.5641,
+    "TV_behav": 0.7879,
+    "TV_behav_n_valid": 33,
+    "CitePrec": 0.9744,
+    "wrong_time_cite_rate": 0.4359,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.9412
   }
 }
