@@ -1,0 +1,33 @@
+{
+  "model": "mistral_small",
+  "overall": {
+    "n": 58,
+    "EM": 0.5862,
+    "TV_cite": 0.6552,
+    "TV_behav": 0.64,
+    "TV_behav_n_valid": 50,
+    "CitePrec": 0.9828,
+    "wrong_time_cite_rate": 0.3448,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  },
+  "as_of_past": {
+    "n": 48,
+    "EM": 0.5625,
+    "TV_cite": 0.6875,
+    "TV_behav": 0.625,
+    "TV_behav_n_valid": 40,
+    "CitePrec": 0.9792,
+    "wrong_time_cite_rate": 0.3125,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  },
+  "current": {
+    "n": 10,
+    "EM": 0.7,
+    "TV_cite": 0.5,
+    "TV_behav": 0.7,
+    "TV_behav_n_valid": 10,
+    "CitePrec": 1.0,
+    "wrong_time_cite_rate": 0.5,
+    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 1.0
+  }
+}

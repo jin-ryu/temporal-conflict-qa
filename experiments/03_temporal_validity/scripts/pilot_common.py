@@ -146,7 +146,7 @@ MODELS: dict[str, tuple[str, str]] = {
     # 오픈 (단일 H100, vLLM) — eval 생성자가 Llama-3.1-70B → Llama 계열은 자가생성 편향으로 제외
     "qwen3_32b":     ("vllm", os.getenv("QWEN3_32B_MODEL", "Qwen/Qwen3-32B")),
     "qwen3_8b":      ("vllm", os.getenv("QWEN3_8B_MODEL", "Qwen/Qwen3-8B")),
-    "mistral_small": ("vllm", os.getenv("MISTRAL_SMALL_MODEL", "mistralai/Mistral-Small-3.2-24B-Instruct-2506")),
+    "mistral_small": ("vllm", os.getenv("MISTRAL_SMALL_MODEL", "mistralai/Mistral-Small-24B-Instruct-2501")),
 }
 
 
