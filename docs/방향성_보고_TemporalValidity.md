@@ -1,6 +1,8 @@
 # Temporal Validity in RAG — 방향성 보고 (파일럿)
 
-> **핵심 한 줄**: RAG에 같은 사실의 옛/새 버전이 섞이면 모델의 시점 grounding이 무너질 수 있는데(틀린 시점 문서 인용·사용), **표준 인용평가(ALCE/CitePrec)는 그 오류를 *정상*이라 판정한다(★ 맹점). 그리고 이 "충돌 견딤"은 모델 능력·크기·open여부로 *예측되지 않는 숨은 축*이다.**
+> **핵심 한 줄**: RAG에 같은 사실의 옛/새 버전이 섞이면 모델의 시점 grounding이 무너질 수 있는데(틀린 시점 문서 인용·사용), **표준 인용평가(ALCE/CitePrec)는 그 오류를 *정상*이라 판정한다(★ 맹점).**
+>
+> **프레임**: *temporal validity* = 인용품질의 **제3의 축** — correctness(ALCE)·faithfulness(Wallat 2025)와 *직교*. 우리 실패는 correct·faithful한데 *시간적으로* 틀려서 기존 평가가 *전부* 통과시킴. (+ 이 "충돌 견딤"은 능력·크기·open여부로 *예측 안 되는* 모델별 축.)
 
 작성: 2026-06-25 · 파일럿(n=48 as-of-past, 5모델)
 
@@ -52,15 +54,27 @@ TV_cite   = 1[ c* ∈ S ]            ← 앵커 = 정답 시점 c*
 
 ---
 
-## 2. HoH(ACL 2025)와의 차별점
+## 2. 관련연구 대비 차별점 — *temporal validity = 제3의 축*
 
-| | **HoH** (선행) | **우리** (novel) |
+**핵심 프레임**: 인용(attribution) 품질엔 *직교하는 세 축*이 있다.
+| 축 | 질문 | 선행연구 |
 |---|---|---|
-| 옛 정보 지위 | 오염원(현재질문·옛=오답) | **시점-유효 정답**(as-of-past·옛=정답) |
-| 무엇을 잰다 | *답 정확도* 하락 | **인용-수준 시점유효성(TV) + 표준 인용평가 맹점(★)** |
-| 해결 | 벤치/진단 | (목표) 시점-grounding 해결법 |
+| **correctness** | 인용 문서가 답을 *뒷받침*하나 | ALCE (Gao 2023) |
+| **faithfulness** | 인용이 모델이 *실제 쓴* 문서인가(과정) | Wallat 2025 |
+| **★ temporal validity** | 인용이 *질문 시점에 유효한* 문서인가 | **아무도 안 함 = 우리** |
 
-→ HoH가 *안 한 것* = **"표준 *인용평가*가 틀린 시점 인용을 통과시킨다(★)" + as-of-past.** 여기가 우리 자리.
+### vs Wallat 2025 ("Correctness is not Faithfulness")
+- 가장 가까운 연구. correctness(=우리 CitePrec) vs faithfulness(post-rationalization, 최대 57%) 분리.
+- **그들 예시조차 시간 사례**("Bonn: no longer capital")인데 *오직 faithfulness 렌즈*로만 봄 — *"as-of 시점엔 어느 문서가 유효한가"는 안 물음.*
+- **우리 결정적 차별**: 우리 실패는 *correct이고 faithful*(모델이 새 문서를 *진짜 사용*; TV_behav로 입증)인데 **시간적으로 틀림** → Wallat framework로 *설명 안 되는 케이스.*
+
+### vs HoH (ACL 2025)
+- HoH = outdated 정보가 *답 정확도* 떨어뜨림(현재질문·옛=오답). **인용평가는 안 함.** 우리 = as-of-past·옛=정답·*인용-수준 평가맹점*.
+
+### vs 시간-인식 RAG (TimeR4·T-GRAG·VersionRAG·Re3 등)
+- 이들은 *검색·리랭킹·필터링 **해결법*** (레드오션). → **우리는 *해결법이 아니라 측정/진단*에 집중**(셀렉터류는 novelty 없음).
+
+→ **빈틈 = "temporal validity를 attribution 품질의 *제3축*으로 정식화 + 그게 correctness·faithfulness와 직교함을 ★로 입증."** (검색·정독으로 확인.)
 
 ---
 

@@ -6,6 +6,7 @@ HoH 정제본(qa_hoh.jsonl) → 사람검수 CSV.
 
 검수법: `verdict` 칸에
    g = genuine 시간변화(유지)   /   c = 정적사실 정정(버림)   /   ? = 애매
+   → 판단 기준 상세: construct_filter_guideline.md (g/c 기준표·예시·LLM rubric)
 저장 후 apply_review.py 로 g만 추려 eval 후보 확정.
 
 usage:
