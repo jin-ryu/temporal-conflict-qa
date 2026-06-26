@@ -67,6 +67,24 @@
 - → **메커니즘 = in-context position bias(일부 모델) + temporal-reasoning failure(공통)의 혼합.**
 - **해결법 함의**: 위치 기반 리랭킹(evidence를 맨뒤로)은 모델특정·부분적 → *시점-유효 청크 selection(틀린시점 제거)이 robust*.
 
+## 4c. Faithfulness 분류 — Wallat(2025)과 구별되는 실패 범주 (핵심)
+틀린시점 인용(TV_cite=0) 항목을, **문서 제거 counterfactual**(conflict 답 vs outdated_only/current_only 답, 추가 호출 0)로 분류:
+- **faithful-wrong-time**: conflict 답이 *새 문서만* 조건 답과 같고 *옛 문서만* 과 다름 → 모델이 새(틀린시점) 문서에 *행동 의존* = 진짜 썼는데 시점 틀림.
+- **post-rationalization 의심**(Wallat): 새 답이 어느 단일조건과도 불일치 → 문서 없이 그 답 = parametric/사후인용.
+- **invariant**: 두 단일조건 답 동일 → 반사실 판정 불가(데이터 한계).
+
+| Model | wrong_time | **faithful-wrong-time** | post-rat | invariant |
+|---|---|---|---|---|
+| GPT-5.5 | 33 | **76%** | 0% | 24% |
+| Gemini | 55 | **64%** | 0% | 35% |
+| Mistral-24B | 48 | **71%** | 12% | 15% |
+| Qwen3-32B | 86 | **81%** | 1% | 17% |
+| Qwen3-8B | 101 | **74%** | 7% | 15% |
+
+- **5모델 전부 64~81%가 faithful-wrong-time** — 모델이 틀린시점 문서를 *실제로 사용*(제거 시 답 변화). 인용이 장식 아님.
+- **post-rationalization은 0~12%** — 우리 실패의 주범 아님 → **Wallat의 범주와 명확히 구별.**
+- → **핵심 주장**: 본 실패는 *correct(답 뒷받침)·faithful(진짜 사용)인데 temporal만 틀림*. 표준 correctness(ALCE)도, Wallat의 faithfulness도 못 잡는 **제3의 독립 축**. (Wallat이 future work로 남긴 "내용변경 counterfactual"을 시간충돌로 충족.)
+
 ## 5. Position vs Prior Work
 - **temporal validity = 인용품질의 제3축** — correctness(ALCE, Gao 2023) · faithfulness(Wallat 2025, ICTIR)와 직교.
 - 본 실패는 *correct·faithful해 보이는데(TV_behav 0.42~0.75로 문서를 실제 사용)* **시점만 틀림** → Wallat의 post-rationalization으로 설명되지 않는 *별도 범주*.
@@ -79,7 +97,7 @@
 
 ## 7. TODO
 - [x] **위치 ablation 재실행 (n=48 → 180)** — open 3모델 완료(§4b): 위치 편향 모델별, 충돌 실패는 위치로 환원 불가.
-- [ ] **faithfulness 분류 분석** — 각 실패를 post-rationalization(Wallat) vs faithful-but-wrong-time(本)으로 분류 (counterfactual = 문서 제거 시 답 변화).
+- [x] **faithfulness 분류 분석** — 완료(§4c): 64~81% faithful-wrong-time, post-rat 0~12% → Wallat과 구별되는 범주 입증.
 - [ ] 다른 attribution 지표(citation-recall, AutoAIS/TRUE NLI)도 동일 맹점 보이나 — ★ 일반화.
 - [ ] 데이터 300~500 확장(필요시 LLM 분류기 + 골드 검증).
 

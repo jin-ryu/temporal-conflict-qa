@@ -1,0 +1,48 @@
+{
+  "gemini": {
+    "total_ap": 180,
+    "wrong_time": 55,
+    "buckets": {
+      "faithful_wrong_time": 35,
+      "invariant": 19,
+      "faithful_correct_time": 1
+    }
+  },
+  "gpt": {
+    "total_ap": 180,
+    "wrong_time": 33,
+    "buckets": {
+      "invariant": 8,
+      "faithful_wrong_time": 25
+    }
+  },
+  "mistral_small": {
+    "total_ap": 180,
+    "wrong_time": 48,
+    "buckets": {
+      "faithful_wrong_time": 34,
+      "invariant": 7,
+      "other_parametric": 6,
+      "faithful_correct_time": 1
+    }
+  },
+  "qwen3_32b": {
+    "total_ap": 180,
+    "wrong_time": 86,
+    "buckets": {
+      "faithful_wrong_time": 70,
+      "invariant": 15,
+      "other_parametric": 1
+    }
+  },
+  "qwen3_8b": {
+    "total_ap": 180,
+    "wrong_time": 101,
+    "buckets": {
+      "faithful_wrong_time": 75,
+      "other_parametric": 7,
+      "invariant": 15,
+      "faithful_correct_time": 4
+    }
+  }
+}
