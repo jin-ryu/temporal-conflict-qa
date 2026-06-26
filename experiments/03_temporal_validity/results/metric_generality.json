@@ -1,0 +1,72 @@
+{
+  "gemini": {
+    "n": 180,
+    "wrong_time": 55,
+    "rate": {
+      "CitePrec": 0.972,
+      "CiteRecall": 0.972,
+      "AIS": 0.972
+    },
+    "beta": {
+      "CitePrec": 0.909,
+      "CiteRecall": 0.909,
+      "AIS": 0.909
+    }
+  },
+  "gpt": {
+    "n": 180,
+    "wrong_time": 33,
+    "rate": {
+      "CitePrec": 1.0,
+      "CiteRecall": 1.0,
+      "AIS": 1.0
+    },
+    "beta": {
+      "CitePrec": 1.0,
+      "CiteRecall": 1.0,
+      "AIS": 1.0
+    }
+  },
+  "mistral_small": {
+    "n": 180,
+    "wrong_time": 48,
+    "rate": {
+      "CitePrec": 0.972,
+      "CiteRecall": 0.972,
+      "AIS": 0.972
+    },
+    "beta": {
+      "CitePrec": 1.0,
+      "CiteRecall": 1.0,
+      "AIS": 1.0
+    }
+  },
+  "qwen3_32b": {
+    "n": 180,
+    "wrong_time": 86,
+    "rate": {
+      "CitePrec": 0.994,
+      "CiteRecall": 0.994,
+      "AIS": 0.994
+    },
+    "beta": {
+      "CitePrec": 0.988,
+      "CiteRecall": 0.988,
+      "AIS": 0.988
+    }
+  },
+  "qwen3_8b": {
+    "n": 180,
+    "wrong_time": 101,
+    "rate": {
+      "CitePrec": 0.983,
+      "CiteRecall": 0.983,
+      "AIS": 0.983
+    },
+    "beta": {
+      "CitePrec": 0.98,
+      "CiteRecall": 0.98,
+      "AIS": 0.98
+    }
+  }
+}

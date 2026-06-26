@@ -85,6 +85,19 @@
 - **post-rationalization은 0~12%** — 우리 실패의 주범 아님 → **Wallat의 범주와 명확히 구별.**
 - → **핵심 주장**: 본 실패는 *correct(답 뒷받침)·faithful(진짜 사용)인데 temporal만 틀림*. 표준 correctness(ALCE)도, Wallat의 faithfulness도 못 잡는 **제3의 독립 축**. (Wallat이 future work로 남긴 "내용변경 counterfactual"을 시간충돌로 충족.)
 
+## 4d. 지표-일반성 — 맹점은 attribution 평가 *전반*의 한계
+틀린시점 인용(TV_cite=0) 중 각 표준 지표가 '정상' 통과한 비율 β_X (추가 호출 0):
+
+| Model | CitePrec | CiteRecall | AIS |
+|---|---|---|---|
+| GPT-5.5 | 100% | 100% | 100% |
+| Gemini | 91% | 91% | 91% |
+| Mistral-24B | 100% | 100% | 100% |
+| Qwen3-32B | 99% | 99% | 99% |
+| Qwen3-8B | 98% | 98% | 98% |
+
+- 세 표준 지표(precision/recall/AIS)가 *전부* 91~100% 눈멈 → 맹점은 *CitePrec 특이성이 아니라 attribution 평가 전반*의 구조적 한계. ("한 지표만 그런 거 아냐?" 반박 차단.)
+
 ## 5. Position vs Prior Work
 - **temporal validity = 인용품질의 제3축** — correctness(ALCE, Gao 2023) · faithfulness(Wallat 2025, ICTIR)와 직교.
 - 본 실패는 *correct·faithful해 보이는데(TV_behav 0.42~0.75로 문서를 실제 사용)* **시점만 틀림** → Wallat의 post-rationalization으로 설명되지 않는 *별도 범주*.
