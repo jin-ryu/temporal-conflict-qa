@@ -1,0 +1,23 @@
+{
+  "misinformation": {
+    "n": 40,
+    "EM": 0.775,
+    "CitePrec": 1.0,
+    "star": 9,
+    "mis_attr": 1.0
+  },
+  "temporal": {
+    "n": 40,
+    "EM": 0.225,
+    "CitePrec": 1.0,
+    "star": 31,
+    "mis_attr": 1.0
+  },
+  "semantic": {
+    "n": 40,
+    "EM": 0.5,
+    "CitePrec": 1.0,
+    "star": 20,
+    "mis_attr": 1.0
+  }
+}
