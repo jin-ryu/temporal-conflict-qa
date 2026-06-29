@@ -1,0 +1,11 @@
+{
+  "model": "gemini",
+  "n": 51,
+  "no_cite": 3,
+  "EM": 0.725,
+  "TV_cite": 0.725,
+  "wrong_time_cite_rate": 0.275,
+  "CitePrec": 0.902,
+  "star_cell": 9,
+  "blind_spot_beta_P(CitePrec=1|TV_cite=0)": 0.818
+}

@@ -1,0 +1,11 @@
+{
+  "model": "gpt",
+  "n": 51,
+  "no_cite": 0,
+  "EM": 0.529,
+  "TV_cite": 0.784,
+  "wrong_time_cite_rate": 0.216,
+  "CitePrec": 0.922,
+  "star_cell": 8,
+  "blind_spot_beta_P(CitePrec=1|TV_cite=0)": 0.727
+}
