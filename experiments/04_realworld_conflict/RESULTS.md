@@ -4,6 +4,8 @@
 
 ---
 
+> **통일 지표(../eval_unified.py)**: mis-attribution = P(CitePrec=1|EM=0). exp04: **81~93%** (5모델). faithful-wrong 43~57%. exp03/05와 동일 자.
+
 ## 1. 동기 — exp03(HoH)의 두 약점을 보완
 | 약점 (exp03 HoH) | exp04가 푸는 방식 |
 |---|---|

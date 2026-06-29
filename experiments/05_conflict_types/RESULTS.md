@@ -4,6 +4,8 @@
 
 ---
 
+> **통일 지표(../eval_unified.py)**: mis-attribution = P(CitePrec=1|EM=0). exp05 9개 조합: **100%**. faithful-wrong 87~93%. exp03/04와 동일 자.
+
 ## 1. 동기
 - exp03·04는 모두 **시간(temporal) 충돌**. → reviewer: *"틀린답에 좋은인용(mis-attribution)이 시간 충돌만의 문제냐?"*
 - exp05는 **시간 외 충돌 유형(오정보·의미)에서도** mis-attribution이 발생함을 보여 *(broad) "충돌 일반의 문제"* 주장을 뒷받침.

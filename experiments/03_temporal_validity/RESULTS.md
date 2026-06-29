@@ -4,6 +4,8 @@
 
 ---
 
+> **통일 지표(eval_unified.py)**: mis-attribution = P(CitePrec=1|EM=0) = 틀린 답 중 표준 인용평가 통과 비율. exp03 as-of-past: **92~100%** (5모델). faithful-wrong 63~81%. → exp04/05와 동일 자로 비교 가능.
+
 ## 1. Setup
 - **Task**: 검색 컨텍스트에 같은 사실의 *옛/새 버전*이 공존(conflict). *as-of-past* 질문에 *시점-유효* 문서를 인용·사용하는지 측정.
 - **Conditions** (per item): `conflict`(옛+새+distractor) · `outdated_only`(옛만) · `current_only`(새만).
