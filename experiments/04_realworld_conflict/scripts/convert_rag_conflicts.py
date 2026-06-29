@@ -48,7 +48,7 @@ def main():
     out_items = rows  # 전체에서 outdated만
     outdated = [r for r in rows if r.get("conflict_type") == "Conflict due to outdated information"]
     out = []
-    reasons = {"no_ans_doc": 0, "no_conflict_dates": 0, "too_few_docs": 0, "ok": 0}
+    reasons = {"no_ans_doc": 0, "no_conflict_dates": 0, "too_few_docs": 0, "no_outdated_doc": 0, "ok": 0}
     for i, r in enumerate(outdated):
         srs = r.get("search_results", [])
         if len(srs) < 2:
@@ -79,15 +79,20 @@ def main():
         if not ans_docs:
             reasons["no_ans_doc"] += 1
             continue
+        # outdated 문서(정답 안 담은)가 *하나라도* 있어야 충돌 — 없으면 측정 불가
+        n_outdated = len(chunks) - len(ans_docs)
+        if n_outdated < 1:
+            reasons["no_outdated_doc"] += 1
+            continue
         # evidence = 정답 담은 문서 중 *가장 최신* (= 시점-유효, 정답 출처)
         ans_docs.sort(key=lambda x: x[1] or "", reverse=True)
         ev_id = ans_docs[0][0]
-        # label 보정: evidence=current, 나머지 정답없는 옛문서=outdated 후보
+        # label 보정: evidence=current, 정답없는 문서=outdated, 정답담은 나머지=current_dup
         for c in chunks:
             if c["chunk_id"] == ev_id:
                 c["label"] = "current"
             else:
-                c["label"] = "outdated" if not contains_ans(c["text"], ans) else "current_dup"
+                c["label"] = "current_dup" if contains_ans(c["text"], ans) else "outdated"
         sid = f"rc_{i}"
         out.append({"id": f"{sid}_current", "source_idx": sid, "mode": "current",
                     "target_side": "current", "domain": "realworld",

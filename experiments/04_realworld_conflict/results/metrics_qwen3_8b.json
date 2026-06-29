@@ -1,33 +1,11 @@
 {
   "model": "qwen3_8b",
-  "overall": {
-    "n": 22,
-    "EM": 0.1364,
-    "TV_cite": 0.2727,
-    "TV_behav": 0.2143,
-    "TV_behav_n_valid": 14,
-    "CitePrec": 0.8636,
-    "wrong_time_cite_rate": 0.7273,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.8125
-  },
-  "as_of_past": {
-    "n": 0,
-    "EM": 0.0,
-    "TV_cite": 0.0,
-    "TV_behav": 0.0,
-    "TV_behav_n_valid": 0,
-    "CitePrec": 0.0,
-    "wrong_time_cite_rate": 1.0,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.0
-  },
-  "current": {
-    "n": 22,
-    "EM": 0.1364,
-    "TV_cite": 0.2727,
-    "TV_behav": 0.2143,
-    "TV_behav_n_valid": 14,
-    "CitePrec": 0.8636,
-    "wrong_time_cite_rate": 0.7273,
-    "blind_spot_rate_P(CitePrec=1|TV_cite=0)": 0.8125
-  }
+  "n": 51,
+  "no_cite": 1,
+  "EM": 0.569,
+  "TV_cite": 0.706,
+  "wrong_time_cite_rate": 0.294,
+  "CitePrec": 0.941,
+  "star_cell": 13,
+  "blind_spot_beta_P(CitePrec=1|TV_cite=0)": 0.929
 }
