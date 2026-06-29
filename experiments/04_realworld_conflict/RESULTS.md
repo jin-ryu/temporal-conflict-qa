@@ -52,6 +52,20 @@
 ### F3 — 모델 규모·패밀리
 - wrong_time이 모델별로 26~31%로 비슷, ★ 10~13건 일관. β는 8B(0.93) > 32B(0.77) > Mistral(0.62) — 표준평가 비가시율은 모델별 차이 있으나 모두 높음.
 
+### F4 — faithfulness 분류 (현실서도 faithful-wrong-time)
+틀린시점 인용을 문서제거 counterfactual로 분류(`faithfulness_split_rc.py`, 추가 호출 0):
+
+| 모델 | faithful-wrong-time | post-rat | 불변 |
+|---|---|---|---|
+| GPT-5.5 | **73%** | 9% | 18% |
+| Gemini | 50% | 14% | 29% |
+| Qwen3-32B | 62% | 31% | 8% |
+| Mistral-24B | 50% | 25% | 19% |
+| Qwen3-8B | 47% | 47% | 8% |
+
+- 현실에서도 **47~73%가 faithful-wrong-time** = 모델이 *옛 문서를 진짜 사용*해 틀림 (exp03의 64~81%와 일관). GPT 73% — 강한 모델일수록 진짜 사용 비율↑.
+- → Wallat의 post-rationalization(여기선 9~47%)과 구별되는 범주가 *통제·현실 양쪽에서* 재현. temporal validity = correctness·faithfulness와 직교하는 제3축.
+
 ## 5. exp03 대비 위치
 | | exp03 HoH | exp04 rag_conflicts |
 |---|---|---|
@@ -66,6 +80,6 @@
 - n=51. 정제·확대 여지.
 - 5모델 완료(open 3 + frontier 2).
 - [x] frontier(GPT·Gemini) 완료 — 둘 다 ★ 실재(β 73~82%).
-- [ ] faithfulness 분류·지표 일반성(03의 05·06)을 exp04에도 적용.
+- [x] faithfulness 분류 완료(F4) — 현실서도 faithful-wrong-time 47~73%.
 
 > 측정 스크립트: `scripts/evaluate_rc.py` · 변환: `scripts/convert_rag_conflicts.py` · exp03: `../03_temporal_validity/RESULTS.md`
