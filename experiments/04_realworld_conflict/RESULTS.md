@@ -14,8 +14,8 @@
 
 ## 2. 데이터
 - **출처**: Google **rag_conflicts** (Cattan et al., "DRAGged into CONFLICTS", 2025), `conflict_type == "Conflict due to outdated information"` 62개.
-- **변환**(`convert_rag_conflicts.py`, 변형 없음): 청크=search_results(short_text+date), 질문=원래(현재지향), 정답=correct_answer(최신), evidence=정답 담은 *가장 최신* 문서. → 모델이 *outdated 문서*를 인용/사용해 틀리면 ★.
-- **필터**: evidence 명확(정답문서 ≤3 + outdated 문서 존재) → **22개** 채택.
+- **변환**(`convert_rag_conflicts.py`, 변형 없음): 청크=search_results(short_text+date), 질문=원래(현재지향), 정답=correct_answer(최신). → 모델이 *outdated 문서*를 인용/사용해 틀리면 ★.
+- **필터**: 정답 담은 문서 ≥1 + outdated(정답 안 담은) 문서 ≥1 (충돌 존재) → **51개** 채택. (정답문서 없음 6, 충돌날짜 부족 3, outdated 없음 2 제외.)
 - mode=current(현재지향). 청크 평균 9.2개.
 
 ## 3. 결과 (n=51, 무료 결정론 채점)
@@ -46,8 +46,8 @@
 - exp04(현재지향): 현재 질문 → *outdated 문서에 속음* (예: "current CIA director"에 전임자, "this year's Ramadan"에 작년 날짜).
 - → 충돌은 *두 방향 모두* 인용 실패를 부르고, **표준 인용평가(CitePrec 86~91%)는 둘 다 못 잡음**.
 
-### F3 — 모델 규모
-- 32B가 8B보다 robust(EM 23→45%, ★ 59→41%)이나, **큰 모델도 ★ 41%** = 여전히 큼.
+### F3 — 모델 규모·패밀리
+- wrong_time이 모델별로 26~31%로 비슷, ★ 10~13건 일관. β는 8B(0.93) > 32B(0.77) > Mistral(0.62) — 표준평가 비가시율은 모델별 차이 있으나 모두 높음.
 
 ## 5. exp03 대비 위치
 | | exp03 HoH | exp04 rag_conflicts |
@@ -61,8 +61,8 @@
 
 ## 6. 한계 / TODO
 - n=51. 정제·확대 여지.
-- EM 낮음(23~45%) — 일부는 evidence 매핑 모호(정답이 여러 문서 분산) 영향 가능 → 매핑 정밀화 검토.
+- frontier(GPT·Gemini) 미측정 — 유료라 보류.
 - [ ] Mistral / frontier(GPT·Gemini) 추가 — "프론티어도 현실서 ★" 확인.
 - [ ] faithfulness 분류·지표 일반성(03의 05·06)을 exp04에도 적용.
 
-> 측정 스크립트: `scripts/eval_star.py` · 변환: `scripts/convert_rag_conflicts.py` · exp03: `../03_temporal_validity/RESULTS.md`
+> 측정 스크립트: `scripts/evaluate_rc.py` · 변환: `scripts/convert_rag_conflicts.py` · exp03: `../03_temporal_validity/RESULTS.md`
