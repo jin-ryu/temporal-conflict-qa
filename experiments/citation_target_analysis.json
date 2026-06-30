@@ -1,0 +1,458 @@
+{
+ "exp03_past": {
+  "gpt": {
+   "n": 180,
+   "wrong": 35,
+   "star": 35,
+   "honest": 0,
+   "cite_mode": {
+    "conflict_doc": 27,
+    "distractor": 5,
+    "evidence": 3,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 27,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 5,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 3,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "gemini": {
+   "n": 180,
+   "wrong": 59,
+   "star": 54,
+   "honest": 5,
+   "cite_mode": {
+    "conflict_doc": 47,
+    "distractor": 5,
+    "evidence": 4,
+    "none": 3
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 45,
+     "honest": 2
+    },
+    "distractor": {
+     "star": 5,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 4,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 3
+    }
+   }
+  },
+  "mistral_small": {
+   "n": 180,
+   "wrong": 61,
+   "star": 56,
+   "honest": 5,
+   "cite_mode": {
+    "conflict_doc": 41,
+    "distractor": 6,
+    "evidence": 14,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 41,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 6,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 9,
+     "honest": 5
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "qwen3_32b": {
+   "n": 180,
+   "wrong": 90,
+   "star": 89,
+   "honest": 1,
+   "cite_mode": {
+    "conflict_doc": 73,
+    "distractor": 12,
+    "evidence": 5,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 72,
+     "honest": 1
+    },
+    "distractor": {
+     "star": 12,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 5,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "qwen3_8b": {
+   "n": 180,
+   "wrong": 108,
+   "star": 105,
+   "honest": 3,
+   "cite_mode": {
+    "conflict_doc": 80,
+    "distractor": 16,
+    "evidence": 11,
+    "none": 1
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 79,
+     "honest": 1
+    },
+    "distractor": {
+     "star": 16,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 10,
+     "honest": 1
+    },
+    "none": {
+     "star": 0,
+     "honest": 1
+    }
+   }
+  }
+ },
+ "exp03_current": {
+  "gpt": {
+   "n": 39,
+   "wrong": 0,
+   "star": 0,
+   "honest": 0,
+   "cite_mode": {
+    "conflict_doc": 0,
+    "distractor": 0,
+    "evidence": 0,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 0,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 0,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "gemini": {
+   "n": 39,
+   "wrong": 0,
+   "star": 0,
+   "honest": 0,
+   "cite_mode": {
+    "conflict_doc": 0,
+    "distractor": 0,
+    "evidence": 0,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 0,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 0,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "mistral_small": {
+   "n": 39,
+   "wrong": 11,
+   "star": 11,
+   "honest": 0,
+   "cite_mode": {
+    "conflict_doc": 9,
+    "distractor": 0,
+    "evidence": 2,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 9,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 2,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "qwen3_32b": {
+   "n": 39,
+   "wrong": 7,
+   "star": 7,
+   "honest": 0,
+   "cite_mode": {
+    "conflict_doc": 5,
+    "distractor": 1,
+    "evidence": 1,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 5,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 1,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 1,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  },
+  "qwen3_8b": {
+   "n": 39,
+   "wrong": 12,
+   "star": 12,
+   "honest": 0,
+   "cite_mode": {
+    "conflict_doc": 7,
+    "distractor": 2,
+    "evidence": 3,
+    "none": 0
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 7,
+     "honest": 0
+    },
+    "distractor": {
+     "star": 2,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 3,
+     "honest": 0
+    },
+    "none": {
+     "star": 0,
+     "honest": 0
+    }
+   }
+  }
+ },
+ "exp04": {
+  "gpt": {
+   "n": 51,
+   "wrong": 24,
+   "star": 20,
+   "honest": 4,
+   "cite_mode": {
+    "conflict_doc": 11,
+    "distractor": 0,
+    "evidence": 5,
+    "none": 8
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 8,
+     "honest": 3
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 5,
+     "honest": 0
+    },
+    "none": {
+     "star": 7,
+     "honest": 1
+    }
+   }
+  },
+  "gemini": {
+   "n": 51,
+   "wrong": 14,
+   "star": 13,
+   "honest": 1,
+   "cite_mode": {
+    "conflict_doc": 10,
+    "distractor": 0,
+    "evidence": 2,
+    "none": 2
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 9,
+     "honest": 1
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 2,
+     "honest": 0
+    },
+    "none": {
+     "star": 2,
+     "honest": 0
+    }
+   }
+  },
+  "mistral_small": {
+   "n": 51,
+   "wrong": 21,
+   "star": 17,
+   "honest": 4,
+   "cite_mode": {
+    "conflict_doc": 14,
+    "distractor": 0,
+    "evidence": 6,
+    "none": 1
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 10,
+     "honest": 4
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 6,
+     "honest": 0
+    },
+    "none": {
+     "star": 1,
+     "honest": 0
+    }
+   }
+  },
+  "qwen3_32b": {
+   "n": 51,
+   "wrong": 23,
+   "star": 20,
+   "honest": 3,
+   "cite_mode": {
+    "conflict_doc": 13,
+    "distractor": 0,
+    "evidence": 8,
+    "none": 2
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 10,
+     "honest": 3
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 8,
+     "honest": 0
+    },
+    "none": {
+     "star": 2,
+     "honest": 0
+    }
+   }
+  },
+  "qwen3_8b": {
+   "n": 51,
+   "wrong": 22,
+   "star": 20,
+   "honest": 2,
+   "cite_mode": {
+    "conflict_doc": 14,
+    "distractor": 0,
+    "evidence": 4,
+    "none": 4
+   },
+   "cross": {
+    "conflict_doc": {
+     "star": 13,
+     "honest": 1
+    },
+    "distractor": {
+     "star": 0,
+     "honest": 0
+    },
+    "evidence": {
+     "star": 4,
+     "honest": 0
+    },
+    "none": {
+     "star": 3,
+     "honest": 1
+    }
+   }
+  }
+ }
+}
