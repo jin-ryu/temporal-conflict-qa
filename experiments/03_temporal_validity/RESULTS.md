@@ -85,33 +85,23 @@
 - **해결법 함의**: 위치 기반 리랭킹(evidence를 맨뒤로)은 모델특정·부분적 → *시점-유효 청크 selection(틀린시점 제거)이 robust*.
 
 ## 4c. Faithfulness 분류 — Wallat(2025)과 구별되는 실패 범주 (핵심)
-틀린시점 인용(TV_cite=0) 항목을, **문서 제거 counterfactual**(conflict 답 vs outdated_only/current_only 답, 추가 호출 0)로 분류:
-- **faithful-wrong-time**: conflict 답이 *새 문서만* 조건 답과 같고 *옛 문서만* 과 다름 → 모델이 새(틀린시점) 문서에 *행동 의존* = 진짜 썼는데 시점 틀림.
-- **post-rationalization 의심**(Wallat): 새 답이 어느 단일조건과도 불일치 → 문서 없이 그 답 = parametric/사후인용.
-- **invariant**: 두 단일조건 답 동일 → 반사실 판정 불가(데이터 한계).
+틀린 답일 때 모델이 *그 충돌 문서를 진짜 보고 따라간* 건지, **Wallat 2025식 진짜 leave-one-out**(틀린 답 지지 문서 *하나만* 제거 후 같은 conflict 컨텍스트 재실행, `10_leave_one_out.py`)으로 분류:
+- **faithful-wrong**: 문서 제거 시 답 *변화* → 모델이 그 틀린시점 문서에 *행동 의존* = 진짜 썼는데 시점 틀림.
+- **post-rationalization**(Wallat): 문서 제거해도 답 *유지* → 문서 없이 그 답 = parametric/사후인용.
 
-| Model | wrong_time | **faithful-wrong-time** | post-rat | invariant |
-|---|---|---|---|---|
-| GPT-5.5 | 33 | **76%** | 0% | 24% |
-| Gemini | 55 | **64%** | 0% | 35% |
-| Mistral-24B | 48 | **71%** | 12% | 15% |
-| Qwen3-32B | 86 | **81%** | 1% | 17% |
-| Qwen3-8B | 101 | **74%** | 7% | 15% |
+**오픈 3모델 × A·B 전부** (A=exp03 as-of-past, B=exp04). 보조 분석이라 *재현 가능한 오픈 3모델*로 진짜 LOO 수행(프론티어는 유료 재실행 필요해 제외):
 
-- **5모델 전부 64~81%가 faithful-wrong-time** — 모델이 틀린시점 문서를 *실제로 사용*(제거 시 답 변화). 인용이 장식 아님.
-- **post-rationalization은 0~12%** — 우리 실패의 주범 아님 → **Wallat의 범주와 명확히 구별.**
+| Model | A (통제) | B (현실) |
+|---|---|---|
+| Mistral-24B | **72%** (n=61) | **76%** (n=21) |
+| Qwen3-32B | **59%** (n=90) | **70%** (n=23) |
+| Qwen3-8B | **68%** (n=108) | **64%** (n=22) |
+
+- **6개 조합 모두 faithful-wrong 59~76% 과반** — 문서 제거 시 답 실제 변화("8"→"10", "657"→"over 660"). 모델이 틀린시점 문서를 *실제로 사용* → 인용이 장식 아님.
+- **post-rationalization은 소수** → 우리 실패의 주범 아님 → **Wallat의 범주와 명확히 구별**을 *Wallat의 직접 방법으로* 통제·현실 양쪽서 확정.
 - → **핵심 주장**: 본 실패는 *correct(답 뒷받침)·faithful(진짜 사용)인데 temporal만 틀림*. 표준 correctness(ALCE)도, Wallat의 faithfulness도 못 잡는 **제3의 독립 축**. (Wallat이 future work로 남긴 "내용변경 counterfactual"을 시간충돌로 충족.)
 
-**검증 — 진짜 leave-one-out (`10_leave_one_out.py`)**: 위 §4c 분류는 3조건(옛만/새만) 답 비교 *근사*다. Wallat 2025식 진짜 leave-one-out(틀린 답 지지 문서 *하나만* 제거 후 같은 conflict 컨텍스트 재실행)으로 검증:
-
-| Model | 3조건 근사 | 진짜 leave-one-out | 차이 |
-|---|---|---|---|
-| Mistral-24B | 71% | **72%** (n=61) | +1%p |
-| Qwen3-8B | 74% | **68%** (n=108) | −6%p |
-| Qwen3-32B | 81% | **59%** (n=90) | **−22%p** |
-
-- 세 모델 모두 진짜 LOO서도 **faithful-wrong 59~72% 과반** (답 실제 변화: "8"→"10", "Lord Ashton"→"Lord de Mauley") → post-rationalization 반박 유지(Wallat 직접 방법).
-- **근사의 한계·교정**: Mistral·Qwen8B는 ±1~6%p 일치하나 **Qwen3-32B는 근사 81%→진짜 59%**. 불일치 39건 분석: 근사가 "conflict답=옛문서답"을 faithful로 판정했으나 *문서 제거 후에도 같은 답 유지*(=parametric)인 케이스(예: 캡스앤골·반복 표현)를 과대평가 → LOO가 post_rat으로 교정. **진짜 LOO가 더 정확**; 헤드라인(과반 faithful) 불변, 정밀값은 LOO 채택. (오픈모델만·무료.)
+> 참고: `eval_unified.py`에 3조건 답 비교 기반의 *무료 근사* faithfulness도 구현돼 있으나(5모델 전체 커버), 진짜 LOO와 최대 ±27%p 차이나 신뢰도가 낮아 *본 보고엔 미사용*. 진짜 LOO만 채택.
 
 ## 4d. 지표-일반성 — 맹점은 attribution 평가 *전반*의 한계
 틀린시점 인용(TV_cite=0) 중 각 표준 지표가 '정상' 통과한 비율 β_X (추가 호출 0):

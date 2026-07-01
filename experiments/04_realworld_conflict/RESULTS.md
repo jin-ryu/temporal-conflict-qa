@@ -69,19 +69,17 @@
 ### F3 — 모델 규모·패밀리
 - wrong_time이 모델별로 26~31%로 비슷, ★ 10~13건 일관. β는 8B(0.93) > 32B(0.77) > Mistral(0.62) — 표준평가 비가시율은 모델별 차이 있으나 모두 높음.
 
-### F4 — faithfulness 분류 (현실서도 faithful-wrong-time)
-틀린시점 인용을 문서제거 counterfactual로 분류(`faithfulness_split_rc.py`, 추가 호출 0):
+### F4 — faithfulness 분류 (현실서도 faithful-wrong)
+틀린 답일 때 **진짜 leave-one-out**(틀린 답 지지 문서 하나만 제거 후 재실행, `../03_temporal_validity/scripts/10_leave_one_out.py`, `results/loo_*.jsonl`)으로 분류. 보조 분석이라 재현 가능한 오픈 3모델 대상(프론티어는 유료 재실행 필요해 제외):
 
-| 모델 | faithful-wrong-time | post-rat | 불변 |
-|---|---|---|---|
-| GPT-5.5 | **73%** | 9% | 18% |
-| Gemini | 50% | 14% | 29% |
-| Qwen3-32B | 62% | 31% | 8% |
-| Mistral-24B | 50% | 25% | 19% |
-| Qwen3-8B | 47% | 47% | 8% |
+| Model | faithful-wrong (진짜 LOO) |
+|---|---|
+| Mistral-24B | **76%** (n=21) |
+| Qwen3-32B | **70%** (n=23) |
+| Qwen3-8B | **64%** (n=22) |
 
-- 현실에서도 **47~73%가 faithful-wrong-time** = 모델이 *옛 문서를 진짜 사용*해 틀림 (exp03의 64~81%와 일관). GPT 73% — 강한 모델일수록 진짜 사용 비율↑.
-- → Wallat의 post-rationalization(여기선 9~47%)과 구별되는 범주가 *통제·현실 양쪽에서* 재현. temporal validity = correctness·faithfulness와 직교하는 제3축.
+- 현실(B)서도 진짜 LOO로 **faithful-wrong 64~76%** = 모델이 *옛 문서를 진짜 사용*해 틀림 (답 실제 변화: "657"→"over 660", "1,762"→"1,759"). exp03(A, 59~72%)과 일관.
+- → Wallat의 post-rationalization과 구별되는 범주가 *통제·현실 양쪽*서 Wallat의 직접 방법으로 확정. temporal validity = correctness·faithfulness와 직교하는 제3축.
 
 ### F5 — 지표 일반성 (맹점은 attribution 평가 전반)
 틀린 답(EM=0) 중 각 표준 지표가 '통과' 판정한 비율 (`results/metric_generality.json`, 추가 호출 0):
