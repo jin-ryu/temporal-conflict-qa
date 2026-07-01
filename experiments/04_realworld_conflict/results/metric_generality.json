@@ -1,0 +1,32 @@
+{
+ "gpt": {
+  "CitePrec": 0.833,
+  "CiteRecall": 0.833,
+  "AIS": 0.833,
+  "n": 24
+ },
+ "gemini": {
+  "CitePrec": 0.929,
+  "CiteRecall": 0.929,
+  "AIS": 0.929,
+  "n": 14
+ },
+ "mistral_small": {
+  "CitePrec": 0.81,
+  "CiteRecall": 0.81,
+  "AIS": 0.81,
+  "n": 21
+ },
+ "qwen3_32b": {
+  "CitePrec": 0.87,
+  "CiteRecall": 0.87,
+  "AIS": 0.87,
+  "n": 23
+ },
+ "qwen3_8b": {
+  "CitePrec": 0.909,
+  "CiteRecall": 0.909,
+  "AIS": 0.909,
+  "n": 22
+ }
+}

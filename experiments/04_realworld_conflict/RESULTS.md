@@ -83,6 +83,20 @@
 - 현실에서도 **47~73%가 faithful-wrong-time** = 모델이 *옛 문서를 진짜 사용*해 틀림 (exp03의 64~81%와 일관). GPT 73% — 강한 모델일수록 진짜 사용 비율↑.
 - → Wallat의 post-rationalization(여기선 9~47%)과 구별되는 범주가 *통제·현실 양쪽에서* 재현. temporal validity = correctness·faithfulness와 직교하는 제3축.
 
+### F5 — 지표 일반성 (맹점은 attribution 평가 전반)
+틀린 답(EM=0) 중 각 표준 지표가 '통과' 판정한 비율 (`results/metric_generality.json`, 추가 호출 0):
+
+| 모델 | CitePrec | CiteRecall | AIS |
+|---|---|---|---|
+| GPT-5.5 | 83% | 83% | 83% |
+| Gemini | 93% | 93% | 93% |
+| Mistral-24B | 81% | 81% | 81% |
+| Qwen3-32B | 87% | 87% | 87% |
+| Qwen3-8B | 91% | 91% | 91% |
+
+- 세 표준 지표가 *전부* 81~93% 눈멈 → 맹점은 *CitePrec 특이성 아니라 attribution 평가 전반*의 한계. exp03(98~100%)과 함께 **통제·현실 양쪽서 재현**.
+- (B는 인용이 대개 1개라 precision=recall=AIS 값이 일치.)
+
 ## 5. exp03 대비 위치
 | | exp03 HoH | exp04 rag_conflicts |
 |---|---|---|

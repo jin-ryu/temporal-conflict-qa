@@ -102,6 +102,17 @@
 - **post-rationalization은 0~12%** — 우리 실패의 주범 아님 → **Wallat의 범주와 명확히 구별.**
 - → **핵심 주장**: 본 실패는 *correct(답 뒷받침)·faithful(진짜 사용)인데 temporal만 틀림*. 표준 correctness(ALCE)도, Wallat의 faithfulness도 못 잡는 **제3의 독립 축**. (Wallat이 future work로 남긴 "내용변경 counterfactual"을 시간충돌로 충족.)
 
+**검증 — 진짜 leave-one-out (`10_leave_one_out.py`)**: 위 §4c 분류는 3조건(옛만/새만) 답 비교 *근사*다. Wallat 2025식 진짜 leave-one-out(틀린 답 지지 문서 *하나만* 제거 후 같은 conflict 컨텍스트 재실행)으로 검증:
+
+| Model | 3조건 근사 | 진짜 leave-one-out | 차이 |
+|---|---|---|---|
+| Mistral-24B | 71% | **72%** (n=61) | +1%p |
+| Qwen3-8B | 74% | **68%** (n=108) | −6%p |
+| Qwen3-32B | 81% | **59%** (n=90) | **−22%p** |
+
+- 세 모델 모두 진짜 LOO서도 **faithful-wrong 59~72% 과반** (답 실제 변화: "8"→"10", "Lord Ashton"→"Lord de Mauley") → post-rationalization 반박 유지(Wallat 직접 방법).
+- **근사의 한계·교정**: Mistral·Qwen8B는 ±1~6%p 일치하나 **Qwen3-32B는 근사 81%→진짜 59%**. 불일치 39건 분석: 근사가 "conflict답=옛문서답"을 faithful로 판정했으나 *문서 제거 후에도 같은 답 유지*(=parametric)인 케이스(예: 캡스앤골·반복 표현)를 과대평가 → LOO가 post_rat으로 교정. **진짜 LOO가 더 정확**; 헤드라인(과반 faithful) 불변, 정밀값은 LOO 채택. (오픈모델만·무료.)
+
 ## 4d. 지표-일반성 — 맹점은 attribution 평가 *전반*의 한계
 틀린시점 인용(TV_cite=0) 중 각 표준 지표가 '정상' 통과한 비율 β_X (추가 호출 0):
 
